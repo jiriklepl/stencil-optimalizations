@@ -1,0 +1,10 @@
+.cache/
+build/
+upload.sh
+repl.sh
+benchmark.sh
+profile.sh
+profile-upload.sh
+*:Zone.Identifier
+*.ncu-rep
+.envrc
