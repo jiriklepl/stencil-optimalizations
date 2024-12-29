@@ -7,57 +7,86 @@
 namespace infrastructure {
 
 template <int Dims, typename ElementType>
-class GridTile {
-
+class GridTileBase {
   public:
     using size_type = std::size_t;
-    using LowerDimTile = GridTile<Dims - 1, ElementType>;
+    using pointer_type = std::add_pointer_t<ElementType>;
 
-    GridTile(ElementType *data, size_type *tile_sizes_per_dimensions)
+    GridTileBase(pointer_type data, size_type* tile_sizes_per_dimensions)
         : _data(data), tile_sizes_per_dimensions(tile_sizes_per_dimensions) {
     }
 
-    LowerDimTile operator[](int index) {
-        auto tile_size = tile_sizes_per_dimensions[0];
-        return LowerDimTile(_data + index * tile_size, tile_sizes_per_dimensions + 1);
-    }
-
-    ElementType* data() {
+    pointer_type data() const {
         return _data;
     }
 
-  private:
-    ElementType *_data;
-    size_type *tile_sizes_per_dimensions;
+  protected:
+    pointer_type _data;
+    size_type* tile_sizes_per_dimensions;
+};
+
+template <int Dims, typename ElementType>
+class GridTile : public GridTileBase<Dims, ElementType> {
+  public:
+    using pointer_type = typename GridTileBase<Dims, ElementType>::pointer_type;
+    using size_type = std::size_t;
+
+    GridTile(pointer_type data, size_type* tile_sizes) : GridTileBase<Dims, ElementType>(data, tile_sizes) {
+    }
+
+    using LowerDimTile = GridTile<Dims - 1, ElementType>;
+    using LowerDimTileConst = GridTile<Dims - 1, const ElementType>;
+
+    LowerDimTile operator[](int index) {
+        auto tile_size = this->tile_sizes_per_dimensions[0];
+        return LowerDimTile(this->_data + index * tile_size, this->tile_sizes_per_dimensions + 1);
+    }
+
+    LowerDimTileConst operator[](int index) const {
+        auto tile_size = this->tile_sizes_per_dimensions[0];
+        return LowerDimTileConst(this->_data + index * tile_size, this->tile_sizes_per_dimensions + 1);
+    }
+
+    size_type top_dimension_size() const {
+        return this->tile_sizes_per_dimensions[-1] / this->tile_sizes_per_dimensions[0];
+    }
 };
 
 template <typename ElementType>
-class GridTile<1, ElementType> {
+class GridTile<1, ElementType> : public GridTileBase<1, ElementType> {
   public:
+    using pointer_type = typename GridTileBase<1, ElementType>::pointer_type;
     using size_type = std::size_t;
 
-    GridTile(ElementType *data, size_type *tile_sizes_per_dimensions) : _data(data) {
+    GridTile(pointer_type data, size_type* tile_sizes) : GridTileBase<1, ElementType>(data, tile_sizes) {
     }
 
-    auto &operator[](int index) {
-        return _data[index];
+    auto& operator[](int index) {
+        return this->_data[index];
     }
-    
-  private:
-    ElementType *_data;
+
+    const ElementType& operator[](int index) const {
+        return this->_data[index];
+    }
+
+    size_type top_dimension_size() const {
+        return this->tile_sizes_per_dimensions[-1];
+    }
 };
 
 template <int DIMS, typename ElementType>
 class Grid {
-
   public:
     using size_type = std::size_t;
+
+    Grid() : dimension_sizes(DIMS, 0), tile_sizes_per_dimensions(DIMS, 0) {
+    }
 
     template <typename... Sizes, typename = std::enable_if_t<sizeof...(Sizes) == DIMS>>
     Grid(Sizes... dims) : Grid(std::vector<size_type>{static_cast<size_type>(dims)...}) {
     }
 
-    Grid(const std::vector<size_type> &dimension_sizes) : dimension_sizes(dimension_sizes) {
+    Grid(const std::vector<size_type>& dimension_sizes) : dimension_sizes(dimension_sizes) {
         if (dimension_sizes.size() != DIMS) {
             throw std::invalid_argument("Dimension sizes must match the number of dimensions");
         }
@@ -65,7 +94,7 @@ class Grid {
         size_type total_size = 1;
         tile_sizes_per_dimensions.resize(DIMS);
 
-        for (int i = DIMS - 1; i >= 0; i--) { 
+        for (int i = DIMS - 1; i >= 0; i--) {
             total_size *= dimension_sizes[i];
             tile_sizes_per_dimensions[i] = total_size;
         }
@@ -78,6 +107,16 @@ class Grid {
         return indexer[index];
     }
 
+    auto operator[](size_type index) const {
+        GridTile<DIMS, const ElementType> indexer(static_cast<const ElementType*>(elements.data()),
+                                                  const_cast<size_type*>(tile_sizes_per_dimensions.data()) + 1);
+        return indexer[index];
+    }
+
+    auto as_tile() {
+        return GridTile<DIMS, ElementType>(elements.data(), tile_sizes_per_dimensions.data() + 1);
+    }
+
     static constexpr int dimensions() {
         return DIMS;
     }
@@ -86,7 +125,20 @@ class Grid {
         return elements.data();
     }
 
-//   private:
+    std::vector<ElementType>* data_as_vector() {
+        return &elements;
+    }
+
+    size_type size() const {
+        return elements.size();
+    }
+
+    template <int Dim>
+    size_type size_in() const {
+        return dimension_sizes[Dim];
+    }
+
+  private:
     std::vector<ElementType> elements;
     std::vector<size_type> dimension_sizes;
     std::vector<size_type> tile_sizes_per_dimensions;
