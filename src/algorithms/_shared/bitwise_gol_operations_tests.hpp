@@ -69,6 +69,20 @@ class BitwiseOpsTests {
             0b0000'0000,
             0b0000'0000>();
 
+        return assert_with_print(actual, expected);
+    }
+
+    static bool t_compute_top_site() {
+        // arrange
+        
+        tile_type lt = 0, ct = 0, rt = 0;
+        tile_type lc = 0, cc = 0, rc = 0;
+        tile_type lb = 0, cb = 0, rb = 0;
+
+
+    };
+
+    static bool assert_with_print(tile_type actual, tile_type expected) {
         auto succeeded = actual == expected;
 
         if (!succeeded) {
@@ -81,6 +95,7 @@ class BitwiseOpsTests {
 
         return succeeded;
     }
+
     // clang-format on
 };
 

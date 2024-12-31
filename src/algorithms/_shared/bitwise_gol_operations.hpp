@@ -29,73 +29,21 @@ struct BitwiseOps {
         tile_type lc, tile_type cc, tile_type rc,
         tile_type lb, tile_type cb, tile_type rb) {
         
-        tile_type result = 0;
+        tile_type result = compute_inner_bits(cc);
 
-        auto neighborhood_mask = tile_num<
-            0b0000'0111,
-            0b0000'0101,
-            0b0000'0111>();
+        result |= compute_side<Vertical::TOP>(cc, ct);
+        result |= compute_side<Vertical::BOTTOM>(cc, cb);
+        result |= compute_side<Horizontal::LEFT>(cc, lc);
+        result |= compute_side<Horizontal::RIGHT>(cc, rc);
 
-        auto cell_mask = tile_num<
-            0b0000'0000,
-            0b0000'0010,
-            0b0000'0000>();
-
-        auto cell_setter = tile_num<
-            0b0000'0000,
-            0b0000'0010,
-            0b0000'0000>();
-
-        auto cell_zeroer = tile_num<
-            0b1111'1111,
-            0b1111'1111,
-            0b1111'1111,
-            0b1111'1111,
-            0b1111'1111,
-            0b1111'1111,
-            0b1111'1101,
-            0b1111'1111>();
-
-        auto current = cc;
-
-        for (std::size_t row = 0; row < 7; ++row) {
-            for (std::size_t col = 0; col < 7; ++col) {
-
-                auto neighborhood = current & neighborhood_mask;
-                auto cell = current & cell_mask;
-
-                auto alive_neighbours = __builtin_popcount(neighborhood);
-
-                if (cell != 0) {
-                    if (alive_neighbours < 2 || alive_neighbours > 3) {
-                        result &= cell_zeroer;
-                    }
-                    else {
-                        result |= cell_setter;
-                    }
-                }
-                else {
-                    if (alive_neighbours == 3) {
-                        result |= cell_setter;
-                    }
-                    else {
-                        result &= cell_zeroer;
-                    }
-                }
-
-                cell_setter <<= 1;
-                cell_zeroer = (cell_zeroer << 1) | 0b1;
-                current >>= 1;
-
-                // std::cout << "row: " << 6 - row << ", col: " << 6 - col << std::endl;
-                // std::cout << debug_print(result) << std::endl;
-            }
-
-            cell_setter <<= 2;
-            cell_zeroer = (cell_zeroer << 2) | 0b11;
-            current >>= 2;
-        }
-        std::cout << std::endl;
+        result |= compute_corner_top_left(lt, ct, 
+                                          lc, cc);
+        result |= compute_corner_top_right(ct, rt, 
+                                           cc, rc);
+        result |= compute_corner_bottom_left(lc, cc, 
+                                             lb, cb);
+        result |= compute_corner_bottom_right(cc, rc, 
+                                              cb, rb);
         return result;
     }
     // clang-format on
@@ -121,7 +69,205 @@ struct BitwiseOps {
 
         return oss.str();
     }
+    
+public: // Ensure enums are public
+    enum class Horizontal : char {
+        LEFT = 0,
+        RIGHT = 1,
+    };
+
+    enum class Vertical : char {
+        TOP = 0,
+        BOTTOM = 1,
+    };
+
+private:
+
+    static tile_type compute_inner_bits(tile_type tile) {
+        tile_type result = 0;
+        
+        constexpr tile_type neighborhood_mask = tile_num<
+            0b0000'0111,
+            0b0000'0101,
+            0b0000'0111>();
+
+        constexpr tile_type cell_mask = tile_num<
+            0b0000'0000,
+            0b0000'0010,
+            0b0000'0000>();
+
+        constexpr tile_type one = tile_num<
+            0b1000'0000,
+            0b0000'0000,
+            0b0000'0000,
+            0b0000'0000,
+            0b0000'0000,
+            0b0000'0000,
+            0b0000'0000,
+            0b0000'0000>();
+
+        for (std::size_t row = 0; row < 6; ++row) {
+            for (std::size_t col = 0; col < 6; ++col) {
+
+                auto neighborhood = tile & neighborhood_mask;
+                auto cell = tile & cell_mask;
+
+                auto alive_neighbours = __builtin_popcount(neighborhood);
+
+                if (cell != 0) {
+                    if (alive_neighbours < 2 || alive_neighbours > 3) {
+                        result &= ~one;
+                    }
+                    else {
+                        result |= one;
+                    }
+                }
+                else {
+                    if (alive_neighbours == 3) {
+                        result |= one;
+                    }
+                    else {
+                        result &= ~one;
+                    }
+                }
+
+                tile >>= 1;
+                result >>= 1;
+            }
+
+            tile >>= 2;
+            result >>= 2;
+        }
+
+        result >>= 6;
+
+        return result;
+    }
+
+    template <Vertical Site>
+    static tile_type compute_side(tile_type tile, tile_type site_tile) {
+        tile_type result = 0;
+        tile_type site_tile_mask;
+        tile_type center_tile_mask;
+        tile_type cell;
+
+        if constexpr (Site == Vertical::TOP) {
+            site_tile_mask = 0b1110'0000;
+            center_tile_mask = tile_num<
+                0b1010'0000,
+                0b1110'0000,
+                0b0000'0000,
+                0b0000'0000,
+                0b0000'0000,
+                0b0000'0000,
+                0b0000'0000,
+                0b0000'0000
+            >();
+            cell = tile_num<
+                0b0100'0000,
+                0b0000'0000,
+                0b0000'0000,
+                0b0000'0000,
+                0b0000'0000,
+                0b0000'0000,
+                0b0000'0000,
+                0b0000'0000
+            >();
+        } else {
+            site_tile_mask = tile_num<
+                0b1110'0000,
+                0b0000'0000,
+                0b0000'0000,
+                0b0000'0000,
+                0b0000'0000,
+                0b0000'0000,
+                0b0000'0000,
+                0b0000'0000
+            >(); 
+            center_tile_mask = tile_num<
+                0b1010'0000,
+                0b1110'0000
+            >();
+            cell = 0b0100'0000;
+        }
+
+        for (size_t i = 0; i < 6; ++i) {
+            auto site_neighborhood = site_tile & site_tile_mask;
+            auto center_neighborhood = tile & center_tile_mask;
+
+            auto alive_neighbours = __builtin_popcount(site_neighborhood) +
+                __builtin_popcount(center_neighborhood);
+
+            if (center_neighborhood != 0) {
+                if (alive_neighbours < 2 || alive_neighbours > 3) {
+                    result &= ~cell;
+                } 
+                else {
+                    result |= cell;
+                }
+            } 
+            else {
+                if (alive_neighbours == 3) {
+                    result |= cell;
+                } 
+                else {
+                    result &= ~cell;
+                }
+            }
+
+            site_tile >>= 1;
+            tile >>= 1;
+            result >>= 1;
+        }
+        
+        result >>= 1;
+
+        if constexpr (Site == Vertical::BOTTOM) {
+            result >>= 56;
+        }
+
+        return result;
+    }
+    
+    template <Horizontal Site>
+    static tile_type compute_side(tile_type tile, tile_type site_tile) {
+        tile_type result = 0;
+        return result;
+    }
+
+    template <Horizontal HorizontalSite, Vertical VerticalSite>
+    static tile_type compute_corner(tile_type t1, tile_type t2,
+                                    tile_type t3, tile_type t4);
+
+    static tile_type compute_corner_top_left(tile_type lt, tile_type ct,
+                                             tile_type lc, tile_type cc) {
+        
+        tile_type result = 0;
+        return result;
+    }
+
+    static tile_type compute_corner_top_right(tile_type ct, tile_type rt,
+                                              tile_type cc, tile_type rc) {
+        
+        tile_type result = 0;
+        return result;
+    }
+
+    static tile_type compute_corner_bottom_left(tile_type lc, tile_type cc,
+                                                tile_type lb, tile_type cb) {
+        
+        tile_type result = 0;
+        return result;
+    }
+
+    static tile_type compute_corner_bottom_right(tile_type cc, tile_type rc,
+                                                 tile_type cb, tile_type rb) {
+        
+        tile_type result = 0;
+        return result;
+    }
 };
+
 } // namespace algorithms
 
 #endif // ALGORITHMS_SHARED_BITWISE_GOL_OPERATION_HPP

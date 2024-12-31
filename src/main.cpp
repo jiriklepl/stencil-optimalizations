@@ -30,16 +30,6 @@ int main() {
 
     tests::BitwiseOpsTests::run();
 
-    auto x = 0b0000'0111 << 3;
-
-    std::cout << std::bitset<8>(x) << std::endl;
-
-    auto num = tile_num<0b0000'0111, 0b0000'0101, 0b0000'0111>();
-
-    auto expected = 0b0000'0111'0000'0101'0000'0111;
-    std::cout << "Num:      " << std::bitset<24>(num) << std::endl;
-    std::cout << "Expected: " << std::bitset<24>(expected) << std::endl;
-
     infrastructure::ExperimentParams params = {
         .algorithm_name = "gol-cpu-naive",
         .grid_dimensions = {10, 20},
