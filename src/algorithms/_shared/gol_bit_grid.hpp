@@ -12,6 +12,8 @@ class GolBitGrid {
     using size_type = std::size_t;
     using Grid = infrastructure::Grid<2, char>;
 
+    GolBitGrid() {};
+
     GolBitGrid(const Grid& grid) {
         assert_dim_has_correct_size<0>(grid);
         assert_dim_has_correct_size<1>(grid);
@@ -22,7 +24,7 @@ class GolBitGrid {
         tiles.resize((x_tiles_count + 2) * (y_tiles_count + 2), 0);
     };
 
-    tile_type get_tile(int x, int y) {
+    tile_type get_tile(int x, int y) const {
         auto x_with_offset = x + 1;
         auto y_with_offset = y + 1;
 
@@ -34,6 +36,14 @@ class GolBitGrid {
         auto y_with_offset = y + 1;
 
         tiles[y_with_offset * (x_tiles_count + 2) + x_with_offset] = tile;
+    }
+
+    size_type x_tiles() const {
+        return x_tiles_count;
+    }
+
+    size_type y_tiles() const {
+        return y_tiles_count;
     }
 
   private:
