@@ -13,8 +13,8 @@ int main() {
 
     infrastructure::ExperimentParams params = {
         .algorithm_name = "gol-cpu-naive",
-        .grid_dimensions = {10, 10},
-        .iterations = 30,
+        .grid_dimensions = {10, 20},
+        .iterations = 50,
     };
 
     infrastructure::ExperimentManager manager;

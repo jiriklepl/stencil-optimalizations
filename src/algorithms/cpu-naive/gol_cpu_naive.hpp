@@ -7,6 +7,8 @@
 #include <iostream>
 #include <thread>
 
+namespace algorithms {
+
 class GoLCpuNaive : public infrastructure::Algorithm<2, char> {
   public:
     GoLCpuNaive() : animate(false) {};
@@ -117,5 +119,7 @@ class GoLCpuNaive : public infrastructure::Algorithm<2, char> {
     DataGrid _intermediate;
     bool animate;
 };
+
+} // namespace algorithms
 
 #endif // GOL_CPU_NAIVE_HPP

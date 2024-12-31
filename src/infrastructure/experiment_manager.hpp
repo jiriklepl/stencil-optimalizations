@@ -16,7 +16,7 @@ namespace infrastructure {
 class ExperimentManager {
   public:
     ExperimentManager() {
-        auto cpu_naive = std::make_unique<GoLCpuNaive>();
+        auto cpu_naive = std::make_unique<algorithms::GoLCpuNaive>();
         cpu_naive->print_game_of_live_in_progress();
 
         _algs_repo_2d_char.register_algorithm("gol-cpu-naive", std::move(cpu_naive));
