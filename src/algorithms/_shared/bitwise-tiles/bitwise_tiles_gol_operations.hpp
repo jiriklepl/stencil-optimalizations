@@ -1,19 +1,14 @@
 #ifndef ALGORITHMS_SHARED_BITWISE_GOL_OPERATION_HPP
 #define ALGORITHMS_SHARED_BITWISE_GOL_OPERATION_HPP
 
-#include "../../debug_utils/pretty_print.hpp"
-#include "../../infrastructure/algorithm.hpp"
-#include "../_shared/gol_bit_grid.hpp"
 #include <bitset>
-#include <chrono>
 #include <cstddef>
 #include <iostream>
 #include <sstream>
-#include <thread>
 
 namespace algorithms {
 
-struct BitwiseOps {
+struct BitwiseTileOps {
     using tile_type = std::uint64_t;
 
     template <tile_type... rows>

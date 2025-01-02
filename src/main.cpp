@@ -1,4 +1,4 @@
-#include "algorithms/_shared/bitwise_gol_operations_tests.hpp"
+#include "algorithms/_shared/bitwise-tiles/bitwise_tiles_gol_operations_tests.hpp"
 #include "infrastructure/experiment_manager.hpp"
 #include "infrastructure/experiment_params.hpp"
 #include "infrastructure/grid.hpp"
@@ -28,7 +28,7 @@ void print_const() {
 int main() {
     std::cout << "Hello" << std::endl;
 
-    tests::BitwiseOpsTests::run();
+    tests::BitwiseTileOpsTests::run();
 
     infrastructure::ExperimentParams params = {
         .algorithm_name = "gol-cpu-naive",

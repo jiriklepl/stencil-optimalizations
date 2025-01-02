@@ -1,9 +1,8 @@
 #ifndef BITWISE_GOL_OPERATIONS_TESTS_HPP
 #define BITWISE_GOL_OPERATIONS_TESTS_HPP
 
-#include "./bitwise_gol_operations.hpp"
+#include "./bitwise_tiles_gol_operations.hpp"
 #include <bits/c++config.h>
-#include <bitset>
 #include <cstdint>
 #include <iostream>
 
@@ -11,7 +10,7 @@ namespace tests {
 
 using namespace algorithms;
 
-class BitwiseOpsTests {
+class BitwiseTileOpsTests {
   public:
     using tile_type = std::uint64_t;
 
@@ -42,7 +41,7 @@ class BitwiseOpsTests {
         tile_type lb = 0, cb = 0, rb = 0;
 
         // game of live glider
-        cc = BitwiseOps::tile_num<
+        cc = BitwiseTileOps::tile_num<
             0b0000'0000,
             0b0010'0000,
             0b0001'0000,
@@ -53,13 +52,13 @@ class BitwiseOpsTests {
             0b0000'0000>();
 
         // act
-        auto actual = BitwiseOps::compute_center_tile(
+        auto actual = BitwiseTileOps::compute_center_tile(
             lt, ct, rt,
             lc, cc, rc,
             lb, cb, rb);
 
         // assert
-        auto expected = BitwiseOps::tile_num<
+        auto expected = BitwiseTileOps::tile_num<
             0b0000'0000,
             0b0000'0000,
             0b0101'0000,
@@ -79,7 +78,7 @@ class BitwiseOpsTests {
         tile_type lc = 0, cc = 0, rc = 0;
         tile_type lb = 0, cb = 0, rb = 0;
 
-
+        return true;
     };
 
     static bool assert_with_print(tile_type actual, tile_type expected) {
@@ -87,10 +86,10 @@ class BitwiseOpsTests {
 
         if (!succeeded) {
             std::cout << "Expected: " << std::endl;
-            std::cout << BitwiseOps::debug_print(expected) << std::endl;
+            std::cout << BitwiseTileOps::debug_print(expected) << std::endl;
 
             std::cout << "Actual: " << std::endl;
-            std::cout << BitwiseOps::debug_print(actual) << std::endl;
+            std::cout << BitwiseTileOps::debug_print(actual) << std::endl;
         }
 
         return succeeded;

@@ -1,20 +1,20 @@
 #ifndef GOL_BIT_GRID_HPP
 #define GOL_BIT_GRID_HPP
 
-#include "../../infrastructure/grid.hpp"
+#include "../../../infrastructure/grid.hpp"
 #include <cstddef>
 
 namespace algorithms {
 
-class GolBitGrid {
+class GolBitTilesGrid {
   public:
     using tile_type = uint64_t;
     using size_type = std::size_t;
     using Grid = infrastructure::Grid<2, char>;
 
-    GolBitGrid() {};
+    GolBitTilesGrid() {};
 
-    GolBitGrid(const Grid& grid) {
+    GolBitTilesGrid(const Grid& grid) {
         assert_dim_has_correct_size<0>(grid);
         assert_dim_has_correct_size<1>(grid);
 
