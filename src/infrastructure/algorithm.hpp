@@ -41,7 +41,7 @@ class Algorithm {
      *
      * @return DataGrid The result of the algorithm.
      */
-    virtual DataGrid fetch_result();
+    virtual DataGrid fetch_result() = 0;
 };
 
 } // namespace infrastructure

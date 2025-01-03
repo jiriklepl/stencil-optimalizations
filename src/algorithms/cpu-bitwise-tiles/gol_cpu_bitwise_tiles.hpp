@@ -7,7 +7,7 @@
 
 namespace algorithms {
 
-class GoLCpuBitwise : public infrastructure::Algorithm<2, char> {
+class GoLCpuBitwiseTiles : public infrastructure::Algorithm<2, char> {
   public:
     using DataGrid = infrastructure::Grid<2, char>;
     using tile_type = GolBitTilesGrid::tile_type;
