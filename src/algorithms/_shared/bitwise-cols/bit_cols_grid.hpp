@@ -14,54 +14,52 @@ namespace algorithms {
 
 class BitColsGrid {
   public:
-    
     using bit_col_type = uint64_t;
     constexpr static std::size_t BITS_IN_COL = sizeof(bit_col_type) * 8;
 
     using size_type = std::size_t;
     using Grid = infrastructure::Grid<2, char>;
-    
+
     BitColsGrid(const Grid& grid) {
         assert_dim_has_correct_size(grid);
-        
+
         x_size = grid.size_in<0>();
         y_size = grid.size_in<1>() / BITS_IN_COL;
-        
+
         bit_cols_grid.resize(x_size * y_size, 0);
         fill_grid(grid);
     }
-  
-    public:
-        bit_col_type get_bit_col(std::size_t x, std::size_t y) const {
-            return bit_cols_grid[idx(x, y)];
-        }
 
-        void set_bit_col(std::size_t x, std::size_t y, bit_col_type bit_col) {
-            bit_cols_grid[idx(x, y)] = bit_col;
-        }
+  public:
+    bit_col_type get_bit_col(std::size_t x, std::size_t y) const {
+        return bit_cols_grid[idx(x, y)];
+    }
 
-        std::string debug_print() {
-            std::string result;
+    void set_bit_col(std::size_t x, std::size_t y, bit_col_type bit_col) {
+        bit_cols_grid[idx(x, y)] = bit_col;
+    }
 
-            for (std::size_t y = 0; y < y_size; ++y) {
-                for (std::size_t bit = 0; bit < BITS_IN_COL; ++bit) {
-                    for (std::size_t x = 0; x < x_size; ++x) {
-                        auto col = get_bit_col(x, y);
-                        char bit_char = ((col >> bit) & 1) ? '1' : '0';
+    std::string debug_print() {
+        std::string result;
 
-                        result += color_0_1(bit_char);
-                        result += " ";
-                    }
-                    result += "\n";
+        for (std::size_t y = 0; y < y_size; ++y) {
+            for (std::size_t bit = 0; bit < BITS_IN_COL; ++bit) {
+                for (std::size_t x = 0; x < x_size; ++x) {
+                    auto col = get_bit_col(x, y);
+                    char bit_char = ((col >> bit) & 1) ? '1' : '0';
+
+                    result += color_0_1(bit_char);
+                    result += " ";
                 }
                 result += "\n";
             }
-
-            return result;
+            result += "\n";
         }
 
-//   private:
+        return result;
+    }
 
+  private:
     void assert_dim_has_correct_size(const Grid& grid) {
         if (grid.size_in<1>() % 64 != 0) {
             throw std::invalid_argument("Grid dimensions must be a multiple of 8");
@@ -72,7 +70,7 @@ class BitColsGrid {
         for (std::size_t y = 0; y < grid.size_in<1>(); y += BITS_IN_COL) {
             for (std::size_t x = 0; x < grid.size_in<0>(); ++x) {
                 bit_col_type bit_col = 0;
-                
+
                 for (std::size_t i = 0; i < BITS_IN_COL; ++i) {
                     auto value = static_cast<bit_col_type>(grid[x][y + i]);
                     bit_col |= value << i;
@@ -107,6 +105,6 @@ class BitColsGrid {
     size_type y_size;
 };
 
-}
+} // namespace algorithms
 
 #endif // GOL_BIT_COL_GRID_HPP

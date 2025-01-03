@@ -2,8 +2,8 @@
 #define GOL_CPU_NAIVE_HPP
 
 #include "../../infrastructure/algorithm.hpp"
-#include "../_shared/bitwise-tiles/bitwise_tiles_gol_operations.hpp"
 #include "../_shared/bitwise-tiles/bit_tiles_grid.hpp"
+#include "../_shared/bitwise-tiles/bitwise_tiles_gol_operations.hpp"
 
 namespace algorithms {
 

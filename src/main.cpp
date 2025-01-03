@@ -50,8 +50,6 @@ int main() {
 
     std::cout << "--------" << std::endl;
 
-    std::cout << pretty(bit_cols_grid.bit_cols_grid) << std::endl;
-
     // infrastructure::ExperimentManager manager;
 
     // manager.run(params);

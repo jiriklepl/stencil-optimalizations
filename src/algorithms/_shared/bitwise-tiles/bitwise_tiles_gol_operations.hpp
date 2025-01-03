@@ -64,8 +64,8 @@ struct BitwiseTileOps {
 
         return oss.str();
     }
-    
-public: // Ensure enums are public
+
+  public: // Ensure enums are public
     enum class Horizontal : char {
         LEFT = 0,
         RIGHT = 1,
@@ -76,30 +76,16 @@ public: // Ensure enums are public
         BOTTOM = 1,
     };
 
-private:
-
+  private:
     static tile_type compute_inner_bits(tile_type tile) {
         tile_type result = 0;
-        
-        constexpr tile_type neighborhood_mask = tile_num<
-            0b0000'0111,
-            0b0000'0101,
-            0b0000'0111>();
 
-        constexpr tile_type cell_mask = tile_num<
-            0b0000'0000,
-            0b0000'0010,
-            0b0000'0000>();
+        constexpr tile_type neighborhood_mask = tile_num<0b0000'0111, 0b0000'0101, 0b0000'0111>();
 
-        constexpr tile_type one = tile_num<
-            0b1000'0000,
-            0b0000'0000,
-            0b0000'0000,
-            0b0000'0000,
-            0b0000'0000,
-            0b0000'0000,
-            0b0000'0000,
-            0b0000'0000>();
+        constexpr tile_type cell_mask = tile_num<0b0000'0000, 0b0000'0010, 0b0000'0000>();
+
+        constexpr tile_type one = tile_num<0b1000'0000, 0b0000'0000, 0b0000'0000, 0b0000'0000, 0b0000'0000, 0b0000'0000,
+                                           0b0000'0000, 0b0000'0000>();
 
         for (std::size_t row = 0; row < 6; ++row) {
             for (std::size_t col = 0; col < 6; ++col) {
@@ -148,41 +134,15 @@ private:
 
         if constexpr (Site == Vertical::TOP) {
             site_tile_mask = 0b1110'0000;
-            center_tile_mask = tile_num<
-                0b1010'0000,
-                0b1110'0000,
-                0b0000'0000,
-                0b0000'0000,
-                0b0000'0000,
-                0b0000'0000,
-                0b0000'0000,
-                0b0000'0000
-            >();
-            cell = tile_num<
-                0b0100'0000,
-                0b0000'0000,
-                0b0000'0000,
-                0b0000'0000,
-                0b0000'0000,
-                0b0000'0000,
-                0b0000'0000,
-                0b0000'0000
-            >();
-        } else {
-            site_tile_mask = tile_num<
-                0b1110'0000,
-                0b0000'0000,
-                0b0000'0000,
-                0b0000'0000,
-                0b0000'0000,
-                0b0000'0000,
-                0b0000'0000,
-                0b0000'0000
-            >(); 
-            center_tile_mask = tile_num<
-                0b1010'0000,
-                0b1110'0000
-            >();
+            center_tile_mask = tile_num<0b1010'0000, 0b1110'0000, 0b0000'0000, 0b0000'0000, 0b0000'0000, 0b0000'0000,
+                                        0b0000'0000, 0b0000'0000>();
+            cell = tile_num<0b0100'0000, 0b0000'0000, 0b0000'0000, 0b0000'0000, 0b0000'0000, 0b0000'0000, 0b0000'0000,
+                            0b0000'0000>();
+        }
+        else {
+            site_tile_mask = tile_num<0b1110'0000, 0b0000'0000, 0b0000'0000, 0b0000'0000, 0b0000'0000, 0b0000'0000,
+                                      0b0000'0000, 0b0000'0000>();
+            center_tile_mask = tile_num<0b1010'0000, 0b1110'0000>();
             cell = 0b0100'0000;
         }
 
@@ -190,21 +150,20 @@ private:
             auto site_neighborhood = site_tile & site_tile_mask;
             auto center_neighborhood = tile & center_tile_mask;
 
-            auto alive_neighbours = __builtin_popcount(site_neighborhood) +
-                __builtin_popcount(center_neighborhood);
+            auto alive_neighbours = __builtin_popcount(site_neighborhood) + __builtin_popcount(center_neighborhood);
 
             if (center_neighborhood != 0) {
                 if (alive_neighbours < 2 || alive_neighbours > 3) {
                     result &= ~cell;
-                } 
+                }
                 else {
                     result |= cell;
                 }
-            } 
+            }
             else {
                 if (alive_neighbours == 3) {
                     result |= cell;
-                } 
+                }
                 else {
                     result &= ~cell;
                 }
@@ -214,7 +173,7 @@ private:
             tile >>= 1;
             result >>= 1;
         }
-        
+
         result >>= 1;
 
         if constexpr (Site == Vertical::BOTTOM) {
@@ -223,7 +182,7 @@ private:
 
         return result;
     }
-    
+
     template <Horizontal Site>
     static tile_type compute_side(tile_type tile, tile_type site_tile) {
         tile_type result = 0;
@@ -231,33 +190,28 @@ private:
     }
 
     template <Horizontal HorizontalSite, Vertical VerticalSite>
-    static tile_type compute_corner(tile_type t1, tile_type t2,
-                                    tile_type t3, tile_type t4);
+    static tile_type compute_corner(tile_type t1, tile_type t2, tile_type t3, tile_type t4);
 
-    static tile_type compute_corner_top_left(tile_type lt, tile_type ct,
-                                             tile_type lc, tile_type cc) {
-        
+    static tile_type compute_corner_top_left(tile_type lt, tile_type ct, tile_type lc, tile_type cc) {
+
         tile_type result = 0;
         return result;
     }
 
-    static tile_type compute_corner_top_right(tile_type ct, tile_type rt,
-                                              tile_type cc, tile_type rc) {
-        
+    static tile_type compute_corner_top_right(tile_type ct, tile_type rt, tile_type cc, tile_type rc) {
+
         tile_type result = 0;
         return result;
     }
 
-    static tile_type compute_corner_bottom_left(tile_type lc, tile_type cc,
-                                                tile_type lb, tile_type cb) {
-        
+    static tile_type compute_corner_bottom_left(tile_type lc, tile_type cc, tile_type lb, tile_type cb) {
+
         tile_type result = 0;
         return result;
     }
 
-    static tile_type compute_corner_bottom_right(tile_type cc, tile_type rc,
-                                                 tile_type cb, tile_type rb) {
-        
+    static tile_type compute_corner_bottom_right(tile_type cc, tile_type rc, tile_type cb, tile_type rb) {
+
         tile_type result = 0;
         return result;
     }
