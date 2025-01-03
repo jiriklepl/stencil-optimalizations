@@ -3,15 +3,14 @@
 std::string debug_utils::pretty(const infrastructure::Grid<2, char>& grid) {
     std::string result;
 
-    for (int x = 0; x < grid.size_in<0>(); ++x) {
-        for (int y = 0; y < grid.size_in<1>(); ++y) {
-            // result += (grid[x][y] == 1 ? "O" : ".");
+    for (int y = 0; y < grid.size_in<1>(); ++y) {
+        for (int x = 0; x < grid.size_in<0>(); ++x) {
             std::string cell = "[";
             cell += std::to_string(static_cast<int>(grid[x][y]));
             cell += ']';
 
             if (grid[x][y] != 0) {
-                result += "\033[31m" + cell + "\033[0m"; // Red color
+                result += "\033[31m" + cell + "\033[0m";
             }
             else {
                 result += cell;

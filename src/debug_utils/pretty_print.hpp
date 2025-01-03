@@ -11,7 +11,7 @@ template <typename T>
 std::string pretty(std::vector<T>& vec) {
     std::string result = "[";
     for (auto& elem : vec) {
-        result += pretty(elem) + ", ";
+        result += std::to_string(elem) + ", ";
     }
     result.pop_back();
     result.pop_back();

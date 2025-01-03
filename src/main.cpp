@@ -1,4 +1,6 @@
+#include "algorithms/_shared/bitwise-cols/bit_cols_grid.hpp"
 #include "algorithms/_shared/bitwise-tiles/bitwise_tiles_gol_operations_tests.hpp"
+#include "infrastructure/data_loader.hpp"
 #include "infrastructure/experiment_manager.hpp"
 #include "infrastructure/experiment_params.hpp"
 #include "infrastructure/grid.hpp"
@@ -28,13 +30,27 @@ void print_const() {
 int main() {
     std::cout << "Hello" << std::endl;
 
-    tests::BitwiseTileOpsTests::run();
+    // tests::BitwiseTileOpsTests::run();
 
     infrastructure::ExperimentParams params = {
         .algorithm_name = "gol-cpu-naive",
-        .grid_dimensions = {10, 20},
+        .grid_dimensions = {10, 128},
         .iterations = 50,
     };
+
+    infrastructure::OneGliderInTheConnerLoader loader;
+    auto grid = loader.load_data<2, char>(params);
+    algorithms::BitColsGrid bit_cols_grid(grid);
+
+    std::cout << bit_cols_grid.debug_print() << std::endl;
+
+    std::cout << "--------" << std::endl;
+
+    std::cout << pretty(grid) << std::endl;
+
+    std::cout << "--------" << std::endl;
+
+    std::cout << pretty(bit_cols_grid.bit_cols_grid) << std::endl;
 
     // infrastructure::ExperimentManager manager;
 

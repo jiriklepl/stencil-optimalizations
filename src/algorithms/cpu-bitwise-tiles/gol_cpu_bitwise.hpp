@@ -1,24 +1,19 @@
 #ifndef GOL_CPU_NAIVE_HPP
 #define GOL_CPU_NAIVE_HPP
 
-#include "../../debug_utils/pretty_print.hpp"
 #include "../../infrastructure/algorithm.hpp"
-#include "../_shared/bitwise_gol_operations.hpp"
-#include "../_shared/gol_bit_grid.hpp"
-#include <chrono>
-#include <cstddef>
-#include <iostream>
-#include <thread>
+#include "../_shared/bitwise-tiles/bitwise_tiles_gol_operations.hpp"
+#include "../_shared/bitwise-tiles/bit_tiles_grid.hpp"
 
 namespace algorithms {
 
 class GoLCpuBitwise : public infrastructure::Algorithm<2, char> {
   public:
     using DataGrid = infrastructure::Grid<2, char>;
-    using tile_type = GolBitGrid::tile_type;
+    using tile_type = GolBitTilesGrid::tile_type;
 
     void set_and_format_input_data(const DataGrid& data) override {
-        bit_grid = GolBitGrid(data);
+        bit_grid = GolBitTilesGrid(data);
     }
 
     void initialize_data_structures() override {
@@ -42,7 +37,7 @@ class GoLCpuBitwise : public infrastructure::Algorithm<2, char> {
                         lc, cc, rc,
                         lb, cb, rb);
 
-                    tile_type new_center = BitwiseOps::compute_center_tile(
+                    tile_type new_center = BitwiseTileOps::compute_center_tile(
                         lt, ct, rt,
                         lc, cc, rc,
                         lb, cb, rb
@@ -64,7 +59,7 @@ class GoLCpuBitwise : public infrastructure::Algorithm<2, char> {
     }
 
   private:
-    void load(const GolBitGrid& bit_grid, size_type x, size_type y, tile_type& lt, tile_type& ct, tile_type& rt,
+    void load(const GolBitTilesGrid& bit_grid, size_type x, size_type y, tile_type& lt, tile_type& ct, tile_type& rt,
               tile_type& lc, tile_type& cc, tile_type& rc, tile_type& lb, tile_type& cb, tile_type& rb) {
         lt = bit_grid.get_tile(x - 1, y - 1);
         ct = bit_grid.get_tile(x, y - 1);
@@ -80,7 +75,7 @@ class GoLCpuBitwise : public infrastructure::Algorithm<2, char> {
     }
 
     DataGrid _result;
-    GolBitGrid bit_grid;
+    GolBitTilesGrid bit_grid;
 };
 
 } // namespace algorithms
