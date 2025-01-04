@@ -8,7 +8,7 @@
 namespace debug_utils {
 
 template <typename T>
-std::string pretty(std::vector<T>& vec) {
+std::string pretty(const std::vector<T>& vec) {
     std::string result = "[";
     for (auto& elem : vec) {
         result += std::to_string(elem) + ", ";

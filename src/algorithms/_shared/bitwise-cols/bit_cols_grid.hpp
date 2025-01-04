@@ -1,26 +1,38 @@
 #ifndef GOL_BIT_COL_GRID_HPP
 #define GOL_BIT_COL_GRID_HPP
 
+#include "../../../debug_utils/pretty_print.hpp"
 #include "../../../infrastructure/grid.hpp"
 #include <bitset>
+#include <cassert>
 #include <cstdarg>
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
+#include <limits>
+#include <sstream>
 #include <string>
 #include <vector>
 
+using namespace debug_utils;
+
 namespace algorithms {
 
+template <typename bit_col_type>
 class BitColsGrid {
   public:
-    using bit_col_type = uint64_t;
     constexpr static std::size_t BITS_IN_COL = sizeof(bit_col_type) * 8;
 
     using size_type = std::size_t;
     using Grid = infrastructure::Grid<2, char>;
 
-    BitColsGrid() = default;
+    BitColsGrid(size_type original_x_size, size_t original_y_size)
+        : _x_size(original_x_size), _y_size(original_y_size) {
+        _x_size = original_x_size;
+        _y_size = original_y_size / BITS_IN_COL;
+
+        bit_cols_grid.resize(x_size() * y_size(), 0);
+    }
 
     BitColsGrid(const Grid& grid) {
         assert_dim_has_correct_size(grid);
@@ -41,8 +53,8 @@ class BitColsGrid {
         bit_cols_grid[idx(x, y)] = bit_col;
     }
 
-    std::string debug_print() {
-        std::string result;
+    std::string debug_print(std::size_t line_limit = std::numeric_limits<std::size_t>::max()) {
+        std::ostringstream result;
 
         for (std::size_t y = 0; y < y_size(); ++y) {
             for (std::size_t bit = 0; bit < BITS_IN_COL; ++bit) {
@@ -50,15 +62,19 @@ class BitColsGrid {
                     auto col = get_bit_col(x, y);
                     char bit_char = ((col >> bit) & 1) ? '1' : '0';
 
-                    result += color_0_1(bit_char);
-                    result += " ";
+                    result << color_0_1(bit_char);
+                    result << " ";
                 }
-                result += "\n";
+                result << "\n";
+
+                if (y * BITS_IN_COL + bit + 1 >= line_limit) {
+                    return result.str();
+                }
             }
-            result += "\n";
+            result << "\n";
         }
 
-        return result;
+        return result.str();
     }
 
     size_type x_size() const {
@@ -71,8 +87,8 @@ class BitColsGrid {
 
   private:
     void assert_dim_has_correct_size(const Grid& grid) {
-        if (grid.size_in<1>() % 64 != 0) {
-            throw std::invalid_argument("Grid dimensions must be a multiple of 8");
+        if (grid.size_in<1>() % BITS_IN_COL != 0) {
+            throw std::invalid_argument("Grid dimensions must be a multiple of " + std::to_string(BITS_IN_COL));
         }
     }
 

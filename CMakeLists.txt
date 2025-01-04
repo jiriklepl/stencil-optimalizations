@@ -10,7 +10,9 @@ set(CMAKE_CXX_COMPILER "/usr/bin/g++")
 set(CMAKE_CUDA_COMPILER "/usr/local/cuda/bin/nvcc")
 
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-relaxed-constexpr -arch=sm_70 -gencode=arch=compute_80,code=sm_80 -gencode=arch=compute_89,code=sm_89 -gencode=arch=compute_90,code=sm_90 --use_fast_math")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g")
+
+set(CMAKE_BUILD_TYPE Debug)
 
 FetchContent_Declare(
     cxxopts

@@ -17,8 +17,8 @@ enum class Position {
 template <Position POSITION, typename col_type>
 class MasksByPosition {};
 
+template <typename col_type>
 struct BitwiseColsOps {
-    using col_type = std::uint64_t;
     constexpr static std::size_t BITS_IN_COL = sizeof(col_type) * 8;
 
     template <Position POSITION>
@@ -48,7 +48,7 @@ struct BitwiseColsOps {
     static col_type compute_inner_bits(col_type lc, col_type cc, col_type rc) {
         col_type result = 0;
 
-        templates::static_for<1, BITS_IN_COL>::run(
+        templates::static_for<1, BITS_IN_COL - 1>::run(
             [&lc, &cc, &rc, &result]<std::size_t N>() { result |= compute_inner_cell<N>(lc, cc, rc); });
 
         return result;
@@ -63,11 +63,16 @@ struct BitwiseColsOps {
         constexpr col_type cell_mask = static_cast<col_type>(0b010) << (N - 1);
         constexpr col_type one = cell_mask;
 
-        auto neighborhood = offset<6, N - 1>(lc & site_neighborhood_mask) |
-                            offset<3, N - 1>((cc & center_neighborhood_mask)) | (rc & site_neighborhood_mask);
         auto cell = cc & cell_mask;
 
-        auto alive_neighbours = __builtin_popcount(neighborhood);
+        // auto neighborhood = offset<6, N - 1>(lc & site_neighborhood_mask) |
+        //                     offset<3, N - 1>((cc & center_neighborhood_mask)) | (rc & site_neighborhood_mask);
+
+        // auto alive_neighbours = __builtin_popcountll(neighborhood);
+
+        auto alive_neighbours = __builtin_popcountll(lc & site_neighborhood_mask) +
+                                __builtin_popcountll(cc & center_neighborhood_mask) +
+                                __builtin_popcountll(rc & site_neighborhood_mask);
 
         if (cell != 0) {
             if (alive_neighbours < 2 || alive_neighbours > 3) {

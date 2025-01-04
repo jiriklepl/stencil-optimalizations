@@ -13,7 +13,7 @@ std::string debug_utils::pretty(const infrastructure::Grid<2, char>& grid) {
                 result += "\033[31m" + cell + "\033[0m";
             }
             else {
-                result += cell;
+                result += "\033[30m" + cell + "\033[0m";
             }
         }
         result += "\n";

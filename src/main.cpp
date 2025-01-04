@@ -7,7 +7,7 @@
 #include "infrastructure/grid.hpp"
 #include <bit>
 #include <bitset>
-#define DEBUG
+#include <cstdint>
 
 #include <iostream>
 
@@ -56,22 +56,23 @@ int main() {
 
     infrastructure::ExperimentParams params = {
         .algorithm_name = "gol-cpu-naive",
-        .grid_dimensions = {10, 128},
-        .iterations = 50,
+        .grid_dimensions = {30, 64},
+        .iterations = 65,
     };
 
     infrastructure::OneGliderInTheConnerLoader loader;
     auto grid = loader.load_data<2, char>(params);
 
-    algorithms::GoLCpuBitwiseCols algo;
+    algorithms::GoLCpuBitwiseCols<16> algo;
 
     algo.set_and_format_input_data(grid);
     algo.initialize_data_structures();
     algo.run(params.iterations);
     algo.finalize_data_structures();
+
     auto res = algo.fetch_result();
 
-    std::cout << pretty(res) << std::endl;
+    // std::cout << pretty(res) << std::endl;
 
     // std::cout << bit_cols_grid.debug_print() << std::endl;
 
