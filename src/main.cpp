@@ -14,77 +14,27 @@
 #include "debug_utils/pretty_print.hpp"
 using namespace debug_utils;
 
-using tile_type = uint64_t;
-
-template <tile_type... rows>
-constexpr tile_type tile_num() {
-    tile_type result = 0;
-    ((result = (result << 8) | rows), ...);
-    return result;
-}
-
-template <tile_type CONST>
-void print_const() {
-    std::cout << std::bitset<64>(CONST) << std::endl;
-}
-
-template <std::size_t N>
-void test_f() {
-    std::cout << "N: " << N << std::endl;
-}
-
-template <std::size_t I, std::size_t N>
-struct static_for {
-    template <typename Functor>
-    static void run(Functor&& f) {
-        f.template operator()<I>();
-        static_for<I + 1, N>::run(std::forward<Functor>(f));
-    }
-};
-
-template <std::size_t N>
-struct static_for<N, N> {
-    template <typename Functor>
-    static void run(Functor&&) {
-    }
-};
-
 int main() {
     std::cout << "Hello" << std::endl;
 
     // tests::BitwiseTileOpsTests::run();
 
     infrastructure::ExperimentParams params = {
-        .algorithm_name = "gol-cpu-naive",
+        // .algorithm_name = "gol-cpu-naive",
+        .algorithm_name = "gol-cpu-bitwise-cols-16",
         .grid_dimensions = {30, 64},
-        .iterations = 65,
+        .iterations = 1,
+        .data_loader_name = "random-ones-zeros",
+        // .data_loader_name = "one-glider-in-the-conner",
+        // .debug_logs = true,
+        
+        .validate = true,
+        .print_validation_diff = true,
     };
 
-    infrastructure::OneGliderInTheConnerLoader loader;
-    auto grid = loader.load_data<2, char>(params);
+    infrastructure::ExperimentManager manager;
 
-    algorithms::GoLCpuBitwiseCols<16> algo;
-
-    algo.set_and_format_input_data(grid);
-    algo.initialize_data_structures();
-    algo.run(params.iterations);
-    algo.finalize_data_structures();
-
-    auto res = algo.fetch_result();
-
-    // std::cout << pretty(res) << std::endl;
-
-    // std::cout << bit_cols_grid.debug_print() << std::endl;
-
-    // std::cout << "--------" << std::endl;
-
-    // std::cout << pretty(grid) << std::endl;
-
-    // std::cout << "--------" << std::endl;
-
-    // infrastructure::ExperimentManager manager;
-
-    // manager.run(params);
+    manager.run(params);
 
     return 0;
 }

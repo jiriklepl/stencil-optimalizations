@@ -10,8 +10,14 @@ class ExperimentParams {
   public:
     std::string algorithm_name;
     std::vector<std::size_t> grid_dimensions;
-    std::size_t random_seed = 42;
     std::size_t iterations;
+    std::string data_loader_name;
+
+    bool validate = false;
+    bool print_validation_diff = false;
+    std::string validation_algorithm_name = "gol-cpu-naive";
+    bool debug_logs = false;
+    std::size_t random_seed = 42;
 };
 
 } // namespace infrastructure

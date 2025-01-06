@@ -12,10 +12,14 @@ namespace algorithms {
 template <std::size_t Bits>
 struct BitsConst {};
 
-template <>
-struct BitsConst<8> {
-    using col_type = std::uint8_t;
-};
+
+// !!! WARNING !!!
+// 8 bits are not supported because it is not possible to encode the cell neighborhood in 8 bits 
+
+// template <>
+// struct BitsConst<8> {
+//     using col_type = std::uint8_t;
+// };
 
 template <>
 struct BitsConst<16> {
@@ -58,16 +62,13 @@ class GoLCpuBitwiseCols : public infrastructure::Algorithm<2, char> {
         auto source = bit_grid.get();
         auto target = intermediate_bit_grid.get();
 
-        std::cout << "Initial state" << std::endl;
-        std::cout << source->debug_print(20) << std::endl;
-
         for (size_type i = 0; i < iterations; ++i) {
             for (size_type y = 0; y < y_size; ++y) {
                 for (size_type x = 0; x < x_size; ++x) {
                     // clang-format off
 
                     col_type lt, ct, rt;
-                    col_type lc, cc, rc; 
+                    col_type lc, cc, rc;
                     col_type lb, cb, rb;
 
                     load(source, x, y,
@@ -86,8 +87,6 @@ class GoLCpuBitwiseCols : public infrastructure::Algorithm<2, char> {
                     // clang-format on
                 }
             }
-            std::cout << "Iteration: " << i << std::endl;
-            std::cout << target->debug_print(20) << std::endl;
 
             std::swap(source, target);
         }
@@ -100,7 +99,7 @@ class GoLCpuBitwiseCols : public infrastructure::Algorithm<2, char> {
         for (size_type y = 0; y < original_y_size; ++y) {
             for (size_type x = 0; x < original_x_size; ++x) {
                 auto col = final_bit_grid->get_bit_col(x, y / BitGrid::BITS_IN_COL);
-                auto bit = y;
+                auto bit = y % BitGrid::BITS_IN_COL;
 
                 _result[x][y] = ((col >> bit) & 1) ? 1 : 0;
             }

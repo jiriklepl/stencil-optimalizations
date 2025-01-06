@@ -1,8 +1,12 @@
 #ifndef INFRASTRUCTURE_GRID_HPP
 #define INFRASTRUCTURE_GRID_HPP
 
+#include <cstddef>
+#include <sstream>
 #include <stdexcept>
+#include <string>
 #include <vector>
+#include "../debug_utils/pretty_print.hpp"
 
 namespace infrastructure {
 
@@ -125,6 +129,10 @@ class Grid {
         return elements.data();
     }
 
+    const ElementType* data() const {
+        return elements.data();
+    }
+
     std::vector<ElementType>* data_as_vector() {
         return &elements;
     }
@@ -136,6 +144,30 @@ class Grid {
     template <int Dim>
     size_type size_in() const {
         return dimension_sizes[Dim];
+    }
+
+    size_type size_in(size_t dim) const {
+        return dimension_sizes[dim];
+    }
+
+    std::vector<size_type> idx_to_coordinates(size_type idx) const {
+        std::vector<size_type> coordinates(DIMS);
+
+        for (int i = DIMS - 1; i >= 0; i--) {
+            coordinates[i] = idx % size_in(i);
+            idx /= size_in(i);
+        }
+
+        return coordinates;
+    }
+
+    bool equals(const Grid& other) const {
+        for (size_type i = 0; i < elements.size(); i++) {
+            if (elements[i] != other.elements[i]) {
+                return false;
+            }
+        }
+        return true;
     }
 
   private:

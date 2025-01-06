@@ -1,6 +1,7 @@
 #ifndef INFRASTRUCTURE_ALGORITHM_HPP
 #define INFRASTRUCTURE_ALGORITHM_HPP
 
+#include "experiment_params.hpp"
 #include "grid.hpp"
 #include <cstddef>
 
@@ -10,7 +11,7 @@ template <int Dims, typename ElementType>
 class Algorithm {
   public:
     using size_type = std::size_t;
-    using DataGrid = Grid<Dims, ElementType>;
+    using DataGrid = Grid<Dims, ElementType>; 
 
     /**
      * @brief Sets the input data and formats it if necessary.
@@ -42,6 +43,18 @@ class Algorithm {
      * @return DataGrid The result of the algorithm.
      */
     virtual DataGrid fetch_result() = 0;
+
+    /**
+     * @brief Sets the experiment parameters.
+     *
+     * @param params The experiment parameters.
+     */
+    void set_params(const ExperimentParams& params) {
+        this->params = params;
+    }
+
+  protected:
+    ExperimentParams params;
 };
 
 } // namespace infrastructure

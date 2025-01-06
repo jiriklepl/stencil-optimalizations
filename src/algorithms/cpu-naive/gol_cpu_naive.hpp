@@ -16,10 +16,6 @@ class GoLCpuNaive : public infrastructure::Algorithm<2, char> {
     using size_type = std::size_t;
     using DataGrid = infrastructure::Grid<2, char>;
 
-    void print_game_of_live_in_progress() {
-        this->animate = true;
-    }
-
     void set_and_format_input_data(const DataGrid& data) override {
         _result = data;
     }
@@ -35,13 +31,13 @@ class GoLCpuNaive : public infrastructure::Algorithm<2, char> {
         auto x_size = _result.size_in<0>();
         auto y_size = _result.size_in<1>();
 
-        if (animate) {
+        if (this->params.debug_logs) {
             print(*source, 0);
         }
 
         for (size_type i = 0; i < iterations; ++i) {
-            for (size_type x = 1; x < x_size - 1; ++x) {
-                for (size_type y = 1; y < y_size - 1; ++y) {
+            for (size_type x = 0; x < x_size; ++x) {
+                for (size_type y = 0; y < y_size; ++y) {
 
                     auto alive_neighbours = count_alive_neighbours(*source, x, y);
 
@@ -64,8 +60,7 @@ class GoLCpuNaive : public infrastructure::Algorithm<2, char> {
                 }
             }
 
-            if (animate) {
-                move_cursor_up_left(*target);
+            if (this->params.debug_logs) {
                 print(*target, i + 1);
             }
 
@@ -86,6 +81,9 @@ class GoLCpuNaive : public infrastructure::Algorithm<2, char> {
     size_type count_alive_neighbours(const DataGrid& grid, size_type x, size_type y) {
         size_type alive_neighbours = 0;
 
+        size_type x_size = grid.size_in<0>();
+        size_type y_size = grid.size_in<1>();
+
         for (int i = -1; i <= 1; ++i) {
             for (int j = -1; j <= 1; ++j) {
                 // Skip the cell itself
@@ -94,6 +92,10 @@ class GoLCpuNaive : public infrastructure::Algorithm<2, char> {
 
                 auto x_neighbour = x + i;
                 auto y_neighbour = y + j;
+
+                if (x_neighbour < 0 || x_neighbour >= x_size || y_neighbour < 0 || y_neighbour >= y_size)
+                    continue;
+
                 alive_neighbours += grid[x_neighbour][y_neighbour] > 0 ? 1 : 0;
             }
         }

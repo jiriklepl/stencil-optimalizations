@@ -102,7 +102,7 @@ class BitColsGrid {
                     bit_col |= value << i;
                 }
 
-                set_bit_col(x, y, bit_col);
+                set_bit_col(x, y / BITS_IN_COL, bit_col);
             }
         }
     }

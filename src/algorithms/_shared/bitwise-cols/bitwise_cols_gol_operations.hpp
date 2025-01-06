@@ -54,25 +54,21 @@ struct BitwiseColsOps {
         return result;
     }
 
-    template <std::size_t N>
+   template <std::size_t N>
     static col_type compute_inner_cell(col_type lc, col_type cc, col_type rc) {
         col_type result = 0;
-
-        constexpr col_type site_neighborhood_mask = static_cast<col_type>(0b111) << (N - 1);
-        constexpr col_type center_neighborhood_mask = static_cast<col_type>(0b101) << (N - 1);
         constexpr col_type cell_mask = static_cast<col_type>(0b010) << (N - 1);
         constexpr col_type one = cell_mask;
 
         auto cell = cc & cell_mask;
 
-        // auto neighborhood = offset<6, N - 1>(lc & site_neighborhood_mask) |
-        //                     offset<3, N - 1>((cc & center_neighborhood_mask)) | (rc & site_neighborhood_mask);
+        auto neighborhood = combine_neighborhoods_into_one_word<N>(lc, cc, rc);
+        auto alive_neighbours = __builtin_popcountll(neighborhood);
 
-        // auto alive_neighbours = __builtin_popcountll(neighborhood);
-
-        auto alive_neighbours = __builtin_popcountll(lc & site_neighborhood_mask) +
-                                __builtin_popcountll(cc & center_neighborhood_mask) +
-                                __builtin_popcountll(rc & site_neighborhood_mask);
+        // auto alive_neighbours = 
+        //     __builtin_popcountll(lc & cell_mask) +
+        //     __builtin_popcountll(cc & cell_mask) +
+        //     __builtin_popcountll(rc & cell_mask);
 
         if (cell != 0) {
             if (alive_neighbours < 2 || alive_neighbours > 3) {
@@ -94,15 +90,26 @@ struct BitwiseColsOps {
         return result;
     }
 
-    template <std::size_t N, std::size_t CENTER>
-    static std::size_t offset(col_type num) {
-        constexpr int SHIFT = static_cast<int>(N) - static_cast<int>(CENTER);
+    template<std::size_t N>
+    static col_type combine_neighborhoods_into_one_word(col_type lc, col_type cc, col_type rc) {
 
-        if constexpr (SHIFT > 0) {
-            return num << SHIFT;
+        constexpr col_type site_neighborhood_mask = static_cast<col_type>(0b111) << (N - 1);
+        constexpr col_type center_neighborhood_mask = static_cast<col_type>(0b101) << (N - 1);
+        constexpr col_type NEIGHBORHOOD_WINDOW = 6;
+
+         return offset<6, N - 1, NEIGHBORHOOD_WINDOW>(lc & site_neighborhood_mask) |
+                offset<3, N - 1, NEIGHBORHOOD_WINDOW>(cc & center_neighborhood_mask) | 
+                (rc & site_neighborhood_mask);
+    }
+
+
+    template <std::size_t N, std::size_t CENTER, std::size_t NEIGHBORHOOD_WINDOW>
+    static col_type offset(col_type num) {
+        if constexpr (CENTER < NEIGHBORHOOD_WINDOW) {
+            return num << N;
         }
         else {
-            return num >> (-SHIFT);
+            return num >> N;
         }
     }
 
@@ -118,16 +125,24 @@ struct BitwiseColsOps {
         constexpr col_type CELL_MASK = masks<POSITION>::CELL_MASK;
 
         auto neighborhood = 
-            masks<POSITION>::template offset_center_cols<4>(cl & SITE_MASK) | 
-            masks<POSITION>::template offset_center_cols<2>(cc & CENTER_MASK) |
-                                                           (cr & SITE_MASK) |
+            masks<POSITION>::template offset_center_cols<7>(cl & SITE_MASK) | 
+            masks<POSITION>::template offset_center_cols<5>(cc & CENTER_MASK) |
+            masks<POSITION>::template offset_center_cols<3>(cr & SITE_MASK) |
             masks<POSITION>::template offset_top_bottom_cols<2>(l_ & UP_BOTTOM_MASK) |
             masks<POSITION>::template offset_top_bottom_cols<1>(c_ & UP_BOTTOM_MASK) |
                                                                (r_ & UP_BOTTOM_MASK);
         
         auto cell = cc & CELL_MASK;
 
-        auto alive_neighbours = __builtin_popcount(neighborhood);
+        // auto alive_neighbours = 
+        //     __builtin_popcountll(cl & SITE_MASK) +
+        //     __builtin_popcountll(cc & CENTER_MASK) +
+        //     __builtin_popcountll(cr & SITE_MASK) +
+        //     __builtin_popcountll(l_ & UP_BOTTOM_MASK) +
+        //     __builtin_popcountll(c_ & UP_BOTTOM_MASK) +
+        //     __builtin_popcountll(r_ & UP_BOTTOM_MASK);
+
+        auto alive_neighbours = __builtin_popcountll(neighborhood);
 
         if (cell != 0) {
             if (alive_neighbours < 2 || alive_neighbours > 3) {
