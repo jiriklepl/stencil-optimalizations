@@ -20,7 +20,7 @@ int main() {
     infrastructure::ExperimentParams params = {
         // .algorithm_name = "gol-cpu-naive",
         .algorithm_name = "gol-cpu-bitwise-cols-64",
-        .grid_dimensions = {30, 1024},
+        .grid_dimensions = {30, 128},
         .iterations = 100,
         .data_loader_name = "random-ones-zeros",
         // .data_loader_name = "one-glider-in-the-conner",
