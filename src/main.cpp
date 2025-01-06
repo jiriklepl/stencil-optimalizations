@@ -17,13 +17,11 @@ using namespace debug_utils;
 int main() {
     std::cout << "Hello" << std::endl;
 
-    // tests::BitwiseTileOpsTests::run();
-
     infrastructure::ExperimentParams params = {
         // .algorithm_name = "gol-cpu-naive",
-        .algorithm_name = "gol-cpu-bitwise-cols-16",
-        .grid_dimensions = {30, 64},
-        .iterations = 1,
+        .algorithm_name = "gol-cpu-bitwise-cols-64",
+        .grid_dimensions = {30, 1024},
+        .iterations = 10,
         .data_loader_name = "random-ones-zeros",
         // .data_loader_name = "one-glider-in-the-conner",
         // .debug_logs = true,

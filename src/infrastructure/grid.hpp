@@ -6,7 +6,6 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include "../debug_utils/pretty_print.hpp"
 
 namespace infrastructure {
 
