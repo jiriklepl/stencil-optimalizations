@@ -69,19 +69,17 @@ struct TimeReport {
     std::string pretty_print() {
         std::string title_color = "\033[1;34m";
         std::string labels_color = "\033[1;33m";
-        std::string time_color = "\033[1;32m";
+        std::string time_color = "\033[32m";
         std::string reset_color = "\033[0m";
 
+        // clang-format off
         std::string result = title_color + "Time report:\n";
-        result += labels_color + "  set_and_format_input_data:  " + time_color +
-                  std::to_string(set_and_format_input_data) + "s\n";
-        result += labels_color + "  initialize_data_structures: " + time_color +
-                  std::to_string(initialize_data_structures) + "s\n";
+        result += labels_color + "  set_and_format_input_data:  " + time_color + std::to_string(set_and_format_input_data) + "s\n";
+        result += labels_color + "  initialize_data_structures: " + time_color + std::to_string(initialize_data_structures) + "s\n";
         result += labels_color + "  run:                        " + time_color + std::to_string(run) + "s\n";
-        result += labels_color + "  finalize_data_structures:   " + time_color +
-                  std::to_string(finalize_data_structures) + "s\n";
-        result += labels_color + "  fetch_result:               " + time_color + std::to_string(fetch_result) + "s\n" +
-                  reset_color;
+        result += labels_color + "  finalize_data_structures:   " + time_color + std::to_string(finalize_data_structures) + "s\n";
+        result += labels_color + "  fetch_result:               " + time_color + std::to_string(fetch_result) + "s\n" + reset_color;
+        // clang-format on
 
         return result;
     }

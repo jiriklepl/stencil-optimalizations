@@ -46,7 +46,6 @@ class RandomOnesZerosDataLoader : public Loader<Dims, ElementType> {
 
         for (std::size_t i = 0; i < grid.size(); ++i) {
             grid_data[i] = static_cast<ElementType>(dist(rng));
-            ;
         }
 
         return grid;
