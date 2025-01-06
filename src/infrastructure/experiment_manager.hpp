@@ -13,8 +13,8 @@
 #include <memory>
 #include <string>
 
-#include "../debug_utils/pretty_print.hpp"
 #include "../debug_utils/diff_grid.hpp"
+#include "../debug_utils/pretty_print.hpp"
 #include "grid.hpp"
 using namespace debug_utils;
 
@@ -50,7 +50,7 @@ class ExperimentManager {
         auto data = loader->load_data(params);
         auto alg = repo.fetch_algorithm(params.algorithm_name);
 
-        auto result = perform_alg( *alg, data, params);
+        auto result = perform_alg(*alg, data, params);
 
         if (params.validate) {
             validate(data, *result.get(), *loader.get(), params);
@@ -58,11 +58,8 @@ class ExperimentManager {
     }
 
     template <int Dims, typename ElementType>
-    void validate(const Grid<Dims, ElementType>& original, 
-        const Grid<Dims, ElementType>& result,
-        Loader<Dims, ElementType>& loader,
-        const ExperimentParams& params) {
-
+    void validate(const Grid<Dims, ElementType>& original, const Grid<Dims, ElementType>& result,
+                  Loader<Dims, ElementType>& loader, const ExperimentParams& params) {
 
         auto validation_data = loader.load_validation_data(params);
 
@@ -75,7 +72,8 @@ class ExperimentManager {
 
         if (validation_data->equals(result)) {
             std::cout << "\033[32mValidation successful\033[0m" << std::endl;
-        } else {
+        }
+        else {
             std::cout << "\033[31mValidation failed\033[0m" << std::endl;
 
             if (params.print_validation_diff) {
@@ -86,10 +84,9 @@ class ExperimentManager {
     }
 
     template <int Dims, typename ElementType>
-    std::unique_ptr<Grid<Dims, ElementType>> perform_alg(
-        Algorithm<Dims, ElementType>& alg,
-        const Grid<Dims, ElementType>& init_data, 
-        const ExperimentParams& params) {
+    std::unique_ptr<Grid<Dims, ElementType>> perform_alg(Algorithm<Dims, ElementType>& alg,
+                                                         const Grid<Dims, ElementType>& init_data,
+                                                         const ExperimentParams& params) {
 
         alg.set_params(params);
 

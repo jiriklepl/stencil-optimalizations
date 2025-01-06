@@ -12,9 +12,8 @@ namespace algorithms {
 template <std::size_t Bits>
 struct BitsConst {};
 
-
 // !!! WARNING !!!
-// 8 bits are not supported because it is not possible to encode the cell neighborhood in 8 bits 
+// 8 bits are not supported because it is not possible to encode the cell neighborhood in 8 bits
 
 // template <>
 // struct BitsConst<8> {

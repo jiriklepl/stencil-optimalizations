@@ -27,7 +27,7 @@ int main() {
         .data_loader_name = "random-ones-zeros",
         // .data_loader_name = "one-glider-in-the-conner",
         // .debug_logs = true,
-        
+
         .validate = true,
         .print_validation_diff = true,
     };

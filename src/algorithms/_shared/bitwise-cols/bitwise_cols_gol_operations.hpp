@@ -54,7 +54,7 @@ struct BitwiseColsOps {
         return result;
     }
 
-   template <std::size_t N>
+    template <std::size_t N>
     static col_type compute_inner_cell(col_type lc, col_type cc, col_type rc) {
         col_type result = 0;
         constexpr col_type cell_mask = static_cast<col_type>(0b010) << (N - 1);
@@ -65,7 +65,7 @@ struct BitwiseColsOps {
         auto neighborhood = combine_neighborhoods_into_one_word<N>(lc, cc, rc);
         auto alive_neighbours = __builtin_popcountll(neighborhood);
 
-        // auto alive_neighbours = 
+        // auto alive_neighbours =
         //     __builtin_popcountll(lc & cell_mask) +
         //     __builtin_popcountll(cc & cell_mask) +
         //     __builtin_popcountll(rc & cell_mask);
@@ -90,18 +90,16 @@ struct BitwiseColsOps {
         return result;
     }
 
-    template<std::size_t N>
+    template <std::size_t N>
     static col_type combine_neighborhoods_into_one_word(col_type lc, col_type cc, col_type rc) {
 
         constexpr col_type site_neighborhood_mask = static_cast<col_type>(0b111) << (N - 1);
         constexpr col_type center_neighborhood_mask = static_cast<col_type>(0b101) << (N - 1);
         constexpr col_type NEIGHBORHOOD_WINDOW = 6;
 
-         return offset<6, N - 1, NEIGHBORHOOD_WINDOW>(lc & site_neighborhood_mask) |
-                offset<3, N - 1, NEIGHBORHOOD_WINDOW>(cc & center_neighborhood_mask) | 
-                (rc & site_neighborhood_mask);
+        return offset<6, N - 1, NEIGHBORHOOD_WINDOW>(lc & site_neighborhood_mask) |
+               offset<3, N - 1, NEIGHBORHOOD_WINDOW>(cc & center_neighborhood_mask) | (rc & site_neighborhood_mask);
     }
-
 
     template <std::size_t N, std::size_t CENTER, std::size_t NEIGHBORHOOD_WINDOW>
     static col_type offset(col_type num) {

@@ -11,7 +11,7 @@ template <int Dims, typename ElementType>
 class Algorithm {
   public:
     using size_type = std::size_t;
-    using DataGrid = Grid<Dims, ElementType>; 
+    using DataGrid = Grid<Dims, ElementType>;
 
     /**
      * @brief Sets the input data and formats it if necessary.
