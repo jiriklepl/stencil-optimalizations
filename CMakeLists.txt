@@ -30,6 +30,10 @@ endif()
 project(
   Stencils
   VERSION 1.0
-  LANGUAGES CXX ${Language})
+  LANGUAGES CXX CUDA)
+  
+find_package(CUDAToolkit REQUIRED)
 
 add_subdirectory(src)
+
+target_link_libraries(stencils PRIVATE CUDA::cudart)

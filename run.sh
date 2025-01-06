@@ -8,4 +8,5 @@ fi
 
 echo -e "\n\033[33mRunning...\033[0m"
 cd build/src
-./stencils
+
+srun -p gpu-short -A kdss --cpus-per-task=64 --mem=256GB --gres=gpu:V100 --time=2:00:00 ./stencils
