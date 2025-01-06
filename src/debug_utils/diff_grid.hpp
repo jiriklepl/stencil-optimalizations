@@ -43,7 +43,7 @@ std::string diff(const infrastructure::Grid<2, ElementType>& original,
     for (std::size_t y = 0; y < y_size; y++) {
         for (std::size_t x = 0; x < x_size; x++) {
 
-            if ((x + 1) % printed_tiles_size == 0) {
+            if ((x % printed_tiles_size == 0) && (x != 0)) {
                 diff_str << " ";
             }
 

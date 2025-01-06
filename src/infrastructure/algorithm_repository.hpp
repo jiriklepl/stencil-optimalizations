@@ -17,6 +17,11 @@ class AlgorithmRepository {
         _algorithms[algorithm_name] = std::move(algorithm);
     }
 
+    template <typename Alg>
+    void register_algorithm(const std::string& algorithm_name) {
+        _algorithms[algorithm_name] = std::make_unique<Alg>();
+    } 
+
     AlgType* fetch_algorithm(const std::string& algorithm_name) {
         auto it = _algorithms.find(algorithm_name);
         if (it != _algorithms.end()) {

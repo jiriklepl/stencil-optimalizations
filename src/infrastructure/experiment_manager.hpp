@@ -4,6 +4,7 @@
 #include "../algorithms/cpu-bitwise-cols/gol_cpu_bitwise_cols.hpp"
 #include "../algorithms/cpu-naive/gol_cpu_naive.hpp"
 #include "./data_loader.hpp"
+#include "../algorithms/cuda-naive/gol_cuda_naive.hpp"
 #include "algorithm.hpp"
 #include "algorithm_repository.hpp"
 #include "data_loader.hpp"
@@ -32,15 +33,15 @@ class ExperimentManager {
 
   public:
     ExperimentManager() {
-        auto cpu_naive = std::make_unique<algorithms::GoLCpuNaive>();
-        auto cpu_bitwise_16 = std::make_unique<algorithms::GoLCpuBitwiseCols<16>>();
-        auto cpu_bitwise_32 = std::make_unique<algorithms::GoLCpuBitwiseCols<32>>();
-        auto cpu_bitwise_64 = std::make_unique<algorithms::GoLCpuBitwiseCols<64>>();
+        auto _2d_repo = _algs_repos.get_repository<2, char>();
 
-        _algs_repos.get_repository<2, char>()->register_algorithm("gol-cpu-naive", std::move(cpu_naive));
-        _algs_repos.get_repository<2, char>()->register_algorithm("gol-cpu-bitwise-cols-16", std::move(cpu_bitwise_16));
-        _algs_repos.get_repository<2, char>()->register_algorithm("gol-cpu-bitwise-cols-32", std::move(cpu_bitwise_32));
-        _algs_repos.get_repository<2, char>()->register_algorithm("gol-cpu-bitwise-cols-64", std::move(cpu_bitwise_64));
+        _2d_repo->register_algorithm<algorithms::GoLCpuNaive>("gol-cpu-naive");
+        
+        _2d_repo->register_algorithm<algorithms::GoLCpuBitwiseCols<16>>("gol-cpu-bitwise-cols-16");
+        _2d_repo->register_algorithm<algorithms::GoLCpuBitwiseCols<32>>("gol-cpu-bitwise-cols-32");
+        _2d_repo->register_algorithm<algorithms::GoLCpuBitwiseCols<64>>("gol-cpu-bitwise-cols-64");
+
+        _2d_repo->register_algorithm<algorithms::GoLCudaNaive>("gol-cuda-naive");
     }
 
     void run(const ExperimentParams& params) {

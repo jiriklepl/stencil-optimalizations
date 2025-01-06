@@ -1,37 +1,63 @@
-// #ifndef GOL_CUDA_NAIVE_HPP
-// #define GOL_CUDA_NAIVE_HPP
+#ifndef GOL_CUDA_NAIVE_HPP
+#define GOL_CUDA_NAIVE_HPP
 
-// #include "../../infrastructure/algorithm.hpp"
+#include "../../infrastructure/algorithm.hpp"
+#include "models.hpp"
+#include "../_shared/cuda-helpers/cuch.hpp"
+#include <iostream>
 
-// namespace algorithms {
+namespace algorithms {
 
-// class GoLCudaNaive : public infrastructure::Algorithm<2, char> {
+class GoLCudaNaive : public infrastructure::Algorithm<2, char> {
 
-// public:
-//     GoLCudaNaive() {};
+public:
+    GoLCudaNaive() {};
 
-//     using size_type = std::size_t;
-//     using DataGrid = infrastructure::Grid<2, char>;
+    using size_type = std::size_t;
+    using DataGrid = infrastructure::Grid<2, char>;
 
-//     void set_and_format_input_data(const DataGrid& data) override {
-//     }
+    void set_and_format_input_data(const DataGrid& data) override {
+        grid = data;
+    }
 
-//     void initialize_data_structures() override {
-//     }
+    void initialize_data_structures() override {
+        cuda_data.x_size = grid.size_in<1>();
+        cuda_data.y_size = grid.size_in<0>();
 
-//     void run(size_type iterations) override {
-//     }
+        auto size = grid.size();
 
-//     void finalize_data_structures() override {
-//     }
+        CUCH(cudaMalloc(&cuda_data.input, size * sizeof(char)));
+        CUCH(cudaMalloc(&cuda_data.output, size * sizeof(char)));
+        
+        CUCH(cudaMemcpy(cuda_data.input, grid.data(), size * sizeof(char), cudaMemcpyHostToDevice));
+    }
 
-//     DataGrid fetch_result() override {
-//     }
+    void run(size_type iterations) override {
+        run_kernel(iterations);
+    }
 
-// private:
+    void finalize_data_structures() override {
+        CUCH(cudaDeviceSynchronize());
 
-// };
+        auto data = grid.data();
 
-// }
+        CUCH(cudaMemcpy(data, cuda_data.output, grid.size() * sizeof(char), cudaMemcpyDeviceToHost));
 
-// #endif // GOL_CUDA_NAIVE_HPP
+        cudaFree(cuda_data.input);
+        cudaFree(cuda_data.output);
+    }
+
+    DataGrid fetch_result() override {
+        return std::move(grid);
+    }
+
+private:
+    DataGrid grid;
+    NaiveGridOnCuda cuda_data;
+
+    void run_kernel(size_type iterations);
+};
+
+}
+
+#endif // GOL_CUDA_NAIVE_HPP

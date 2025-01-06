@@ -19,11 +19,12 @@ int main() {
 
     infrastructure::ExperimentParams params = {
         // .algorithm_name = "gol-cpu-naive",
-        .algorithm_name = "gol-cpu-bitwise-cols-64",
-        .grid_dimensions = {30, 128},
+        // .algorithm_name = "gol-cpu-bitwise-cols-64",
+        .algorithm_name = "gol-cuda-naive",
+        .grid_dimensions = {1024, 1024},
         .iterations = 100,
-        .data_loader_name = "random-ones-zeros",
-        // .data_loader_name = "one-glider-in-the-conner",
+        // .data_loader_name = "random-ones-zeros",
+        .data_loader_name = "one-glider-in-the-conner",
         // .debug_logs = true,
 
         .validate = true,

@@ -1,4 +1,3 @@
-// ...existing code...
 #include "../template_helpers/static_for.hpp"
 #include "bitwise_cols_gol_operations.hpp"
 #include <cstdint>
