@@ -2,15 +2,15 @@
 #define GOL_CUDA_NAIVE_HPP
 
 #include "../../infrastructure/algorithm.hpp"
-#include "models.hpp"
 #include "../_shared/cuda-helpers/cuch.hpp"
+#include "models.hpp"
 #include <iostream>
 
 namespace algorithms {
 
 class GoLCudaNaive : public infrastructure::Algorithm<2, char> {
 
-public:
+  public:
     GoLCudaNaive() {};
 
     using size_type = std::size_t;
@@ -28,7 +28,7 @@ public:
 
         CUCH(cudaMalloc(&cuda_data.input, size * sizeof(char)));
         CUCH(cudaMalloc(&cuda_data.output, size * sizeof(char)));
-        
+
         CUCH(cudaMemcpy(cuda_data.input, grid.data(), size * sizeof(char), cudaMemcpyHostToDevice));
     }
 
@@ -51,13 +51,13 @@ public:
         return std::move(grid);
     }
 
-private:
+  private:
     DataGrid grid;
     NaiveGridOnCuda cuda_data;
 
     void run_kernel(size_type iterations);
 };
 
-}
+} // namespace algorithms
 
 #endif // GOL_CUDA_NAIVE_HPP

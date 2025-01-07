@@ -2,8 +2,8 @@
 #define CUDA_NAIVE_KERNEL_CU
 
 #include "gol_cuda_naive.hpp"
-#include <cuda_runtime.h>
 #include "models.hpp"
+#include <cuda_runtime.h>
 
 namespace algorithms {
 
@@ -20,14 +20,16 @@ __global__ void game_of_live_kernel(NaiveGridOnCuda data) {
     idx_t x_size = data.x_size;
     idx_t y_size = data.y_size;
 
-    if (x >= x_size || y >= y_size) return;
+    if (x >= x_size || y >= y_size)
+        return;
 
     idx_t idx = get_idx(x, y, x_size);
     idx_t live_neighbors = 0;
 
     for (int i = -1; i <= 1; ++i) {
         for (int j = -1; j <= 1; ++j) {
-            if (i == 0 && j == 0) continue;
+            if (i == 0 && j == 0)
+                continue;
 
             idx_t nx = x + i;
             idx_t ny = y + j;
@@ -40,15 +42,15 @@ __global__ void game_of_live_kernel(NaiveGridOnCuda data) {
 
     if (data.input[idx] == 1) {
         data.output[idx] = (live_neighbors == 2 || live_neighbors == 3) ? 1 : 0;
-    } else {
+    }
+    else {
         data.output[idx] = (live_neighbors == 3) ? 1 : 0;
     }
 }
 
 void GoLCudaNaive::run_kernel(size_type iterations) {
     dim3 block(16, 16);
-    dim3 grid((cuda_data.x_size + block.x - 1) / block.x, 
-              (cuda_data.y_size + block.y - 1) / block.y);
+    dim3 grid((cuda_data.x_size + block.x - 1) / block.x, (cuda_data.y_size + block.y - 1) / block.y);
 
     for (std::size_t i = 0; i < iterations; ++i) {
         if (i != 0) {

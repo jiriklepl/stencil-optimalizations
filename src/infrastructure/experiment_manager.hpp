@@ -1,10 +1,11 @@
 #ifndef INFRASTRUCTURE_EXPERIMENT_MANAGER_HPP
 #define INFRASTRUCTURE_EXPERIMENT_MANAGER_HPP
 
+#include "../algorithms/cpu-bitwise-cols-macro/gol_cpu_bitwise_cols_macro.hpp"
 #include "../algorithms/cpu-bitwise-cols/gol_cpu_bitwise_cols.hpp"
 #include "../algorithms/cpu-naive/gol_cpu_naive.hpp"
-#include "./data_loader.hpp"
 #include "../algorithms/cuda-naive/gol_cuda_naive.hpp"
+#include "./data_loader.hpp"
 #include "algorithm.hpp"
 #include "algorithm_repository.hpp"
 #include "data_loader.hpp"
@@ -33,13 +34,21 @@ class ExperimentManager {
 
   public:
     ExperimentManager() {
+
         auto _2d_repo = _algs_repos.get_repository<2, char>();
 
         _2d_repo->register_algorithm<algorithms::GoLCpuNaive>("gol-cpu-naive");
-        
+
         _2d_repo->register_algorithm<algorithms::GoLCpuBitwiseCols<16>>("gol-cpu-bitwise-cols-16");
         _2d_repo->register_algorithm<algorithms::GoLCpuBitwiseCols<32>>("gol-cpu-bitwise-cols-32");
         _2d_repo->register_algorithm<algorithms::GoLCpuBitwiseCols<64>>("gol-cpu-bitwise-cols-64");
+
+        _2d_repo->register_algorithm<algorithms::GoLCpuBitwiseCols<16, algorithms::MacroBitOperations>>(
+            "gol-cpu-bitwise-cols-macro-16");
+        _2d_repo->register_algorithm<algorithms::GoLCpuBitwiseCols<32, algorithms::MacroBitOperations>>(
+            "gol-cpu-bitwise-cols-macro-32");
+        _2d_repo->register_algorithm<algorithms::GoLCpuBitwiseCols<64, algorithms::MacroBitOperations>>(
+            "gol-cpu-bitwise-cols-macro-64");
 
         _2d_repo->register_algorithm<algorithms::GoLCudaNaive>("gol-cuda-naive");
     }

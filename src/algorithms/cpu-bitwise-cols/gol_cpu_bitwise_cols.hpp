@@ -35,7 +35,7 @@ struct BitsConst<64> {
     using col_type = std::uint64_t;
 };
 
-template <std::size_t Bits>
+template <std::size_t Bits, template <typename col_type> class BitOps = BitwiseColsOps>
 class GoLCpuBitwiseCols : public infrastructure::Algorithm<2, char> {
   public:
     using col_type = typename BitsConst<Bits>::col_type;
@@ -75,7 +75,7 @@ class GoLCpuBitwiseCols : public infrastructure::Algorithm<2, char> {
                         lc, cc, rc,
                         lb, cb, rb);
 
-                    col_type new_center = BitwiseColsOps<col_type>::compute_center_col(
+                    col_type new_center = BitOps<col_type>::compute_center_col(
                         lt, ct, rt,
                         lc, cc, rc,
                         lb, cb, rb
