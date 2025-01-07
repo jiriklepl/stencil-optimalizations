@@ -68,10 +68,21 @@ class ExperimentManager {
         auto loader = load_data<Dims, ElementType>(params);
         auto data = loader->load_data(params);
         auto alg = repo.fetch_algorithm(params.algorithm_name);
+        TimeReport bench_report;
 
+        if (params.measure_speedup) {
+            bench_report = measure_speedup(params, data);
+        }
+
+        std::cout << "\033[35mRunning experiment...        \033[33m" << params.algorithm_name << "\033[0m" << std::endl;
         auto [result, time_report] = perform_alg<AlgMode::Timed>(*alg, data, params);
 
-        std::cout << time_report.pretty_print() << std::endl;
+        if (params.measure_speedup) {
+            std::cout << time_report.pretty_print_speedup(bench_report) << std::endl;
+        }
+        else {
+            std::cout << time_report.pretty_print() << std::endl;
+        }
 
         if (params.validate) {
             validate(data, *result.get(), *loader.get(), params);
@@ -82,7 +93,8 @@ class ExperimentManager {
     void validate(const Grid<Dims, ElementType>& original, const Grid<Dims, ElementType>& result,
                   Loader<Dims, ElementType>& loader, const ExperimentParams& params) {
 
-        std::cout << "\033[35mValidating result...\033[0m" << std::endl;
+        std::cout << "\033[35mValidating result... \033[33m" << params.validation_algorithm_name << "\033[0m"
+                  << std::endl;
 
         auto validation_data = loader.load_validation_data(params);
 
@@ -104,6 +116,19 @@ class ExperimentManager {
                 std::cout << "Diff: \n" << diff << std::endl;
             }
         }
+    }
+
+    template <int Dim, typename ElementType>
+    TimeReport measure_speedup(const ExperimentParams& params, const Grid<Dim, ElementType>& init_data) {
+        std::cout << "\033[35mMeasuring bench algorithm... \033[33m" << params.speedup_bench_algorithm_name << "\033[0m"
+                  << std::endl;
+
+        auto repo = _algs_repos.template get_repository<Dim, ElementType>();
+        auto alg = repo->fetch_algorithm(params.speedup_bench_algorithm_name);
+
+        auto [result, time_report] = perform_alg<AlgMode::Timed>(*alg, init_data, params);
+
+        return time_report;
     }
 
     template <AlgMode mode, int Dims, typename ElementType>

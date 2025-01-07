@@ -74,7 +74,7 @@ class GoLCpuNaive : public infrastructure::Algorithm<2, char> {
     }
 
     DataGrid fetch_result() override {
-        return _result;
+        return std::move(_result);
     }
 
   private:

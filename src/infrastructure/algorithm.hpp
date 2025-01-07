@@ -5,6 +5,7 @@
 #include "grid.hpp"
 #include "timer.hpp"
 #include <cstddef>
+#include <iomanip>
 #include <memory>
 
 namespace infrastructure {
@@ -82,6 +83,44 @@ struct TimeReport {
         // clang-format on
 
         return result;
+    }
+
+    std::string pretty_print_speedup(const TimeReport& bench) {
+        std::string title_color = "\033[1;34m";
+        std::string labels_color = "\033[1;33m";
+        std::string time_color = "\033[34m";
+        std::string reset_color = "\033[0m";
+
+        // clang-format off
+        std::string result = title_color + "Time report:\n";
+        result += labels_color + "  set_and_format_input_data:  " + time_color + std::to_string(set_and_format_input_data) + "s ~ " + speedup_str(bench.set_and_format_input_data, set_and_format_input_data) + "\n";
+        result += labels_color + "  initialize_data_structures: " + time_color + std::to_string(initialize_data_structures) + "s ~ " + speedup_str(bench.initialize_data_structures, initialize_data_structures) + "\n";
+        result += labels_color + "  run:                        " + time_color + std::to_string(run) + "s ~ " + speedup_str(bench.run, run) + "\n";
+        result += labels_color + "  finalize_data_structures:   " + time_color + std::to_string(finalize_data_structures) + "s ~ " + speedup_str(bench.finalize_data_structures, finalize_data_structures) + "\n";
+        result += labels_color + "  fetch_result:               " + time_color + std::to_string(fetch_result) + "s ~ " + speedup_str(bench.fetch_result, fetch_result) + "\n" + reset_color;
+        // clang-format on
+
+        return result;
+    }
+
+  private:
+    std::string speedup_str(double bench, double time) {
+        std::string positive_color = "\033[32m";
+        std::string negative_color = "\033[31m";
+        std::string reset_color = "\033[0m";
+
+        double speedup = bench / time;
+
+        std::stringstream stream;
+        stream << std::fixed << std::setprecision(2) << speedup;
+        std::string speedup_str = stream.str();
+
+        if (speedup > 1 || speedup_str == "1.00") {
+            return positive_color + speedup_str + " x" + reset_color;
+        }
+        else {
+            return negative_color + speedup_str + " x" + reset_color;
+        }
     }
 };
 
