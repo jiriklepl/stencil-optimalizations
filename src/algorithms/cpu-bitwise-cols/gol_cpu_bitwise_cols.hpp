@@ -2,38 +2,13 @@
 #define GOL_CPU_BITWISE_COLS_HPP
 
 #include "../../infrastructure/algorithm.hpp"
+#include "../_shared/bitwise-cols/bit_col_types.hpp"
 #include "../_shared/bitwise-cols/bit_cols_grid.hpp"
 #include "../_shared/bitwise-cols/bitwise_cols_gol_operations.hpp"
 #include <cstddef>
 #include <memory>
 
 namespace algorithms {
-
-template <std::size_t Bits>
-struct BitsConst {};
-
-// !!! WARNING !!!
-// 8 bits are not supported because it is not possible to encode the cell neighborhood in 8 bits
-
-// template <>
-// struct BitsConst<8> {
-//     using col_type = std::uint8_t;
-// };
-
-template <>
-struct BitsConst<16> {
-    using col_type = std::uint16_t;
-};
-
-template <>
-struct BitsConst<32> {
-    using col_type = std::uint32_t;
-};
-
-template <>
-struct BitsConst<64> {
-    using col_type = std::uint64_t;
-};
 
 template <std::size_t Bits, template <typename col_type> class BitOps = BitwiseColsOps>
 class GoLCpuBitwiseCols : public infrastructure::Algorithm<2, char> {
@@ -93,20 +68,10 @@ class GoLCpuBitwiseCols : public infrastructure::Algorithm<2, char> {
     }
 
     void finalize_data_structures() override {
-        _result = DataGrid(original_x_size, original_y_size);
-
-        for (size_type y = 0; y < original_y_size; ++y) {
-            for (size_type x = 0; x < original_x_size; ++x) {
-                auto col = final_bit_grid->get_bit_col(x, y / BitGrid::BITS_IN_COL);
-                auto bit = y % BitGrid::BITS_IN_COL;
-
-                _result[x][y] = ((col >> bit) & 1) ? 1 : 0;
-            }
-        }
     }
 
     DataGrid fetch_result() override {
-        return std::move(_result);
+        return final_bit_grid->to_grid();
     }
 
   private:

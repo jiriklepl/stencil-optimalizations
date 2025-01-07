@@ -2,6 +2,7 @@
 # COL_TYPE_SIZE = 32
 COL_TYPE_SIZE = 64
 
+POP_COUNT_FUNC = f'POPCOUNT_{COL_TYPE_SIZE}'
 COL_TYPE = f'std::uint{COL_TYPE_SIZE}_t'
 
 lt_var = 'lt'; ct_var = 'ct'; rt_var = 'rt'
@@ -9,7 +10,7 @@ lc_var = 'lc'; cc_var = 'cc'; rc_var = 'rc'
 lb_var = 'lb'; cb_var = 'cb'; rb_var = 'rb'
 
 def count_bits_f(expr):
-    return '__builtin_popcountll(' + expr + ')'
+    return f'{POP_COUNT_FUNC}({expr})'
 
 def cast(expr):
     return f'static_cast<{COL_TYPE}>({expr})'

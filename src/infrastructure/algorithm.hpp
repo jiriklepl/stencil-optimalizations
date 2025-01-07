@@ -111,15 +111,15 @@ struct TimeReport {
 
         double speedup = bench / time;
 
-        std::stringstream stream;
-        stream << std::fixed << std::setprecision(2) << speedup;
-        std::string speedup_str = stream.str();
+        std::stringstream speedup_s;
+        speedup_s << std::fixed << std::setprecision(2) << speedup << +" x";
 
-        if (speedup > 1 || speedup_str == "1.00") {
-            return positive_color + speedup_str + " x" + reset_color;
+        if (speedup > 1 || speedup_s.str() == "1.00") {
+            return positive_color + speedup_s.str() + reset_color;
         }
         else {
-            return negative_color + speedup_str + " x" + reset_color;
+            speedup_s << " (" << std::fixed << std::setprecision(2) << 1 / speedup << " x)";
+            return negative_color + speedup_s.str() + reset_color;
         }
     }
 };

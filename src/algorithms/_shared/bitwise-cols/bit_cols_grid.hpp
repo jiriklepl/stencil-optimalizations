@@ -85,6 +85,40 @@ class BitColsGrid {
         return _y_size;
     }
 
+    size_type size() const {
+        return x_size() * y_size();
+    }
+
+    size_type original_x_size() const {
+        return _x_size;
+    }
+
+    size_type original_y_size() const {
+        return _y_size * BITS_IN_COL;
+    }
+
+    bit_col_type* data() {
+        return bit_cols_grid.data();
+    }
+
+    Grid to_grid() const {
+        auto _original_x_size = original_x_size();
+        auto _original_y_size = original_y_size();
+
+        Grid grid(_original_x_size, _original_y_size);
+
+        for (size_type y = 0; y < _original_y_size; ++y) {
+            for (size_type x = 0; x < _original_x_size; ++x) {
+                auto col = get_bit_col(x, y / BITS_IN_COL);
+                auto bit = y % BITS_IN_COL;
+
+                grid[x][y] = ((col >> bit) & 1) ? 1 : 0;
+            }
+        }
+
+        return std::move(grid);
+    }
+
   private:
     void assert_dim_has_correct_size(const Grid& grid) {
         if (grid.size_in<1>() % BITS_IN_COL != 0) {
