@@ -72,8 +72,8 @@ int main() {
 
     infrastructure::ExperimentParams params = {
         // .algorithm_name = "gol-cpu-naive",
-        // .algorithm_name = "gol-cpu-bitwise-cols-64",
-        .algorithm_name = "gol-cpu-bitwise-cols-macro-64",
+        .algorithm_name = "gol-cpu-bitwise-cols-64",
+        // .algorithm_name = "gol-cpu-bitwise-cols-macro-64",
         // .algorithm_name = "gol-cuda-naive",
         // .grid_dimensions = {10'000, 10'000},
         .grid_dimensions = {512, 1024},
