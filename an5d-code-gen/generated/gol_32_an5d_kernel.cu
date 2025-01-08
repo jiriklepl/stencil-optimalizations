@@ -2,7 +2,7 @@
 typedef ui32_t (*c_grid_t)[y_size_ext][x_size_ext];
 __device__ unsigned int __sbref_wrap(unsigned int *sb, size_t index) { return sb[index]; }
 
-__global__ void kernel0_4(unsigned int *grid, int x_size_ext, int y_size_ext, int iters, int c0)
+__global__ void _32_kernel0_4(unsigned int *grid, int x_size_ext, int y_size_ext, int iters, int c0)
 {
 #ifndef AN5D_TYPE
 #define AN5D_TYPE unsigned
@@ -330,7 +330,7 @@ __global__ void kernel0_4(unsigned int *grid, int x_size_ext, int y_size_ext, in
       __h++;
     }
 }
-__global__ void kernel0_3(unsigned int *grid, int x_size_ext, int y_size_ext, int iters, int c0)
+__global__ void _32_kernel0_3(unsigned int *grid, int x_size_ext, int y_size_ext, int iters, int c0)
 {
 #ifndef AN5D_TYPE
 #define AN5D_TYPE unsigned
@@ -600,7 +600,7 @@ __global__ void kernel0_3(unsigned int *grid, int x_size_ext, int y_size_ext, in
       __h++;
     }
 }
-__global__ void kernel0_2(unsigned int *grid, int x_size_ext, int y_size_ext, int iters, int c0)
+__global__ void _32_kernel0_2(unsigned int *grid, int x_size_ext, int y_size_ext, int iters, int c0)
 {
 #ifndef AN5D_TYPE
 #define AN5D_TYPE unsigned
@@ -815,7 +815,7 @@ __global__ void kernel0_2(unsigned int *grid, int x_size_ext, int y_size_ext, in
       __h++;
     }
 }
-__global__ void kernel0_1(unsigned int *grid, int x_size_ext, int y_size_ext, int iters, int c0)
+__global__ void _32_kernel0_1(unsigned int *grid, int x_size_ext, int y_size_ext, int iters, int c0)
 {
 #ifndef AN5D_TYPE
 #define AN5D_TYPE unsigned

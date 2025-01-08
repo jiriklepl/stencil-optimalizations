@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdint.h>
-#include "gol_32_an5d.hpp"
+#include "cuda_gol_32_64_an5d.hpp"
 
 #undef CELL_TYPE
 #define CELL_TYPE ui32_t
@@ -10,7 +10,7 @@ CELL_TYPE GOL_OP(
     CELL_TYPE lc, CELL_TYPE cc, CELL_TYPE rc,
     CELL_TYPE lb, CELL_TYPE cb, CELL_TYPE rb);
 
-void gol_32(CELL_TYPE* src, CELL_TYPE* dst, int x_size, int y_size, int iters) {
+void cuda_gol_32(CELL_TYPE* src, CELL_TYPE* dst, int x_size, int y_size, int iters) {
     int x_size_ext = x_size + 2;
     int y_size_ext = y_size + 2;
 

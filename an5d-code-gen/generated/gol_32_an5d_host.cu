@@ -3,7 +3,7 @@
 #include "gol_32_an5d_kernel.hu"
 #include <stdlib.h>
 #include <stdint.h>
-#include "gol_32_an5d.hpp"
+#include "cuda_gol_32_64_an5d.hpp"
 
 #undef CELL_TYPE
 #define CELL_TYPE ui32_t
@@ -13,7 +13,7 @@ CELL_TYPE GOL_OP(
     CELL_TYPE lc, CELL_TYPE cc, CELL_TYPE rc,
     CELL_TYPE lb, CELL_TYPE cb, CELL_TYPE rb);
 
-void gol_32(CELL_TYPE* src, CELL_TYPE* dst, int x_size, int y_size, int iters) {
+void cuda_gol_32(CELL_TYPE* src, CELL_TYPE* dst, int x_size, int y_size, int iters) {
     int x_size_ext = x_size + 2;
     int y_size_ext = y_size + 2;
 
@@ -93,7 +93,7 @@ SB_START_INSTRUMENTS;
         __side0LenMax = __side0Len;
         for (c0 = __c0Pad; c0 < __c0Pad + __c0Len / __side0Len - __c0Padr; c0 += 1)
         {
-          kernel0_4<<<k0_dimGrid, k0_dimBlock>>> (dev_grid, x_size_ext, y_size_ext, iters, c0);
+          _32_kernel0_4<<<k0_dimGrid, k0_dimBlock>>> (dev_grid, x_size_ext, y_size_ext, iters, c0);
         }
       }
       if ((__c0Len % 2) != (((__c0Len + __side0LenMax - 1) / __side0LenMax) % 2))
@@ -112,7 +112,7 @@ SB_START_INSTRUMENTS;
             assert((__side1Len >= 2 * __side0Len * __halo1) && (__c1Len % __side1Len == 0 || __c1Len % __side1Len >= 2 * __side0Len * __halo1) && "[AN5D ERROR] Too short stream");
             dim3 k0_dimBlock(__blockSize, 1, 1);
             dim3 k0_dimGrid(1 * ((__c1Len + __side1Len - 1) / __side1Len) * ((__c2Len + __side2Len - 1) / __side2Len), 1, 1);
-            kernel0_2<<<k0_dimGrid, k0_dimBlock>>> (dev_grid, x_size_ext, y_size_ext, iters, c0);
+            _32_kernel0_2<<<k0_dimGrid, k0_dimBlock>>> (dev_grid, x_size_ext, y_size_ext, iters, c0);
           }
           c0 += 1;
           {
@@ -127,7 +127,7 @@ SB_START_INSTRUMENTS;
             assert((__side1Len >= 2 * __side0Len * __halo1) && (__c1Len % __side1Len == 0 || __c1Len % __side1Len >= 2 * __side0Len * __halo1) && "[AN5D ERROR] Too short stream");
             dim3 k0_dimBlock(__blockSize, 1, 1);
             dim3 k0_dimGrid(1 * ((__c1Len + __side1Len - 1) / __side1Len) * ((__c2Len + __side2Len - 1) / __side2Len), 1, 1);
-            kernel0_2<<<k0_dimGrid, k0_dimBlock>>> (dev_grid, x_size_ext, y_size_ext, iters, c0);
+            _32_kernel0_2<<<k0_dimGrid, k0_dimBlock>>> (dev_grid, x_size_ext, y_size_ext, iters, c0);
           }
         }
         else if (__c0Len % __side0LenMax == 1)
@@ -144,7 +144,7 @@ SB_START_INSTRUMENTS;
             assert((__side1Len >= 2 * __side0Len * __halo1) && (__c1Len % __side1Len == 0 || __c1Len % __side1Len >= 2 * __side0Len * __halo1) && "[AN5D ERROR] Too short stream");
             dim3 k0_dimBlock(__blockSize, 1, 1);
             dim3 k0_dimGrid(1 * ((__c1Len + __side1Len - 1) / __side1Len) * ((__c2Len + __side2Len - 1) / __side2Len), 1, 1);
-            kernel0_3<<<k0_dimGrid, k0_dimBlock>>> (dev_grid, x_size_ext, y_size_ext, iters, c0);
+            _32_kernel0_3<<<k0_dimGrid, k0_dimBlock>>> (dev_grid, x_size_ext, y_size_ext, iters, c0);
           }
           c0 += 1;
           {
@@ -159,7 +159,7 @@ SB_START_INSTRUMENTS;
             assert((__side1Len >= 2 * __side0Len * __halo1) && (__c1Len % __side1Len == 0 || __c1Len % __side1Len >= 2 * __side0Len * __halo1) && "[AN5D ERROR] Too short stream");
             dim3 k0_dimBlock(__blockSize, 1, 1);
             dim3 k0_dimGrid(1 * ((__c1Len + __side1Len - 1) / __side1Len) * ((__c2Len + __side2Len - 1) / __side2Len), 1, 1);
-            kernel0_1<<<k0_dimGrid, k0_dimBlock>>> (dev_grid, x_size_ext, y_size_ext, iters, c0);
+            _32_kernel0_1<<<k0_dimGrid, k0_dimBlock>>> (dev_grid, x_size_ext, y_size_ext, iters, c0);
           }
           c0 += 1;
           {
@@ -174,7 +174,7 @@ SB_START_INSTRUMENTS;
             assert((__side1Len >= 2 * __side0Len * __halo1) && (__c1Len % __side1Len == 0 || __c1Len % __side1Len >= 2 * __side0Len * __halo1) && "[AN5D ERROR] Too short stream");
             dim3 k0_dimBlock(__blockSize, 1, 1);
             dim3 k0_dimGrid(1 * ((__c1Len + __side1Len - 1) / __side1Len) * ((__c2Len + __side2Len - 1) / __side2Len), 1, 1);
-            kernel0_1<<<k0_dimGrid, k0_dimBlock>>> (dev_grid, x_size_ext, y_size_ext, iters, c0);
+            _32_kernel0_1<<<k0_dimGrid, k0_dimBlock>>> (dev_grid, x_size_ext, y_size_ext, iters, c0);
           }
         }
         else if (__c0Len % __side0LenMax == 2)
@@ -191,7 +191,7 @@ SB_START_INSTRUMENTS;
             assert((__side1Len >= 2 * __side0Len * __halo1) && (__c1Len % __side1Len == 0 || __c1Len % __side1Len >= 2 * __side0Len * __halo1) && "[AN5D ERROR] Too short stream");
             dim3 k0_dimBlock(__blockSize, 1, 1);
             dim3 k0_dimGrid(1 * ((__c1Len + __side1Len - 1) / __side1Len) * ((__c2Len + __side2Len - 1) / __side2Len), 1, 1);
-            kernel0_1<<<k0_dimGrid, k0_dimBlock>>> (dev_grid, x_size_ext, y_size_ext, iters, c0);
+            _32_kernel0_1<<<k0_dimGrid, k0_dimBlock>>> (dev_grid, x_size_ext, y_size_ext, iters, c0);
           }
           c0 += 1;
           {
@@ -206,7 +206,7 @@ SB_START_INSTRUMENTS;
             assert((__side1Len >= 2 * __side0Len * __halo1) && (__c1Len % __side1Len == 0 || __c1Len % __side1Len >= 2 * __side0Len * __halo1) && "[AN5D ERROR] Too short stream");
             dim3 k0_dimBlock(__blockSize, 1, 1);
             dim3 k0_dimGrid(1 * ((__c1Len + __side1Len - 1) / __side1Len) * ((__c2Len + __side2Len - 1) / __side2Len), 1, 1);
-            kernel0_1<<<k0_dimGrid, k0_dimBlock>>> (dev_grid, x_size_ext, y_size_ext, iters, c0);
+            _32_kernel0_1<<<k0_dimGrid, k0_dimBlock>>> (dev_grid, x_size_ext, y_size_ext, iters, c0);
           }
         }
         else if (__c0Len % __side0LenMax == 3)
@@ -223,7 +223,7 @@ SB_START_INSTRUMENTS;
             assert((__side1Len >= 2 * __side0Len * __halo1) && (__c1Len % __side1Len == 0 || __c1Len % __side1Len >= 2 * __side0Len * __halo1) && "[AN5D ERROR] Too short stream");
             dim3 k0_dimBlock(__blockSize, 1, 1);
             dim3 k0_dimGrid(1 * ((__c1Len + __side1Len - 1) / __side1Len) * ((__c2Len + __side2Len - 1) / __side2Len), 1, 1);
-            kernel0_2<<<k0_dimGrid, k0_dimBlock>>> (dev_grid, x_size_ext, y_size_ext, iters, c0);
+            _32_kernel0_2<<<k0_dimGrid, k0_dimBlock>>> (dev_grid, x_size_ext, y_size_ext, iters, c0);
           }
           c0 += 1;
           {
@@ -238,7 +238,7 @@ SB_START_INSTRUMENTS;
             assert((__side1Len >= 2 * __side0Len * __halo1) && (__c1Len % __side1Len == 0 || __c1Len % __side1Len >= 2 * __side0Len * __halo1) && "[AN5D ERROR] Too short stream");
             dim3 k0_dimBlock(__blockSize, 1, 1);
             dim3 k0_dimGrid(1 * ((__c1Len + __side1Len - 1) / __side1Len) * ((__c2Len + __side2Len - 1) / __side2Len), 1, 1);
-            kernel0_1<<<k0_dimGrid, k0_dimBlock>>> (dev_grid, x_size_ext, y_size_ext, iters, c0);
+            _32_kernel0_1<<<k0_dimGrid, k0_dimBlock>>> (dev_grid, x_size_ext, y_size_ext, iters, c0);
           }
         }
       }
@@ -257,7 +257,7 @@ SB_START_INSTRUMENTS;
           assert((__side1Len >= 2 * __side0Len * __halo1) && (__c1Len % __side1Len == 0 || __c1Len % __side1Len >= 2 * __side0Len * __halo1) && "[AN5D ERROR] Too short stream");
           dim3 k0_dimBlock(__blockSize, 1, 1);
           dim3 k0_dimGrid(1 * ((__c1Len + __side1Len - 1) / __side1Len) * ((__c2Len + __side2Len - 1) / __side2Len), 1, 1);
-          kernel0_1<<<k0_dimGrid, k0_dimBlock>>> (dev_grid, x_size_ext, y_size_ext, iters, c0);
+          _32_kernel0_1<<<k0_dimGrid, k0_dimBlock>>> (dev_grid, x_size_ext, y_size_ext, iters, c0);
         }
         else if (__c0Len % __side0LenMax == 2)
         {
@@ -272,7 +272,7 @@ SB_START_INSTRUMENTS;
           assert((__side1Len >= 2 * __side0Len * __halo1) && (__c1Len % __side1Len == 0 || __c1Len % __side1Len >= 2 * __side0Len * __halo1) && "[AN5D ERROR] Too short stream");
           dim3 k0_dimBlock(__blockSize, 1, 1);
           dim3 k0_dimGrid(1 * ((__c1Len + __side1Len - 1) / __side1Len) * ((__c2Len + __side2Len - 1) / __side2Len), 1, 1);
-          kernel0_2<<<k0_dimGrid, k0_dimBlock>>> (dev_grid, x_size_ext, y_size_ext, iters, c0);
+          _32_kernel0_2<<<k0_dimGrid, k0_dimBlock>>> (dev_grid, x_size_ext, y_size_ext, iters, c0);
         }
         else if (__c0Len % __side0LenMax == 3)
         {
@@ -287,7 +287,7 @@ SB_START_INSTRUMENTS;
           assert((__side1Len >= 2 * __side0Len * __halo1) && (__c1Len % __side1Len == 0 || __c1Len % __side1Len >= 2 * __side0Len * __halo1) && "[AN5D ERROR] Too short stream");
           dim3 k0_dimBlock(__blockSize, 1, 1);
           dim3 k0_dimGrid(1 * ((__c1Len + __side1Len - 1) / __side1Len) * ((__c2Len + __side2Len - 1) / __side2Len), 1, 1);
-          kernel0_3<<<k0_dimGrid, k0_dimBlock>>> (dev_grid, x_size_ext, y_size_ext, iters, c0);
+          _32_kernel0_3<<<k0_dimGrid, k0_dimBlock>>> (dev_grid, x_size_ext, y_size_ext, iters, c0);
         }
       }
     }
