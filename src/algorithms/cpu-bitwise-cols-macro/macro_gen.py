@@ -24,8 +24,17 @@ def _1_at(N):
 
 def if_else(cond, if_expr, else_expr):
     return f'(({cond}) ? ({if_expr}) : ({else_expr}))'
+
 def _and(expr1, expr2):
     return f'(({expr1}) & ({expr2}))'
+
+def game_of_live(cell_is_alive, alive_neighbours, alive_cell, dead_cell):
+
+    return if_else(f'({cell_is_alive})',
+                    # this version is even faster than the original one
+                    if_else(f'({alive_neighbours} & ~1) == 2', alive_cell, dead_cell),
+                    # if_else(f'({alive_neighbours} == 2 || {alive_neighbours} == 3)', alive_cell, dead_cell),
+                    if_else(f'({alive_neighbours} == 3)', alive_cell, dead_cell))
 
 class INNER_BITS:
     @staticmethod
@@ -59,16 +68,13 @@ class INNER_BITS:
         s_mask = INNER_BITS.site_mask(N)
         cell_mask = _1_at(N)
 
-        alive_nei = INNER_BITS.count_nei(N, _and(rc, s_mask), _and(cc, c_mask), _and(lc, s_mask))
-        cell_state_is_alive = _and(cc, cell_mask)
+        alive_neighbours_count = INNER_BITS.count_nei(N, _and(rc, s_mask), _and(cc, c_mask), _and(lc, s_mask))
+        cell_is_alive = _and(cc, cell_mask)
 
-        alive_cell = cell_mask
-        dead_cell = num_bits(0)
+        alive = cell_mask
+        dead = num_bits(0)
 
-        return if_else(f'({cell_state_is_alive})',
-                        if_else(f'(({alive_nei}) == 2 || ({alive_nei}) == 3)', alive_cell, dead_cell),
-                        if_else(f'(({alive_nei}) == 3)', alive_cell, dead_cell))
-
+        return game_of_live(cell_is_alive, alive_neighbours_count, alive, dead)
 
     @staticmethod
     def compute_all_inner_bits(BITS, rc, cc, lc):
@@ -126,14 +132,13 @@ class END_BITS:
                        f'({consts.offset_top_bottom_cols(f"({_c} & {up_bottom_mask})", 1)}) | ' \
                        f'({_r} & {up_bottom_mask}))'
 
-        alive_neighbours = count_bits_f(neighborhood)
-        cell = _and(cc, cell_mask) 
+        alive_neighbours_count = count_bits_f(neighborhood)
+        cell_is_alive = _and(cc, cell_mask) 
 
-        return if_else(
-            f'({cell} != 0)',
-            if_else(f'({alive_neighbours} < 2 || {alive_neighbours} > 3)', '0', cell_mask),
-            if_else(f'({alive_neighbours} == 3)', cell_mask, '0')
-        )
+        alive = cell_mask
+        dead = num_bits(0)
+
+        return game_of_live(cell_is_alive, alive_neighbours_count, alive, dead)
 
 def entire_expr(
     lt, ct, rt,
