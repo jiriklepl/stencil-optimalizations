@@ -10,14 +10,18 @@
 #include <iostream>
 #include <memory>
 #include <thread>
-#include "raw_gol.hpp"
 
 namespace algorithms {
 
-template <std::size_t Bits>
-class An5dCpu : public infrastructure::Algorithm<2, char> {
+enum class ExecModel {
+    CPU = 0,
+    CUDA = 1,
+};
+
+template <std::size_t Bits, ExecModel Model>
+class An5dAlg : public infrastructure::Algorithm<2, char> {
   public:
-    An5dCpu() {};
+    An5dAlg() {};
 
     using col_type = typename BitsConst<Bits>::col_type;
     using BitGrid = algorithms::BitColsGrid<col_type>;

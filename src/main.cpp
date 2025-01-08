@@ -24,23 +24,26 @@ int main() {
         // .algorithm_name = "gol-cpu-bitwise-cols-64",
         // .algorithm_name = "gol-cpu-bitwise-cols-macro-64",
         // .algorithm_name = "gol-cuda-naive-bitwise-cols-64",
-        .algorithm_name = "an5d-cpu-32",
+        .algorithm_name = "an5d-cpu-64",
         // .algorithm_name = "gol-cuda-naive",
         // .grid_dimensions = {10'000, 10'000},
         .grid_dimensions = {512, 1024},
         // .grid_dimensions = {64, 128},
-        .iterations = 10,
-        .data_loader_name = "random-ones-zeros",
-        // .data_loader_name = "one-glider-in-the-conner",
+        // .grid_dimensions = {64, 256},
+        .iterations = 100,
+
+        // .data_loader_name = "random-ones-zeros",
+        .data_loader_name = "one-glider-in-the-conner",
         // .debug_logs = true,
 
         .measure_speedup = true,
         // .speedup_bench_algorithm_name = "gol-cpu-naive",
-        .speedup_bench_algorithm_name = "gol-cpu-bitwise-cols-64",
+        // .speedup_bench_algorithm_name = "gol-cpu-bitwise-cols-64",
+        .speedup_bench_algorithm_name = "gol-cpu-bitwise-cols-macro-64",
         // .speedup_bench_algorithm_name = "gol-cuda-naive",
 
         .validate = true,
-        // .print_validation_diff = true,
+        .print_validation_diff = true,
     };
 
     infrastructure::ExperimentManager manager;
