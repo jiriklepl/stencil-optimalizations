@@ -101,6 +101,10 @@ class BitColsGrid {
         return bit_cols_grid.data();
     }
 
+    std::vector<bit_col_type>* data_vector() {
+        return &bit_cols_grid;
+    }
+
     Grid to_grid() const {
         auto _original_x_size = original_x_size();
         auto _original_y_size = original_y_size();
