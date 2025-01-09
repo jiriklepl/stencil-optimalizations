@@ -81,6 +81,7 @@ template <int DIMS, typename ElementType>
 class Grid {
   public:
     using size_type = std::size_t;
+    using element_t = ElementType;
 
     Grid() : dimension_sizes(DIMS, 0), tile_sizes_per_dimensions(DIMS, 0) {
     }
@@ -167,6 +168,10 @@ class Grid {
             }
         }
         return true;
+    }
+
+    void set(size_type x, size_type y, ElementType value) {
+        elements[y * dimension_sizes[0] + x] = value;
     }
 
   private:

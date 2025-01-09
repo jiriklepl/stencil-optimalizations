@@ -12,9 +12,11 @@
 #include "algorithm_repository.hpp"
 #include "data_loader.hpp"
 #include "experiment_params.hpp"
+#include <cstddef>
 #include <iostream>
 #include <map>
 #include <memory>
+#include <ostream>
 #include <string>
 #include <tuple>
 
@@ -72,6 +74,8 @@ class ExperimentManager {
     }
 
     void run(const ExperimentParams& params) {
+        print_basic_param_info(params);
+        
         _algs_repos.for_each([&](auto& repo) {
             if (repo.has_algorithm(params.algorithm_name)) {
                 run_experiment(repo, params);
@@ -83,8 +87,12 @@ class ExperimentManager {
     template <int Dims, typename ElementType>
     void run_experiment(AlgorithmRepository<Dims, ElementType>& repo, const ExperimentParams& params) {
 
-        auto loader = load_data<Dims, ElementType>(params);
+        auto loader = fetch_loader<Dims, ElementType>(params);
+
+        std::cout << title_color << "Loading data... " << param_color << "             "
+                  << params.data_loader_name << reset_color << std::endl;        
         auto data = loader->load_data(params);
+
         auto alg = repo.fetch_algorithm(params.algorithm_name);
         TimeReport bench_report;
 
@@ -92,7 +100,8 @@ class ExperimentManager {
             bench_report = measure_speedup(params, data);
         }
 
-        std::cout << "\033[35mRunning experiment...        \033[33m" << params.algorithm_name << "\033[0m" << std::endl;
+        std::cout << title_color << "Running experiment...        " << param_color
+                  << params.algorithm_name << reset_color << std::endl;
         auto [result, time_report] = perform_alg<AlgMode::Timed>(*alg, data, params);
 
         if (params.measure_speedup) {
@@ -111,8 +120,8 @@ class ExperimentManager {
     void validate(const Grid<Dims, ElementType>& original, const Grid<Dims, ElementType>& result,
                   Loader<Dims, ElementType>& loader, const ExperimentParams& params) {
 
-        std::cout << "\033[35mValidating result... \033[33m" << params.validation_algorithm_name << "\033[0m"
-                  << std::endl;
+        std::cout << title_color << "Validating result... " << param_color
+                  << params.validation_algorithm_name << reset_color << std::endl;
 
         auto validation_data = loader.load_validation_data(params);
 
@@ -138,8 +147,8 @@ class ExperimentManager {
 
     template <int Dim, typename ElementType>
     TimeReport measure_speedup(const ExperimentParams& params, const Grid<Dim, ElementType>& init_data) {
-        std::cout << "\033[35mMeasuring bench algorithm... \033[33m" << params.speedup_bench_algorithm_name << "\033[0m"
-                  << std::endl;
+        std::cout << title_color << "Measuring bench algorithm... " << param_color
+                  << params.speedup_bench_algorithm_name << reset_color << std::endl;
 
         auto repo = _algs_repos.template get_repository<Dim, ElementType>();
         auto alg = repo->fetch_algorithm(params.speedup_bench_algorithm_name);
@@ -176,7 +185,7 @@ class ExperimentManager {
     }
 
     template <int Dims, typename ElementType>
-    std::unique_ptr<Loader<Dims, ElementType>> load_data(const ExperimentParams& params) {
+    std::unique_ptr<Loader<Dims, ElementType>> fetch_loader(const ExperimentParams& params) {
         LoaderCtor<RandomOnesZerosDataLoader, Dims, ElementType> random_loader;
         LoaderCtor<OneGliderInTheConnerLoader, Dims, ElementType> one_glider_loader;
 
@@ -188,7 +197,39 @@ class ExperimentManager {
         return loaderCtor->create();
     }
 
+    void print_basic_param_info(const ExperimentParams& params) {
+        std::cout << title_color << "Experiment parameters:" << reset_color << std::endl;
+        std::cout << label_color << "  Grid dimensions: " << param_color << print_grid_dims(params.grid_dimensions) << reset_color << std::endl;
+        std::cout << label_color << "  Iterations:      " << param_color << print_num(params.iterations) << reset_color << std::endl;
+        
+        std::cout << std::endl;
+    }
+
+    std::string print_grid_dims(const std::vector<std::size_t>& dims) {
+        std::string result = "";
+        for (auto&& dim : dims) {
+            result += print_num(dim) + " x ";
+        }
+        result.pop_back();
+        result.pop_back();
+        return result;
+    }
+
+    std::string print_num(std::size_t num) {
+        std::string result = std::to_string(num);
+        for (int i = result.size() - 3; i > 0; i -= 3) {
+            result.insert(i, "'");
+        }
+        return result;
+    }
+
     AlgorithmReposCollection<AlgRepoParams<2, char>, AlgRepoParams<3, char>> _algs_repos;
+
+    std::string title_color = "\033[35m";
+    std::string param_color = "\033[33m";
+    std::string label_color = "\033[36m";
+    std::string reset_color = "\033[0m";
+
 };
 
 } // namespace infrastructure
