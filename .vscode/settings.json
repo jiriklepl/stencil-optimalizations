@@ -6,6 +6,7 @@
         "popcll",
         "popcount",
         "popcountll",
+        "STENCILBENCH",
         "zeroer"
     ]
 }

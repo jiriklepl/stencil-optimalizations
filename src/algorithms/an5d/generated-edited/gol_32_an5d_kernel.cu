@@ -1,9 +1,6 @@
 #include "gol_32_an5d_kernel.hu"
 #include "../cuda_GOL_OP.hpp"
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wall"
-
 #define __pet_none 0
 #define GOL_OP GOL_OP_32
 
@@ -993,5 +990,3 @@ __global__ void _32_kernel0_1(unsigned int *grid, int x_size_ext, int y_size_ext
       __h++;
     }
 }
-
-#pragma GCC diagnostic pop

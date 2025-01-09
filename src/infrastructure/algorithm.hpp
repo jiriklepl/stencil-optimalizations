@@ -7,6 +7,8 @@
 #include <cstddef>
 #include <iomanip>
 #include <memory>
+#include <string>
+#include "../algorithms/an5d/an5d_cuda_timer.hpp"
 
 namespace infrastructure {
 
@@ -56,16 +58,22 @@ class Algorithm {
         this->params = params;
     }
 
+    virtual bool is_an5d_cuda_alg() const {
+        return false;
+    }
+
   protected:
     ExperimentParams params;
 };
 
 struct TimeReport {
-    double set_and_format_input_data = -1;
-    double initialize_data_structures = -1;
-    double run = -1;
-    double finalize_data_structures = -1;
-    double fetch_result = -1;
+    static constexpr double INVALID = -1;
+
+    double set_and_format_input_data = INVALID;
+    double initialize_data_structures = INVALID;
+    double run = INVALID;
+    double finalize_data_structures = INVALID;
+    double fetch_result = INVALID;
 
     std::string pretty_print() {
         std::string title_color = "\033[1;34m";
@@ -75,11 +83,11 @@ struct TimeReport {
 
         // clang-format off
         std::string result = title_color + "Time report:\n";
-        result += labels_color + "  set_and_format_input_data:  " + time_color + std::to_string(set_and_format_input_data) + "s\n";
-        result += labels_color + "  initialize_data_structures: " + time_color + std::to_string(initialize_data_structures) + "s\n";
-        result += labels_color + "  run:                        " + time_color + std::to_string(run) + "s\n";
-        result += labels_color + "  finalize_data_structures:   " + time_color + std::to_string(finalize_data_structures) + "s\n";
-        result += labels_color + "  fetch_result:               " + time_color + std::to_string(fetch_result) + "s\n" + reset_color;
+        result += pretty_print_line("  set_and_format_input_data:  ", set_and_format_input_data);
+        result += pretty_print_line("  initialize_data_structures: ", initialize_data_structures);
+        result += pretty_print_line("  run:                        ", run);
+        result += pretty_print_line("  finalize_data_structures:   ", finalize_data_structures);
+        result += pretty_print_line("  fetch_result:               ", fetch_result);
         // clang-format on
 
         return result;
@@ -93,11 +101,11 @@ struct TimeReport {
 
         // clang-format off
         std::string result = title_color + "Time report:\n";
-        result += labels_color + "  set_and_format_input_data:  " + time_color + std::to_string(set_and_format_input_data) + "s ~ " + speedup_str(bench.set_and_format_input_data, set_and_format_input_data) + "\n";
-        result += labels_color + "  initialize_data_structures: " + time_color + std::to_string(initialize_data_structures) + "s ~ " + speedup_str(bench.initialize_data_structures, initialize_data_structures) + "\n";
-        result += labels_color + "  run:                        " + time_color + std::to_string(run) + "s ~ " + speedup_str(bench.run, run) + "\n";
-        result += labels_color + "  finalize_data_structures:   " + time_color + std::to_string(finalize_data_structures) + "s ~ " + speedup_str(bench.finalize_data_structures, finalize_data_structures) + "\n";
-        result += labels_color + "  fetch_result:               " + time_color + std::to_string(fetch_result) + "s ~ " + speedup_str(bench.fetch_result, fetch_result) + "\n" + reset_color;
+        result += pretty_print_speedup_line("  set_and_format_input_data:  ", set_and_format_input_data, bench.set_and_format_input_data);
+        result += pretty_print_speedup_line("  initialize_data_structures: ", initialize_data_structures, bench.initialize_data_structures);
+        result += pretty_print_speedup_line("  run:                        ", run, bench.run);
+        result += pretty_print_speedup_line("  finalize_data_structures:   ", finalize_data_structures, bench.finalize_data_structures);
+        result += pretty_print_speedup_line("  fetch_result:               ", fetch_result, bench.fetch_result) + reset_color;
         // clang-format on
 
         return result;
@@ -121,6 +129,30 @@ struct TimeReport {
             speedup_s << " (" << std::fixed << std::setprecision(2) << 1 / speedup << " x)";
             return negative_color + speedup_s.str() + reset_color;
         }
+    }
+
+    std::string pretty_print_line(const std::string& label, double time) {
+        if (time == INVALID) {
+            return "";
+        }
+        
+        std::string labels_color = "\033[1;33m";
+        std::string time_color = "\033[32m";
+        std::string reset_color = "\033[0m";
+
+        return labels_color + label + time_color + std::to_string(time) + "s" + reset_color + "\n";
+    }
+
+    std::string pretty_print_speedup_line(const std::string& label, double time, double bench) {
+        if (time == INVALID || bench == INVALID) {
+            return "";
+        }
+
+        std::string labels_color = "\033[1;33m";
+        std::string time_color = "\033[32m";
+        std::string reset_color = "\033[0m";
+
+        return labels_color + label + time_color + std::to_string(time) + "s ~ " + speedup_str(bench, time) + reset_color + "\n";
     }
 };
 
@@ -147,7 +179,7 @@ class TimedAlgorithm : public Algorithm<Dims, ElementType> {
 
     void run(size_type iterations) override {
         Timer t;
-
+        
         time_report.run = t.measure([&]() { algorithm->run(iterations); });
     }
 
@@ -168,6 +200,17 @@ class TimedAlgorithm : public Algorithm<Dims, ElementType> {
     }
 
     TimeReport get_time_report() {
+        if (algorithm->is_an5d_cuda_alg()) {
+            
+            time_report.set_and_format_input_data = TimeReport::INVALID;
+            time_report.initialize_data_structures = TimeReport::INVALID;
+            
+            time_report.run = algorithms::An5dCudaTimer::elapsed_time_s();
+            
+            time_report.finalize_data_structures = TimeReport::INVALID;
+            time_report.fetch_result = TimeReport::INVALID;
+        }
+
         return time_report;
     }
 

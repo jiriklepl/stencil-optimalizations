@@ -5,11 +5,14 @@
 #include <stdint.h>
 #include "../cuda_gol_32_64_an5d.hpp"
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wall"
-
 #undef CELL_TYPE
 #define CELL_TYPE ui64_t
+
+#include "../an5d_cuda_timer.hpp"
+#define STENCILBENCH
+#define SB_START_INSTRUMENTS algorithms::An5dCudaTimer::start();
+#define SB_STOP_INSTRUMENTS algorithms::An5dCudaTimer::stop();
+
 
 void cuda_gol_64(CELL_TYPE* src, CELL_TYPE* dst, int x_size, int y_size, int iters) {
     int x_size_ext = x_size + 2;
@@ -308,5 +311,3 @@ SB_STOP_INSTRUMENTS;
 
     free(working_memory);
 }
-
-#pragma GCC diagnostic pop

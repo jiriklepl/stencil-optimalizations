@@ -25,26 +25,27 @@ int main() {
         // .algorithm_name = "gol-cpu-bitwise-cols-macro-64",
         // .algorithm_name = "gol-cuda-naive-bitwise-cols-64",
         // .algorithm_name = "an5d-cpu-64",
-        .algorithm_name = "an5d-cuda-64",
+        .algorithm_name = "an5d-cuda-32",
         // .algorithm_name = "gol-cuda-naive",
         // .grid_dimensions = {10'000, 10'000},
-        .grid_dimensions = {512, 1024},
+        // .grid_dimensions = {512 * 16, 1024 * 16},
         // .grid_dimensions = {64, 128},
-        // .grid_dimensions = {64, 256},
-        .iterations = 100,
+        .grid_dimensions = {64, 256},
+        .iterations = 1,
 
-        // .data_loader_name = "random-ones-zeros",
-        .data_loader_name = "one-glider-in-the-conner",
+        .data_loader_name = "random-ones-zeros",
+        // .data_loader_name = "one-glider-in-the-conner",
         // .debug_logs = true,
 
         .measure_speedup = true,
         // .speedup_bench_algorithm_name = "gol-cpu-naive",
         // .speedup_bench_algorithm_name = "gol-cpu-bitwise-cols-64",
-        .speedup_bench_algorithm_name = "gol-cpu-bitwise-cols-macro-64",
-        // .speedup_bench_algorithm_name = "gol-cuda-naive",
+        // .speedup_bench_algorithm_name = "gol-cpu-bitwise-cols-macro-64",
+        .speedup_bench_algorithm_name = "gol-cuda-naive-bitwise-cols-64",
 
         .validate = true,
-        .print_validation_diff = true,
+        // .print_validation_diff = true,
+        .validation_algorithm_name = "gol-cuda-naive",
     };
 
     infrastructure::ExperimentManager manager;

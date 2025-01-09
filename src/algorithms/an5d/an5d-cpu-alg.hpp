@@ -28,6 +28,10 @@ class An5dAlg : public infrastructure::Algorithm<2, char> {
     using DataGrid = infrastructure::Grid<2, char>;
     using size_type = BitGrid::size_type;
 
+    bool is_an5d_cuda_alg() const override {
+        return Model == ExecModel::CUDA;
+    }
+
     void set_and_format_input_data(const DataGrid& data) override {
         input_bit_grid = std::make_unique<BitGrid>(data);
 
