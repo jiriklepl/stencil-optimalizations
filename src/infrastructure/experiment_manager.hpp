@@ -1,10 +1,10 @@
 #ifndef INFRASTRUCTURE_EXPERIMENT_MANAGER_HPP
 #define INFRASTRUCTURE_EXPERIMENT_MANAGER_HPP
 
+#include "../algorithms/an5d/an5d-cpu-alg.hpp"
 #include "../algorithms/cpu-bitwise-cols-macro/gol_cpu_bitwise_cols_macro.hpp"
 #include "../algorithms/cpu-bitwise-cols/gol_cpu_bitwise_cols.hpp"
 #include "../algorithms/cpu-naive/gol_cpu_naive.hpp"
-#include "../algorithms/an5d/an5d-cpu-alg.hpp"
 #include "../algorithms/cuda-naive-bitwise/gol_cuda_naive_bitwise.hpp"
 #include "../algorithms/cuda-naive/gol_cuda_naive.hpp"
 #include "./data_loader.hpp"
@@ -75,7 +75,7 @@ class ExperimentManager {
 
     void run(const ExperimentParams& params) {
         print_basic_param_info(params);
-        
+
         _algs_repos.for_each([&](auto& repo) {
             if (repo.has_algorithm(params.algorithm_name)) {
                 run_experiment(repo, params);
@@ -89,8 +89,8 @@ class ExperimentManager {
 
         auto loader = fetch_loader<Dims, ElementType>(params);
 
-        std::cout << title_color << "Loading data... " << param_color << "             "
-                  << params.data_loader_name << reset_color << std::endl;        
+        std::cout << title_color << "Loading data... " << param_color << "             " << params.data_loader_name
+                  << reset_color << std::endl;
         auto data = loader->load_data(params);
 
         auto alg = repo.fetch_algorithm(params.algorithm_name);
@@ -100,8 +100,8 @@ class ExperimentManager {
             bench_report = measure_speedup(params, data);
         }
 
-        std::cout << title_color << "Running experiment...        " << param_color
-                  << params.algorithm_name << reset_color << std::endl;
+        std::cout << title_color << "Running experiment...        " << param_color << params.algorithm_name
+                  << reset_color << std::endl;
         auto [result, time_report] = perform_alg<AlgMode::Timed>(*alg, data, params);
 
         if (params.measure_speedup) {
@@ -120,8 +120,8 @@ class ExperimentManager {
     void validate(const Grid<Dims, ElementType>& original, const Grid<Dims, ElementType>& result,
                   Loader<Dims, ElementType>& loader, const ExperimentParams& params) {
 
-        std::cout << title_color << "Validating result... " << param_color
-                  << params.validation_algorithm_name << reset_color << std::endl;
+        std::cout << title_color << "Validating result... " << param_color << params.validation_algorithm_name
+                  << reset_color << std::endl;
 
         auto validation_data = loader.load_validation_data(params);
 
@@ -161,7 +161,7 @@ class ExperimentManager {
     template <AlgMode mode, int Dims, typename ElementType>
     auto perform_alg(Algorithm<Dims, ElementType>& alg, const Grid<Dims, ElementType>& init_data,
                      const ExperimentParams& params) {
-                        
+
         TimedAlgorithm<Dims, ElementType> timed_alg(&alg);
 
         timed_alg.set_params(params);
@@ -199,9 +199,11 @@ class ExperimentManager {
 
     void print_basic_param_info(const ExperimentParams& params) {
         std::cout << title_color << "Experiment parameters:" << reset_color << std::endl;
-        std::cout << label_color << "  Grid dimensions: " << param_color << print_grid_dims(params.grid_dimensions) << reset_color << std::endl;
-        std::cout << label_color << "  Iterations:      " << param_color << print_num(params.iterations) << reset_color << std::endl;
-        
+        std::cout << label_color << "  Grid dimensions: " << param_color << print_grid_dims(params.grid_dimensions)
+                  << reset_color << std::endl;
+        std::cout << label_color << "  Iterations:      " << param_color << print_num(params.iterations) << reset_color
+                  << std::endl;
+
         std::cout << std::endl;
     }
 
@@ -229,7 +231,6 @@ class ExperimentManager {
     std::string param_color = "\033[33m";
     std::string label_color = "\033[36m";
     std::string reset_color = "\033[0m";
-
 };
 
 } // namespace infrastructure

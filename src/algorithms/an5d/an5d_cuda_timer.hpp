@@ -25,6 +25,6 @@ class An5dCudaTimer {
     static std::chrono::time_point<std::chrono::high_resolution_clock> end_time;
 };
 
-}
+} // namespace algorithms
 
 #endif // AN5D_CUDA_TIMER_HPP

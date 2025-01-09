@@ -53,7 +53,6 @@ class An5dAlg : public infrastructure::Algorithm<2, char> {
     }
 
   private:
-
     size_type original_x_size;
     size_type original_y_size;
 
@@ -62,7 +61,6 @@ class An5dAlg : public infrastructure::Algorithm<2, char> {
     std::unique_ptr<BitGrid> input_bit_grid;
     std::unique_ptr<BitGrid> result_bit_grid;
 };
-
 
 } // namespace algorithms
 

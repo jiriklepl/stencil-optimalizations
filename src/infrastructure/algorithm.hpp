@@ -1,6 +1,7 @@
 #ifndef INFRASTRUCTURE_ALGORITHM_HPP
 #define INFRASTRUCTURE_ALGORITHM_HPP
 
+#include "../algorithms/an5d/an5d_cuda_timer.hpp"
 #include "experiment_params.hpp"
 #include "grid.hpp"
 #include "timer.hpp"
@@ -8,7 +9,6 @@
 #include <iomanip>
 #include <memory>
 #include <string>
-#include "../algorithms/an5d/an5d_cuda_timer.hpp"
 
 namespace infrastructure {
 
@@ -135,7 +135,7 @@ struct TimeReport {
         if (time == INVALID) {
             return "";
         }
-        
+
         std::string labels_color = "\033[1;33m";
         std::string time_color = "\033[32m";
         std::string reset_color = "\033[0m";
@@ -152,7 +152,8 @@ struct TimeReport {
         std::string time_color = "\033[32m";
         std::string reset_color = "\033[0m";
 
-        return labels_color + label + time_color + std::to_string(time) + "s ~ " + speedup_str(bench, time) + reset_color + "\n";
+        return labels_color + label + time_color + std::to_string(time) + "s ~ " + speedup_str(bench, time) +
+               reset_color + "\n";
     }
 };
 
@@ -179,7 +180,7 @@ class TimedAlgorithm : public Algorithm<Dims, ElementType> {
 
     void run(size_type iterations) override {
         Timer t;
-        
+
         time_report.run = t.measure([&]() { algorithm->run(iterations); });
     }
 
@@ -201,12 +202,12 @@ class TimedAlgorithm : public Algorithm<Dims, ElementType> {
 
     TimeReport get_time_report() {
         if (algorithm->is_an5d_cuda_alg()) {
-            
+
             time_report.set_and_format_input_data = TimeReport::INVALID;
             time_report.initialize_data_structures = TimeReport::INVALID;
-            
+
             time_report.run = algorithms::An5dCudaTimer::elapsed_time_s();
-            
+
             time_report.finalize_data_structures = TimeReport::INVALID;
             time_report.fetch_result = TimeReport::INVALID;
         }

@@ -3,8 +3,8 @@
 
 #ifndef CUSTOM_TYPES_DEFINED
 #define CUSTOM_TYPES_DEFINED
-    typedef unsigned int ui32_t;
-    typedef unsigned long ui64_t;
+typedef unsigned int ui32_t;
+typedef unsigned long ui64_t;
 #endif
 
 #include "an5d_cuda_timer.hpp"
