@@ -31,7 +31,7 @@ class GoLCpuNaive : public infrastructure::Algorithm<2, char> {
         auto x_size = _result.size_in<0>();
         auto y_size = _result.size_in<1>();
 
-        if (this->params.debug_logs) {
+        if (this->params.animate_output) {
             print(*source, 0);
         }
 
@@ -60,7 +60,7 @@ class GoLCpuNaive : public infrastructure::Algorithm<2, char> {
                 }
             }
 
-            if (this->params.debug_logs) {
+            if (this->params.animate_output) {
                 print(*target, i + 1);
             }
 

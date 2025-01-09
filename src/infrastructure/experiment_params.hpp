@@ -11,7 +11,9 @@ class ExperimentParams {
     std::string algorithm_name;
     std::vector<std::size_t> grid_dimensions;
     std::size_t iterations;
+
     std::string data_loader_name;
+    std::string pattern_expression;
 
     bool measure_speedup = false;
     std::string speedup_bench_algorithm_name;
@@ -21,7 +23,7 @@ class ExperimentParams {
 
     std::string validation_algorithm_name = "gol-cpu-naive";
 
-    bool debug_logs = false;
+    bool animate_output = false;
 
     std::size_t random_seed = 42;
 };

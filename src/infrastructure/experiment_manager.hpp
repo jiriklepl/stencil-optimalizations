@@ -187,11 +187,11 @@ class ExperimentManager {
     template <int Dims, typename ElementType>
     std::unique_ptr<Loader<Dims, ElementType>> fetch_loader(const ExperimentParams& params) {
         LoaderCtor<RandomOnesZerosDataLoader, Dims, ElementType> random_loader;
-        LoaderCtor<OneGliderInTheConnerLoader, Dims, ElementType> one_glider_loader;
+        LoaderCtor<LexiconLoader, Dims, ElementType> lexicon_loader;
 
         auto loaderCtor = std::map<std::string, LoaderCtorBase<Dims, ElementType>*>{
             {"random-ones-zeros", &random_loader},
-            {"one-glider-in-the-conner", &one_glider_loader},
+            {"lexicon", &lexicon_loader},
         }[params.data_loader_name];
 
         return loaderCtor->create();

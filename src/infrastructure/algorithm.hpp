@@ -215,6 +215,10 @@ class TimedAlgorithm : public Algorithm<Dims, ElementType> {
         return time_report;
     }
 
+    void set_params(const ExperimentParams& params) {
+        algorithm->set_params(params);
+    }
+
   private:
     TimeReport time_report;
     Algorithm<Dims, ElementType>* algorithm;

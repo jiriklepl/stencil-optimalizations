@@ -25,10 +25,10 @@ int main() {
         // TESTED ALGORITHM         //
         //////////////////////////////
 
-        // .algorithm_name = "gol-cpu-naive",
+        .algorithm_name = "gol-cpu-naive",
         // .algorithm_name = "gol-cpu-bitwise-cols-64",
         // .algorithm_name = "gol-cpu-bitwise-cols-macro-64",
-        .algorithm_name = "gol-cuda-naive-bitwise-cols-64",
+        // .algorithm_name = "gol-cuda-naive-bitwise-cols-64",
         // .algorithm_name = "an5d-cpu-64",
         // .algorithm_name = "an5d-cuda-64",
         // .algorithm_name = "gol-cuda-naive",
@@ -39,23 +39,27 @@ int main() {
 
         // .grid_dimensions = {10'000, 10'000},
         // .grid_dimensions = {512 * (64 + 32), 1024 * (64 + 32)},
-        .grid_dimensions = {512, 1024},
+        // .grid_dimensions = {512, 1024},
         // .grid_dimensions = {64, 128},
         // .grid_dimensions = {64, 256},
-        .iterations = 1'000,
+        .grid_dimensions = {32, 16},
+
+        .iterations = 10,
 
         //////////////////////////////
         // DATA                     //
         //////////////////////////////
 
-        .data_loader_name = "random-ones-zeros",
-        // .data_loader_name = "one-glider-in-the-conner",
+        // .data_loader_name = "random-ones-zeros",
+        .data_loader_name = "lexicon",
+
+        .pattern_expression = "glider[0,1]",
 
         //////////////////////////////
         // SPEEDUP                  //
         //////////////////////////////
 
-        .measure_speedup = true,
+        // .measure_speedup = true,
         // .speedup_bench_algorithm_name = "gol-cpu-naive",
         // .speedup_bench_algorithm_name = "gol-cpu-bitwise-cols-64",
         // .speedup_bench_algorithm_name = "gol-cpu-bitwise-cols-macro-64",
@@ -65,9 +69,11 @@ int main() {
         // VALIDATION               //
         //////////////////////////////
 
-        .validate = true,
+        // .validate = true,
         // .print_validation_diff = true,
         .validation_algorithm_name = "gol-cuda-naive",
+
+        .animate_output = true,
     };
 
     infrastructure::ExperimentManager manager;
