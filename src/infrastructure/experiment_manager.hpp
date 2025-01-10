@@ -7,6 +7,7 @@
 #include "../algorithms/cpu-naive/gol_cpu_naive.hpp"
 #include "../algorithms/cuda-naive-bitwise/gol_cuda_naive_bitwise.hpp"
 #include "../algorithms/cuda-naive/gol_cuda_naive.hpp"
+#include "../algorithms/cuda-naive-local/gol_cuda_naive_local.hpp"
 #include "./data_loader.hpp"
 #include "algorithm.hpp"
 #include "algorithm_repository.hpp"
@@ -25,6 +26,7 @@
 #include "grid.hpp"
 using namespace debug_utils;
 namespace alg = algorithms;
+namespace cuda_naive_local = algorithms::cuda_naive_local;
 
 namespace infrastructure {
 
@@ -63,6 +65,10 @@ class ExperimentManager {
         _2d_repo->register_algorithm<alg::GoLCudaNaiveBitwise<16>>("gol-cuda-naive-bitwise-cols-16");
         _2d_repo->register_algorithm<alg::GoLCudaNaiveBitwise<32>>("gol-cuda-naive-bitwise-cols-32");
         _2d_repo->register_algorithm<alg::GoLCudaNaiveBitwise<64>>("gol-cuda-naive-bitwise-cols-64");
+
+        _2d_repo->register_algorithm<cuda_naive_local::GoLCudaNaiveLocal<16>>("gol-cuda-naive-local-16");
+        _2d_repo->register_algorithm<cuda_naive_local::GoLCudaNaiveLocal<32>>("gol-cuda-naive-local-32");
+        _2d_repo->register_algorithm<cuda_naive_local::GoLCudaNaiveLocal<64>>("gol-cuda-naive-local-64");
 
         // AN5D
 
