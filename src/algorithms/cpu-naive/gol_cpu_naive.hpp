@@ -93,7 +93,9 @@ class GoLCpuNaive : public infrastructure::Algorithm<2, char> {
                 auto x_neighbour = x + i;
                 auto y_neighbour = y + j;
 
-                if (x_neighbour < 0 || x_neighbour >= x_size || y_neighbour < 0 || y_neighbour >= y_size)
+                constexpr std::size_t zero = 0;
+
+                if (x_neighbour < zero || x_neighbour >= x_size || y_neighbour < zero || y_neighbour >= y_size)
                     continue;
 
                 alive_neighbours += grid[x_neighbour][y_neighbour] > 0 ? 1 : 0;

@@ -26,6 +26,7 @@ class Loader {
     virtual Grid<Dims, ElementType> load_data(const ExperimentParams& params) = 0;
 
     virtual std::unique_ptr<Grid<Dims, ElementType>> load_validation_data(const ExperimentParams& params) {
+        (void)params;
         return nullptr;
     }
 };

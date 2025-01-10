@@ -95,6 +95,7 @@ class AlgorithmReposCollection<> {
 
     template <typename Func>
     void for_each(Func&& func) {
+        (void)func;
     }
 };
 

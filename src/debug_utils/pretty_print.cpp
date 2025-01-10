@@ -1,10 +1,11 @@
 #include "pretty_print.hpp"
+#include <cstddef>
 
 std::string debug_utils::pretty(const infrastructure::Grid<2, char>& grid) {
     std::string result;
 
-    for (int y = 0; y < grid.size_in<1>(); ++y) {
-        for (int x = 0; x < grid.size_in<0>(); ++x) {
+    for (std::size_t y = 0; y < grid.size_in<1>(); ++y) {
+        for (std::size_t x = 0; x < grid.size_in<0>(); ++x) {
             std::string cell = "[";
             cell += std::to_string(static_cast<int>(grid[x][y]));
             cell += ']';
@@ -28,10 +29,10 @@ std::string debug_utils::pretty(const infrastructure::Grid<3, char>& grid) {
     auto dimY = grid.size_in<1>();
     auto dimZ = grid.size_in<2>();
 
-    for (int z = 0; z < dimZ; z++) {
+    for (std::size_t z = 0; z < dimZ; z++) {
         result += "Layer Z=" + std::to_string(z) + "\n";
-        for (int x = 0; x < dimX; ++x) {
-            for (int y = 0; y < dimY; ++y) {
+        for (std::size_t x = 0; x < dimX; ++x) {
+            for (std::size_t y = 0; y < dimY; ++y) {
                 result += (grid[x][y][z] == 1 ? "O" : ".");
             }
             result += "\n";

@@ -180,7 +180,7 @@ class ExperimentManager {
             return std::make_tuple(std::move(result_ptr), time_report);
         }
         else {
-            return std::move(result_ptr);
+            return result_ptr;
         }
     }
 
