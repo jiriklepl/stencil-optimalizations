@@ -1,3 +1,4 @@
+#!/bin/bash
 echo -e "\033[33mCompiling...\033[0m"
 ./compile.sh
 

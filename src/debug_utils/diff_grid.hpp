@@ -1,19 +1,20 @@
 #ifndef DIFF_GRID_HPP
 #define DIFF_GRID_HPP
 
-#include "../infrastructure/grid.hpp"
-#include "./pretty_print.hpp"
 #include <cstddef>
 #include <sstream>
 #include <string>
 
+#include "../infrastructure/grid.hpp"
+#include "./pretty_print.hpp"
+
 namespace debug_utils {
 
 template <int Dims, typename ElementType>
-std::string diff(const infrastructure::Grid<Dims, ElementType>& original,
-                 const infrastructure::Grid<Dims, ElementType>& other) {
+inline std::string diff(const infrastructure::Grid<Dims, ElementType>& original,
+                        const infrastructure::Grid<Dims, ElementType>& other) {
 
-    std::stringstream diff_str;
+    std::ostringstream diff_str;
 
     auto original_data = original.data();
     auto other_data = other.data();
@@ -30,10 +31,10 @@ std::string diff(const infrastructure::Grid<Dims, ElementType>& original,
 }
 
 template <typename ElementType>
-std::string diff(const infrastructure::Grid<2, ElementType>& original,
-                 const infrastructure::Grid<2, ElementType>& other) {
+inline std::string diff(const infrastructure::Grid<2, ElementType>& original,
+                        const infrastructure::Grid<2, ElementType>& other) {
 
-    std::stringstream diff_str;
+    std::ostringstream diff_str;
 
     auto x_size = original.size_in(0);
     auto y_size = original.size_in(1);
