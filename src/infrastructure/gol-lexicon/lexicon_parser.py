@@ -66,10 +66,9 @@ class Pattern:
         name = self.name()
         cpp_body_rows = self._load_cpp_body_rows()
 
-        rec_template = '''            {"<name>",
-             {
-<rows>,
-             }},'''
+        rec_template = '''{"<name>", {
+<rows>}},
+'''
         
         rec = rec_template.replace('<name>', name)
         rec = rec.replace('<rows>', cpp_body_rows)
@@ -77,7 +76,7 @@ class Pattern:
         return rec
 
     def _load_cpp_body_rows(self):
-        row_template = '''                 {<cells>}'''
+        row_template = '''{<cells>}'''
 
         body = self.body()
         rows = []
@@ -146,7 +145,7 @@ WORKING_DIR = os.path.dirname(os.path.abspath(__file__))
 LEXICON_FILE_PATH = os.path.join(WORKING_DIR, 'lexicon.txt')
 LEXICON_TEXT = open(LEXICON_FILE_PATH, 'r').read()
 
-CPP_SOURCE_FILE_PATH = os.path.join(WORKING_DIR, 'patterns.hpp')
+CPP_SOURCE_FILE_PATH = os.path.join(WORKING_DIR, 'patterns.cpp')
 CPP_SOURCE_CONTENT = open(CPP_SOURCE_FILE_PATH, 'r').read()
 
 lexicon = Lexicon()

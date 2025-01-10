@@ -20,6 +20,8 @@ using namespace debug_utils;
 int main() {
     std::cout << "Hello" << std::endl;
 
+    std::size_t x = 128, y = 64;
+
     infrastructure::ExperimentParams params = {
         //////////////////////////////
         // TESTED ALGORITHM         //
@@ -42,7 +44,7 @@ int main() {
         // .grid_dimensions = {512, 1024},
         // .grid_dimensions = {64, 128},
         // .grid_dimensions = {64, 256},
-        .grid_dimensions = {32, 16},
+        .grid_dimensions = {x, y},
 
         .iterations = 10,
 
@@ -53,7 +55,7 @@ int main() {
         // .data_loader_name = "random-ones-zeros",
         .data_loader_name = "lexicon",
 
-        .pattern_expression = "glider[0,1]",
+        .pattern_expression = "spacefiller[" + std::to_string(x / 2 - 10) + ", " + std::to_string(y / 2 - 10) + "];",
 
         //////////////////////////////
         // SPEEDUP                  //
@@ -73,7 +75,7 @@ int main() {
         // .print_validation_diff = true,
         .validation_algorithm_name = "gol-cuda-naive",
 
-        .animate_output = true,
+        // .animate_output = true,
     };
 
     infrastructure::ExperimentManager manager;

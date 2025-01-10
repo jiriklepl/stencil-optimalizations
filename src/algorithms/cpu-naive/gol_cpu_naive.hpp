@@ -11,8 +11,6 @@ namespace algorithms {
 
 class GoLCpuNaive : public infrastructure::Algorithm<2, char> {
   public:
-    GoLCpuNaive() : animate(false) {};
-
     using size_type = std::size_t;
     using DataGrid = infrastructure::Grid<2, char>;
 
@@ -121,7 +119,6 @@ class GoLCpuNaive : public infrastructure::Algorithm<2, char> {
 
     DataGrid _result;
     DataGrid _intermediate;
-    bool animate;
 };
 
 } // namespace algorithms
