@@ -1,11 +1,12 @@
 #ifndef ALGORITHMS_SHARED_BITWISE_GOL_OPERATION_HPP
 #define ALGORITHMS_SHARED_BITWISE_GOL_OPERATION_HPP
 
-#include "../template_helpers/static_for.hpp"
 #include <bitset>
 #include <cstddef>
 #include <iostream>
 #include <sstream>
+
+#include "../template_helpers/static_for.hpp"
 
 namespace algorithms {
 

@@ -1,8 +1,9 @@
 #ifndef CUCH_HPP
 #define CUCH_HPP
 
-#include <cuda_runtime.h>
 #include <sstream>
+
+#include <cuda_runtime.h>
 
 /**
  * A stream exception that is base for all runtime errors.
@@ -20,10 +21,8 @@ class CudaError : public std::exception {
     CudaError(const std::string& msg, cudaError_t status = cudaSuccess)
         : std::exception(), mMessage(msg), mStatus(status) {
     }
-    virtual ~CudaError() throw() {
-    }
 
-    virtual const char* what() const throw() {
+    virtual const char* what() const noexcept override {
         return mMessage.c_str();
     }
 

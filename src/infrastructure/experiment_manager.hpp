@@ -126,7 +126,7 @@ class ExperimentManager {
         auto validation_data = loader.load_validation_data(params);
 
         if (validation_data == nullptr) {
-            auto repo = _algs_repos.template get_repository<Dims, ElementType>();
+            auto repo = _algs_repos.get_repository<Dims, ElementType>();
             auto alg = repo->fetch_algorithm(params.validation_algorithm_name);
 
             validation_data = perform_alg<AlgMode::NotTimed>(*alg, original, params);
@@ -150,7 +150,7 @@ class ExperimentManager {
         std::cout << title_color << "Measuring bench algorithm... " << param_color
                   << params.speedup_bench_algorithm_name << reset_color << std::endl;
 
-        auto repo = _algs_repos.template get_repository<Dim, ElementType>();
+        auto repo = _algs_repos.get_repository<Dim, ElementType>();
         auto alg = repo->fetch_algorithm(params.speedup_bench_algorithm_name);
 
         auto [result, time_report] = perform_alg<AlgMode::Timed>(*alg, init_data, params);
@@ -197,7 +197,7 @@ class ExperimentManager {
         return loaderCtor->create();
     }
 
-    void print_basic_param_info(const ExperimentParams& params) {
+    void print_basic_param_info(const ExperimentParams& params) const {
         std::cout << title_color << "Experiment parameters:" << reset_color << std::endl;
         std::cout << label_color << "  Grid dimensions: " << param_color << print_grid_dims(params.grid_dimensions)
                   << reset_color << std::endl;
@@ -207,7 +207,7 @@ class ExperimentManager {
         std::cout << std::endl;
     }
 
-    std::string print_grid_dims(const std::vector<std::size_t>& dims) {
+    std::string print_grid_dims(const std::vector<std::size_t>& dims) const {
         std::string result = "";
         for (auto&& dim : dims) {
             result += print_num(dim) + " x ";
@@ -217,7 +217,7 @@ class ExperimentManager {
         return result;
     }
 
-    std::string print_num(std::size_t num) {
+    std::string print_num(std::size_t num) const {
         std::string result = std::to_string(num);
         for (int i = result.size() - 3; i > 0; i -= 3) {
             result.insert(i, "'");

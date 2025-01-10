@@ -1,18 +1,28 @@
 #ifndef DATA_LOADER_HPP
 #define DATA_LOADER_HPP
 
-#include "experiment_params.hpp"
-#include "gol-lexicon/lexicon.hpp"
-#include "grid.hpp"
 #include <iostream>
 #include <memory>
 #include <random>
+
+#include "experiment_params.hpp"
+#include "gol-lexicon/lexicon.hpp"
+#include "grid.hpp"
 
 namespace infrastructure {
 
 template <int Dims, typename ElementType>
 class Loader {
   public:
+    Loader() = default;
+    virtual ~Loader() = default;
+
+    Loader(const Loader&) = delete;
+    Loader& operator=(const Loader&) = delete;
+
+    Loader(Loader&&) = default;
+    Loader& operator=(Loader&&) = default;
+
     virtual Grid<Dims, ElementType> load_data(const ExperimentParams& params) = 0;
 
     virtual std::unique_ptr<Grid<Dims, ElementType>> load_validation_data(const ExperimentParams& params) {
@@ -23,6 +33,15 @@ class Loader {
 template <int Dims, typename ElementType>
 class LoaderCtorBase {
   public:
+    LoaderCtorBase() = default;
+    virtual ~LoaderCtorBase() = default;
+
+    LoaderCtorBase(const LoaderCtorBase&) = delete;
+    LoaderCtorBase& operator=(const LoaderCtorBase&) = delete;
+
+    LoaderCtorBase(LoaderCtorBase&&) = default;
+    LoaderCtorBase& operator=(LoaderCtorBase&&) = default;
+
     virtual std::unique_ptr<Loader<Dims, ElementType>> create() = 0;
 };
 

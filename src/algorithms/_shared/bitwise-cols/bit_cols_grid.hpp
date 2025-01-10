@@ -1,8 +1,6 @@
 #ifndef GOL_BIT_COL_GRID_HPP
 #define GOL_BIT_COL_GRID_HPP
 
-#include "../../../debug_utils/pretty_print.hpp"
-#include "../../../infrastructure/grid.hpp"
 #include <bitset>
 #include <cassert>
 #include <cstdarg>
@@ -13,6 +11,9 @@
 #include <sstream>
 #include <string>
 #include <vector>
+
+#include "../../../debug_utils/pretty_print.hpp"
+#include "../../../infrastructure/grid.hpp"
 
 using namespace debug_utils;
 
@@ -120,7 +121,7 @@ class BitColsGrid {
             }
         }
 
-        return std::move(grid);
+        return grid;
     }
 
   private:

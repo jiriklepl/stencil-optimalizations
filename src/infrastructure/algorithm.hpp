@@ -1,14 +1,15 @@
 #ifndef INFRASTRUCTURE_ALGORITHM_HPP
 #define INFRASTRUCTURE_ALGORITHM_HPP
 
-#include "../algorithms/an5d/an5d_cuda_timer.hpp"
-#include "experiment_params.hpp"
-#include "grid.hpp"
-#include "timer.hpp"
 #include <cstddef>
 #include <iomanip>
 #include <memory>
 #include <string>
+
+#include "../algorithms/an5d/an5d_cuda_timer.hpp"
+#include "experiment_params.hpp"
+#include "grid.hpp"
+#include "timer.hpp"
 
 namespace infrastructure {
 
@@ -17,6 +18,15 @@ class Algorithm {
   public:
     using size_type = std::size_t;
     using DataGrid = Grid<Dims, ElementType>;
+
+    Algorithm() = default;
+    virtual ~Algorithm() = default;
+
+    Algorithm(const Algorithm&) = delete;
+    Algorithm& operator=(const Algorithm&) = delete;
+
+    Algorithm(Algorithm&&) = default;
+    Algorithm& operator=(Algorithm&&) = default;
 
     /**
      * @brief Sets the input data and formats it if necessary.
@@ -75,7 +85,7 @@ struct TimeReport {
     double finalize_data_structures = INVALID;
     double fetch_result = INVALID;
 
-    std::string pretty_print() {
+    std::string pretty_print() const {
         std::string title_color = "\033[1;34m";
         std::string labels_color = "\033[1;33m";
         std::string time_color = "\033[32m";
@@ -93,7 +103,7 @@ struct TimeReport {
         return result;
     }
 
-    std::string pretty_print_speedup(const TimeReport& bench) {
+    std::string pretty_print_speedup(const TimeReport& bench) const {
         std::string title_color = "\033[1;34m";
         std::string labels_color = "\033[1;33m";
         std::string time_color = "\033[34m";
@@ -112,7 +122,7 @@ struct TimeReport {
     }
 
   private:
-    std::string speedup_str(double bench, double time) {
+    std::string speedup_str(double bench, double time) const {
         std::string positive_color = "\033[32m";
         std::string negative_color = "\033[31m";
         std::string reset_color = "\033[0m";
@@ -131,7 +141,7 @@ struct TimeReport {
         }
     }
 
-    std::string pretty_print_line(const std::string& label, double time) {
+    std::string pretty_print_line(const std::string& label, double time) const {
         if (time == INVALID) {
             return "";
         }
@@ -143,7 +153,7 @@ struct TimeReport {
         return labels_color + label + time_color + std::to_string(time) + "s" + reset_color + "\n";
     }
 
-    std::string pretty_print_speedup_line(const std::string& label, double time, double bench) {
+    std::string pretty_print_speedup_line(const std::string& label, double time, double bench) const {
         if (time == INVALID || bench == INVALID) {
             return "";
         }

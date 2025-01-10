@@ -14,28 +14,36 @@ class AlgorithmRepository {
     using AlgType = Algorithm<Dims, ElementType>;
 
     void register_algorithm(const std::string& algorithm_name, std::unique_ptr<AlgType> algorithm) {
-        _algorithms[algorithm_name] = std::move(algorithm);
+        _algorithms.insert_or_assign(algorithm_name, std::move(algorithm));
     }
 
     template <typename Alg>
     void register_algorithm(const std::string& algorithm_name) {
-        _algorithms[algorithm_name] = std::make_unique<Alg>();
+        _algorithms.insert_or_assign(algorithm_name, std::make_unique<Alg>());
+    }
+
+    void register_loader(const std::string& loader_name, std::unique_ptr<AlgType> loader) {
+        _algorithms.insert_or_assign(loader_name, std::move(loader));
     }
 
     AlgType* fetch_algorithm(const std::string& algorithm_name) {
-        auto it = _algorithms.find(algorithm_name);
+        const auto it = _algorithms.find(algorithm_name);
         if (it != _algorithms.end()) {
             return it->second.get();
         }
         return nullptr;
     }
 
-    bool has_algorithm(const std::string& algorithm_name) {
-        return _algorithms.find(algorithm_name) != _algorithms.end();
+    const AlgType* fetch_algorithm(const std::string& algorithm_name) const {
+        const auto it = _algorithms.find(algorithm_name);
+        if (it != _algorithms.end()) {
+            return it->second.get();
+        }
+        return nullptr;
     }
 
-    void register_loader(const std::string& loader_name, std::unique_ptr<AlgType> loader) {
-        _algorithms[loader_name] = std::move(loader);
+    bool has_algorithm(const std::string& algorithm_name) const {
+        return _algorithms.contains(algorithm_name);
     }
 
   private:
