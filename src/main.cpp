@@ -45,13 +45,14 @@ int main() {
 
         // .grid_dimensions = {10'000, 10'000},
         // .grid_dimensions = {512 * (64 + 32), 1024 * (64 + 32)},
-        .grid_dimensions = {512 * 16, 1024 * 16},
+        // .grid_dimensions = {512 * 16, 1024 * 16},
+        .grid_dimensions = {512 * 4, 1024 * 4},
         // .grid_dimensions = {512, 1024},
         // .grid_dimensions = {64, 128},
         // .grid_dimensions = {64, 256},
         // .grid_dimensions = {x, y},
 
-        .iterations = 1,
+        .iterations = 100'000,
 
         //////////////////////////////
         // DATA                     //
@@ -67,7 +68,7 @@ int main() {
         // SPEEDUP                  //
         //////////////////////////////
 
-        // .measure_speedup = true,
+        .measure_speedup = true,
         // .speedup_bench_algorithm_name = "gol-cpu-naive",
         // .speedup_bench_algorithm_name = "gol-cpu-bitwise-cols-64",
         // .speedup_bench_algorithm_name = "gol-cpu-bitwise-cols-macro-64",

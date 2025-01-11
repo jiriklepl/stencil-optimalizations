@@ -29,7 +29,7 @@ class GoLCudaNaiveLocal : public infrastructure::Algorithm<2, char> {
         bit_grid = std::make_unique<BitGrid>(data);
 
         cuda_data.warp_dims = { .x = 4, .y = 8};
-        cuda_data.warp_tile_dims = { .x = 64, .y = 8};
+        cuda_data.warp_tile_dims = { .x = 16, .y = 8};
 
         assert(warp_size() == 32);
     }
@@ -39,9 +39,6 @@ class GoLCudaNaiveLocal : public infrastructure::Algorithm<2, char> {
         cuda_data.y_size = bit_grid->y_size();
 
         auto size = bit_grid->size();   
-
-        // auto size_of_warp_tile = cuda_data.warp_dims.x * cuda_data.warp_dims.y;
-        // auto change_state_store_size = size / ;
 
         CUCH(cudaMalloc(&cuda_data.input, size * sizeof(col_type)));
         CUCH(cudaMalloc(&cuda_data.output, size * sizeof(col_type)));
@@ -85,8 +82,6 @@ class GoLCudaNaiveLocal : public infrastructure::Algorithm<2, char> {
     std::size_t get_thread_block_count(std::size_t thread_block_size) {
         auto warps_per_block = thread_block_size / warp_size();
         auto computed_elems_in_block = warps_per_block * warp_tile_size(); 
-
-        std::cout << "computed_elems_in_block: " << computed_elems_in_block << std::endl;
 
         return bit_grid->size() / computed_elems_in_block;
     }

@@ -10,6 +10,7 @@
 namespace algorithms::cuda_naive_local {
 
 using idx_t = std::int64_t;
+// using idx_t = std::int32_t;
 
 __device__ inline idx_t get_idx(idx_t x, idx_t y, idx_t x_size) {
     return y * x_size + x;
@@ -18,11 +19,6 @@ __device__ inline idx_t get_idx(idx_t x, idx_t y, idx_t x_size) {
 template <typename col_type, typename state_store_type>
 __device__ inline idx_t x_tiles(BitGridWithChangeInfo<col_type, state_store_type> data) {
     return data.x_size / data.warp_tile_dims.x;
-}
-
-template <typename col_type, typename state_store_type>
-__device__ inline idx_t y_tiles(BitGridWithChangeInfo<col_type, state_store_type> data) {
-    return data.y_size / data.warp_tile_dims.y;
 }
 
 template <typename col_type, typename state_store_type>
@@ -53,30 +49,43 @@ __global__ void game_of_live_kernel(BitGridWithChangeInfo<col_type, state_store_
     idx_t y_start = (y_tile * data.warp_tile_dims.y) + (y_in_warp * y_rows_in_warp);
 
     for (idx_t y = y_start; y < y_start + y_rows_in_warp; ++y) {
-        for (idx_t x = x_start; x < x_start + x_cols_in_warp; ++x) {
+        idx_t x = x_start;
 
-            col_type lt = load(x - 1, y - 1, data);
-            col_type ct = load(x, y - 1, data);
-            col_type rt = load(x + 1, y - 1, data);
+        col_type lt, ct, rt;
+        col_type lc, cc, rc;
+        col_type lb, cb, rb;
 
-            col_type lc = load(x - 1, y, data);
-            col_type cc = load(x, y, data);
-            col_type rc = load(x + 1, y, data);
+        ct = load(x - 1, y - 1, data);
+        cc = load(x - 1, y + 0, data);
+        cb = load(x - 1, y + 1, data);
 
-            col_type lb = load(x - 1, y + 1, data);
-            col_type cb = load(x, y + 1, data);
-            col_type rb = load(x + 1, y + 1, data);
+        rt = load(x + 0, y - 1, data);
+        rc = load(x + 0, y + 0, data);
+        rb = load(x + 0, y + 1, data);
+
+        for (; x < x_start + x_cols_in_warp; ++x) {
+
+            lt = ct;
+            lc = cc;
+            lb = cb;
+
+            ct = rt;
+            cc = rc;
+            cb = rb;
+
+            rt = load(x + 1, y - 1, data);
+            rc = load(x + 1, y + 0, data);
+            rb = load(x + 1, y + 1, data);
 
             data.output[get_idx(x, y, data.x_size)] =
                 CudaBitwiseOps<col_type>::compute_center_col(lt, ct, rt, lc, cc, rc, lb, cb, rb);
         }
     }
-
 }
 
 template <std::size_t Bits, typename state_store_type>
 void GoLCudaNaiveLocal<Bits, state_store_type>::run_kernel(size_type iterations) {
-    auto block_size = 32 * 4;
+    auto block_size = 32 * 8;
     auto blocks = get_thread_block_count(block_size);
 
     for (std::size_t i = 0; i < iterations; ++i) {
