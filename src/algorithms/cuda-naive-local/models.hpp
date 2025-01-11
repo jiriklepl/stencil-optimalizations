@@ -31,6 +31,25 @@ struct BitGridWithChangeInfo {
     ChangeStateStore<change_state_store_type> change_state_store;
 };
 
+template <typename col_type, typename change_state_store_type, typename idx_t>
+struct WarpInformation {
+    idx_t warp_idx;
+    idx_t lane_idx;
+
+    idx_t x_tile;
+    idx_t y_tile;
+
+    idx_t x_in_warp;
+    idx_t y_in_warp;
+
+    idx_t x_cols_in_warp;
+    idx_t y_rows_in_warp;
+
+    idx_t x_start;
+    idx_t y_start;
+};
+
+
 } // namespace algorithms
 
 #endif // CUDA_NAIVE_MODELS_HPP

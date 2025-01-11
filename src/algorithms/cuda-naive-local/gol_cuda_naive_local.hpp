@@ -25,11 +25,14 @@ class GoLCudaNaiveLocal : public infrastructure::Algorithm<2, char> {
     using BitGrid = BitColsGrid<col_type>;
     using BitGrid_ptr = std::unique_ptr<BitGrid>;
 
+    constexpr static std::size_t STATE_STORE_BITS = sizeof(state_store_type) * 8;
+
     void set_and_format_input_data(const DataGrid& data) override {
         bit_grid = std::make_unique<BitGrid>(data);
 
         cuda_data.warp_dims = { .x = 4, .y = 8};
         cuda_data.warp_tile_dims = { .x = 16, .y = 8};
+        thread_block_size = 32 * 8;
 
         assert(warp_size() == 32);
     }
@@ -39,11 +42,27 @@ class GoLCudaNaiveLocal : public infrastructure::Algorithm<2, char> {
         cuda_data.y_size = bit_grid->y_size();
 
         auto size = bit_grid->size();   
+        auto state_store_word_count = get_thread_block_count();
+        
+        std::cout << "block_count: " << get_thread_block_count() << std::endl;
+
+        // col_type* input;
+        // col_type* output;
+        // state_store_type* change_state_store_last;
+        // state_store_type* change_state_store_current;
 
         CUCH(cudaMalloc(&cuda_data.input, size * sizeof(col_type)));
         CUCH(cudaMalloc(&cuda_data.output, size * sizeof(col_type)));
 
+        CUCH(cudaMalloc(&cuda_data.change_state_store.last, state_store_word_count * sizeof(state_store_type)));
+        CUCH(cudaMalloc(&cuda_data.change_state_store.current, state_store_word_count * sizeof(state_store_type)));
+
         CUCH(cudaMemcpy(cuda_data.input, bit_grid->data(), size * sizeof(col_type), cudaMemcpyHostToDevice));
+
+        // cuda_data.input = input;
+        // cuda_data.output = output;
+        // cuda_data.change_state_store.last = change_state_store_last;
+        // cuda_data.change_state_store.current = change_state_store_current;
     }
 
     void run(size_type iterations) override {
@@ -69,6 +88,8 @@ class GoLCudaNaiveLocal : public infrastructure::Algorithm<2, char> {
     BitGrid_ptr bit_grid;
     BitGridWithChangeInfo<col_type, state_store_type> cuda_data;
 
+    std::size_t thread_block_size;
+
     void run_kernel(size_type iterations);
 
     std::size_t warp_tile_size() const {
@@ -79,7 +100,11 @@ class GoLCudaNaiveLocal : public infrastructure::Algorithm<2, char> {
         return cuda_data.warp_dims.x * cuda_data.warp_dims.y;
     }
 
-    std::size_t get_thread_block_count(std::size_t thread_block_size) {
+    std::size_t get_warp_tiles_count() {
+        return bit_grid->size() / warp_tile_size();
+    }
+
+    std::size_t get_thread_block_count() {
         auto warps_per_block = thread_block_size / warp_size();
         auto computed_elems_in_block = warps_per_block * warp_tile_size(); 
 
