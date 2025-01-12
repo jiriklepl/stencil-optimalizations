@@ -11,6 +11,7 @@ struct Dims {
 
 template <typename change_state_store_type>
 struct ChangeStateStore {
+    change_state_store_type* before_last;
     change_state_store_type* last;
     change_state_store_type* current;
 };
@@ -50,8 +51,6 @@ struct WarpInformation {
 
     idx_t x_start;
     idx_t y_start;
-
-    idx_t iter;
 };
 
 
