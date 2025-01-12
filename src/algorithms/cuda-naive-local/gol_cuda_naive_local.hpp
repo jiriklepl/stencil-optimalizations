@@ -9,6 +9,7 @@
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
+#include <iostream>
 #include <memory>
 
 namespace algorithms::cuda_naive_local {
@@ -34,35 +35,39 @@ class GoLCudaNaiveLocal : public infrastructure::Algorithm<2, char> {
         cuda_data.warp_tile_dims = { .x = 16, .y = 8};
         thread_block_size = 32 * 8;
 
+        std::cout << "block size: " << thread_block_size << std::endl;
+        std::cout << "tiles per block: " << tiles_per_block() << std::endl;
+        std::cout << "block count: " << get_thread_block_count() << std::endl;
+        std::cout << "warp tiles count: " << get_warp_tiles_count() << std::endl;
+        std::cout << "elements total: " << bit_grid->size() << std::endl;
+        std::cout << "x size: " << bit_grid->x_size() << std::endl;
+        std::cout << "y size: " << bit_grid->y_size() << std::endl;
+        std::cout << "x tiles: " << bit_grid->x_size() / cuda_data.warp_tile_dims.x << std::endl;
+        std::cout << "y tiles: " << bit_grid->y_size() / cuda_data.warp_tile_dims.y << std::endl;
+        
+        std::cout << std::endl;
+
+
+
         assert(warp_size() == 32);
+        assert(tiles_per_block() < STATE_STORE_BITS);
     }
 
     void initialize_data_structures() override {
         cuda_data.x_size = bit_grid->x_size();
         cuda_data.y_size = bit_grid->y_size();
 
-        auto size = bit_grid->size();   
-        auto state_store_word_count = get_thread_block_count();
+        auto size = bit_grid->size();
         
-        std::cout << "block_count: " << get_thread_block_count() << std::endl;
-
-        // col_type* input;
-        // col_type* output;
-        // state_store_type* change_state_store_last;
-        // state_store_type* change_state_store_current;
-
         CUCH(cudaMalloc(&cuda_data.input, size * sizeof(col_type)));
         CUCH(cudaMalloc(&cuda_data.output, size * sizeof(col_type)));
 
-        CUCH(cudaMalloc(&cuda_data.change_state_store.last, state_store_word_count * sizeof(state_store_type)));
-        CUCH(cudaMalloc(&cuda_data.change_state_store.current, state_store_word_count * sizeof(state_store_type)));
+        CUCH(cudaMalloc(&cuda_data.change_state_store.last, state_store_word_count() * sizeof(state_store_type)));
+        CUCH(cudaMalloc(&cuda_data.change_state_store.current, state_store_word_count() * sizeof(state_store_type)));
 
         CUCH(cudaMemcpy(cuda_data.input, bit_grid->data(), size * sizeof(col_type), cudaMemcpyHostToDevice));
 
-        // cuda_data.input = input;
-        // cuda_data.output = output;
-        // cuda_data.change_state_store.last = change_state_store_last;
-        // cuda_data.change_state_store.current = change_state_store_current;
+        reset_changed_stores();
     }
 
     void run(size_type iterations) override {
@@ -110,6 +115,107 @@ class GoLCudaNaiveLocal : public infrastructure::Algorithm<2, char> {
 
         return bit_grid->size() / computed_elems_in_block;
     }
+
+    std::size_t state_store_word_count() {
+        return get_thread_block_count();
+    }
+
+    void reset_changed_stores() {
+        state_store_type zero = 0;
+
+        CUCH(cudaMemset(cuda_data.change_state_store.last, ~zero, state_store_word_count() * sizeof(state_store_type)));
+        CUCH(cudaMemset(cuda_data.change_state_store.current, ~zero, state_store_word_count() * sizeof(state_store_type)));
+    }
+
+    void check_state_stores() {
+
+        std::vector<state_store_type> last(state_store_word_count(), 0);
+        std::vector<state_store_type> current(state_store_word_count(), 0);
+
+        CUCH(cudaMemcpy(last.data(), cuda_data.change_state_store.last, state_store_word_count() * sizeof(state_store_type), cudaMemcpyDeviceToHost));
+        CUCH(cudaMemcpy(current.data(), cuda_data.change_state_store.current, state_store_word_count() * sizeof(state_store_type), cudaMemcpyDeviceToHost));
+
+        std::size_t changed_tiles_in_last = 0;
+        std::size_t changed_tiles_in_current = 0;
+
+        for (std::size_t i = 0; i < state_store_word_count(); i++) {
+            changed_tiles_in_last += __builtin_popcountll(last[i]);
+            changed_tiles_in_current += __builtin_popcountll(current[i]);
+        }
+
+        std::cout << "Changed tiles in last: " << changed_tiles_in_last << std::endl;
+        std::cout << "Changed tiles in current: " << changed_tiles_in_current << std::endl;
+
+        // print_state_store(last.data());
+        print_state_store(current.data());
+
+        std::cout << std::endl;
+    }
+
+    std::size_t tiles_per_block() {
+        return thread_block_size / warp_size();
+    }
+
+    void print_state_store(state_store_type* store) {
+        auto x_tiles = bit_grid->x_size() / cuda_data.warp_tile_dims.x;
+        auto y_tiles = bit_grid->y_size() / cuda_data.warp_tile_dims.y;
+
+        constexpr std::size_t MAX_WIDTH = 32 * 4;
+        auto shrink_factor = x_tiles / MAX_WIDTH;
+
+        std::cout << "Shrink factor: " << shrink_factor << std::endl;
+
+        auto used_bits_in_word = tiles_per_block();
+
+        for (std::size_t i = 0; i < state_store_word_count(); i++) {
+            if (store[i] != 0) {
+                std::cout << "Word " << i << ": " << std::bitset<64>(store[i]) << std::endl;
+            }
+        }
+
+        for (std::size_t y = 0; y < y_tiles; y += shrink_factor) {
+            for (std::size_t x = 0; x < x_tiles; x += shrink_factor) {
+                auto idx = y * x_tiles + x;
+                
+                auto word_idx = idx / used_bits_in_word;
+                auto bit_idx = idx % used_bits_in_word;
+                
+                auto word = store[word_idx];
+                auto bit = (word >> bit_idx) & 1;
+
+                bool changed = bit;
+                
+                // bool changed = false;
+
+                // for (std::size_t i_y = y; i_y < y + shrink_factor; i_y++) {
+                //     for (std::size_t i_x = x; i_x < x + shrink_factor; i_x++) {
+                //         auto idx = i_y * x_tiles + i_x;
+
+                //         auto word_idx = idx / used_bits_in_word;
+                //         auto bit_idx = idx % used_bits_in_word;
+
+                //         auto word = store[word_idx];
+                //         auto bit = (word >> bit_idx) & 1;
+
+                //         if (bit) {
+                //             changed = true;
+                //             break;
+                //         }
+                //     }
+                // }
+
+                if (changed) {
+                    std::cout << "X";
+                } else {
+                    std::cout << ".";
+                }
+            }
+            std::cout << std::endl;
+        }
+
+        std::cout << std::endl;
+    }
+    
 };
 
 } // namespace algorithms

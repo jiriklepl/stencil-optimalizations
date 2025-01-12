@@ -39,6 +39,9 @@ struct WarpInformation {
     idx_t x_tile;
     idx_t y_tile;
 
+    idx_t x_tiles;
+    idx_t y_tiles;
+
     idx_t x_in_warp;
     idx_t y_in_warp;
 
@@ -47,6 +50,8 @@ struct WarpInformation {
 
     idx_t x_start;
     idx_t y_start;
+
+    idx_t iter;
 };
 
 

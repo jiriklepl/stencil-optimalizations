@@ -56,7 +56,8 @@ int main() {
         // .grid_dimensions = {64, 256},
         .grid_dimensions = {x, y},
 
-        .iterations = 100'000,
+        // .iterations = 100'000,
+        .iterations = 2000,
 
         //////////////////////////////
         // DATA                     //
@@ -66,8 +67,9 @@ int main() {
         .data_loader_name = "lexicon",
 
         // .pattern_expression = "spacefiller[" + std::to_string(x / 2 - 10) + ", " + std::to_string(y / 2 - 10) + "];",
-        // .pattern_expression="glider[40,40] glider[50,40]",
-        .pattern_expression=spacefiller_in_the_middle,
+        // .pattern_expression="glider[10,10]",
+        .pattern_expression="glider[1000,2000]",
+        // .pattern_expression=spacefiller_in_the_middle,
 
         //////////////////////////////
         // SPEEDUP                  //
@@ -91,6 +93,8 @@ int main() {
     };
 
     infrastructure::ExperimentManager manager;
+
+    std::cout << "pattern_expression: " << params.pattern_expression << std::endl;
 
     manager.run(params);
 
