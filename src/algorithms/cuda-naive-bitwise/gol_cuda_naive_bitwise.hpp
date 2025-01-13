@@ -50,8 +50,8 @@ class GoLCudaNaiveBitwise : public infrastructure::Algorithm<2, char> {
 
         CUCH(cudaMemcpy(data, cuda_data.output, bit_grid->size() * sizeof(col_type), cudaMemcpyDeviceToHost));
 
-        cudaFree(cuda_data.input);
-        cudaFree(cuda_data.output);
+        CUCH(cudaFree(cuda_data.input));
+        CUCH(cudaFree(cuda_data.output));
     }
 
     DataGrid fetch_result() override {

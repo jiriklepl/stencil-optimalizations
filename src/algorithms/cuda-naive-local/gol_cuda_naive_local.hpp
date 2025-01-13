@@ -14,7 +14,7 @@
 
 namespace algorithms::cuda_naive_local {
 
-template <std::size_t Bits, typename state_store_type = std::uint64_t>
+template <std::size_t Bits, typename state_store_type = std::uint32_t>
 class GoLCudaNaiveLocal : public infrastructure::Algorithm<2, char> {
 
   public:
@@ -68,8 +68,11 @@ class GoLCudaNaiveLocal : public infrastructure::Algorithm<2, char> {
 
         CUCH(cudaMemcpy(data, cuda_data.output, bit_grid->size() * sizeof(col_type), cudaMemcpyDeviceToHost));
 
-        cudaFree(cuda_data.input);
-        cudaFree(cuda_data.output);
+        CUCH(cudaFree(cuda_data.input));
+        CUCH(cudaFree(cuda_data.output));
+        CUCH(cudaFree(cuda_data.change_state_store.before_last));
+        CUCH(cudaFree(cuda_data.change_state_store.last));
+        CUCH(cudaFree(cuda_data.change_state_store.current));
     }
 
     DataGrid fetch_result() override {
@@ -137,6 +140,11 @@ class GoLCudaNaiveLocal : public infrastructure::Algorithm<2, char> {
 
     std::size_t tiles_per_block() {
         return thread_block_size / warp_size();
+    }
+
+    void rotate_state_stores() {
+        std::swap(cuda_data.change_state_store.before_last, cuda_data.change_state_store.last);
+        std::swap(cuda_data.change_state_store.last, cuda_data.change_state_store.current);
     }
 
     void print_state_store(state_store_type* store) {

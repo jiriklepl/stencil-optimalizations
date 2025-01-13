@@ -79,11 +79,12 @@ int main() {
         // SPEEDUP                  //
         //////////////////////////////
 
-        .measure_speedup = true,
+        // .measure_speedup = true,
         // .speedup_bench_algorithm_name = "gol-cpu-naive",
         // .speedup_bench_algorithm_name = "gol-cpu-bitwise-cols-64",
         // .speedup_bench_algorithm_name = "gol-cpu-bitwise-cols-macro-64",
         .speedup_bench_algorithm_name = "gol-cuda-naive-bitwise-cols-64",
+        // .speedup_bench_algorithm_name = "an5d-cuda-64",
 
         //////////////////////////////
         // VALIDATION               //

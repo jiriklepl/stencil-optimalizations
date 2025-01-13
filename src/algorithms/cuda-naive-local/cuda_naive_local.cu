@@ -185,22 +185,26 @@ template <typename col_type, typename state_store_type>
 __global__ void game_of_live_kernel(BitGridWithChangeInfo<col_type, state_store_type> data) {
 
     extern __shared__ shm_private_value_t block_store[];
-    bool warp_tile_changed;
+    bool entire_tile_changed;
 
     auto info = get_warp_info(data);
 
     if (!tile_or_neighbours_changed(info.x_tile, info.y_tile, info, data.change_state_store.last)) {
-        cpy_to_output(info, data);
-        warp_tile_changed = false;
+        
+        if (warp_tile_changed(info.x_tile, info.y_tile, info, data.change_state_store.before_last)) {
+            cpy_to_output(info, data);
+        }
+        
+        entire_tile_changed = false;
     }
     else {
         auto local_tile_changed = compute_GOL_on_tile(info, data);
-        warp_tile_changed = __any_sync(0xFF'FF'FF'FF, local_tile_changed);
+        entire_tile_changed = __any_sync(0xFF'FF'FF'FF, local_tile_changed);
     }
 
     if (info.lane_idx == 0) {
         auto tiles_per_block = blockDim.x / WARP_SIZE;
-        block_store[info.warp_idx % tiles_per_block] = warp_tile_changed ? 1 : 0;
+        block_store[info.warp_idx % tiles_per_block] = entire_tile_changed ? 1 : 0;
     }
 
     __syncthreads();
@@ -221,7 +225,7 @@ void GoLCudaNaiveLocal<Bits, state_store_type>::run_kernel(size_type iterations)
     for (std::size_t i = 0; i < iterations; ++i) {
         if (i != 0) {
             std::swap(cuda_data.input, cuda_data.output);
-            std::swap(cuda_data.change_state_store.current, cuda_data.change_state_store.last);
+            rotate_state_stores();      
         }
 
         game_of_live_kernel<<<blocks, block_size, shm_size>>>(cuda_data);
