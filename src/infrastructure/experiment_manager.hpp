@@ -96,8 +96,16 @@ class ExperimentManager {
         auto loader = fetch_loader<Dims, ElementType>(params);
 
         std::cout << title_color << "Loading data... " << param_color << "             " << params.data_loader_name
+                  << ((params.data_loader_name == "lexicon") ? title_color + " with pattern " + param_color + params.pattern_expression: "") 
                   << reset_color << std::endl;
-        auto data = loader->load_data(params);
+
+        
+        Timer t;
+
+        Grid<Dims, ElementType> data;
+
+        auto ms  = t.measure([&]() { data = loader->load_data(params); });
+        std::cout << label_color << "  Data loaded in " << param_color << ms << " ms" << reset_color << std::endl;
 
         auto alg = repo.fetch_algorithm(params.algorithm_name);
         TimeReport bench_report;

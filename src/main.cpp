@@ -23,7 +23,8 @@ int main() {
 
     // std::size_t x = 128, y = 64;
     // std::size_t x = 512 * 4, y = 1024 * 4;
-    std::size_t x = 512 * 16, y = 1024 * 16;
+    // std::size_t x = 512 * 16, y = 1024 * 16;
+    std::size_t x = 512 * 32, y = 1024 * 32;
     std::string spacefiller_in_the_middle = "spacefiller[" + std::to_string(x / 2 - 10) + ", " + std::to_string(y / 2 - 10) + "];";
     std::string glider_in_bottom_right = "glider[" + std::to_string(x - 10) + ", " + std::to_string(y - 10) + "];";
 
@@ -60,7 +61,8 @@ int main() {
         .grid_dimensions = {x, y},
 
         // .iterations = 100'000,
-        .iterations = 4000,
+        // .iterations = 16'000,
+        .iterations = 16,
 
         //////////////////////////////
         // DATA                     //
@@ -72,14 +74,14 @@ int main() {
         // .pattern_expression = "spacefiller[" + std::to_string(x / 2 - 10) + ", " + std::to_string(y / 2 - 10) + "];",
         // .pattern_expression="glider[10,10]",
         // .pattern_expression="glider[1000,2000]",
-        .pattern_expression = glider_in_bottom_right,
-        // .pattern_expression=spacefiller_in_the_middle,
+        // .pattern_expression = glider_in_bottom_right,
+        .pattern_expression=spacefiller_in_the_middle,
 
         //////////////////////////////
         // SPEEDUP                  //
         //////////////////////////////
 
-        // .measure_speedup = true,
+        .measure_speedup = true,
         // .speedup_bench_algorithm_name = "gol-cpu-naive",
         // .speedup_bench_algorithm_name = "gol-cpu-bitwise-cols-64",
         // .speedup_bench_algorithm_name = "gol-cpu-bitwise-cols-macro-64",

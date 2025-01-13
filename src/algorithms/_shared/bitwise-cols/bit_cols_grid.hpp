@@ -111,13 +111,15 @@ class BitColsGrid {
         auto _original_y_size = original_y_size();
 
         Grid grid(_original_x_size, _original_y_size);
-
-        for (size_type y = 0; y < _original_y_size; ++y) {
+        
+        for (size_type y = 0; y < _original_y_size; y += BITS_IN_COL) {
             for (size_type x = 0; x < _original_x_size; ++x) {
                 auto col = get_bit_col(x, y / BITS_IN_COL);
-                auto bit = y % BITS_IN_COL;
 
-                grid[x][y] = ((col >> bit) & 1) ? 1 : 0;
+                for (size_type bit = 0; bit < BITS_IN_COL; ++bit) {
+                    auto value = (col >> bit) & 1;
+                    grid[x][y + bit] = value;
+                }
             }
         }
 
@@ -132,8 +134,8 @@ class BitColsGrid {
     }
 
     void fill_grid(const Grid& grid) {
-        for (std::size_t y = 0; y < grid.size_in<1>(); y += BITS_IN_COL) {
-            for (std::size_t x = 0; x < grid.size_in<0>(); ++x) {
+        for (std::size_t x = 0; x < grid.size_in<0>(); ++x) {
+            for (std::size_t y = 0; y < grid.size_in<1>(); y += BITS_IN_COL) {
                 bit_col_type bit_col = 0;
 
                 for (std::size_t i = 0; i < BITS_IN_COL; ++i) {
