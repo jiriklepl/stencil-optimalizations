@@ -185,8 +185,13 @@ class ExperimentManager {
         timed_alg.run(params.iterations);
         timed_alg.finalize_data_structures();
 
-        auto result = timed_alg.fetch_result();
-        auto result_ptr = std::make_unique<Grid<Dims, ElementType>>(result);
+
+        std::unique_ptr<Grid<Dims, ElementType>> result_ptr = nullptr;
+
+        if (params.validate) {
+            auto result = timed_alg.fetch_result();
+            result_ptr = std::make_unique<Grid<Dims, ElementType>>(result);
+        }
 
         auto time_report = timed_alg.get_time_report();
 

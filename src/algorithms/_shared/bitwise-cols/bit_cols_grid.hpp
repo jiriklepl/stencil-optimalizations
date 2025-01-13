@@ -111,6 +111,7 @@ class BitColsGrid {
         auto _original_y_size = original_y_size();
 
         Grid grid(_original_x_size, _original_y_size);
+        auto raw_data = grid.data();
         
         for (size_type y = 0; y < _original_y_size; y += BITS_IN_COL) {
             for (size_type x = 0; x < _original_x_size; ++x) {
@@ -118,7 +119,7 @@ class BitColsGrid {
 
                 for (size_type bit = 0; bit < BITS_IN_COL; ++bit) {
                     auto value = (col >> bit) & 1;
-                    grid[x][y + bit] = value;
+                    raw_data[in_grid_idx(x,y + bit)] = value;
                 }
             }
         }
@@ -127,6 +128,10 @@ class BitColsGrid {
     }
 
   private:
+    std::size_t in_grid_idx(std::size_t x, std::size_t y) const {
+        return y * _x_size + x;
+    }
+
     void assert_dim_has_correct_size(const Grid& grid) {
         if (grid.size_in<1>() % BITS_IN_COL != 0) {
             throw std::invalid_argument("Grid dimensions must be a multiple of " + std::to_string(BITS_IN_COL));
@@ -134,12 +139,14 @@ class BitColsGrid {
     }
 
     void fill_grid(const Grid& grid) {
-        for (std::size_t x = 0; x < grid.size_in<0>(); ++x) {
-            for (std::size_t y = 0; y < grid.size_in<1>(); y += BITS_IN_COL) {
+        auto raw_data = grid.data();
+
+        for (std::size_t y = 0; y < grid.size_in<1>(); y += BITS_IN_COL) {
+            for (std::size_t x = 0; x < grid.size_in<0>(); ++x) {
                 bit_col_type bit_col = 0;
 
                 for (std::size_t i = 0; i < BITS_IN_COL; ++i) {
-                    auto value = static_cast<bit_col_type>(grid[x][y + i]);
+                    auto value = static_cast<bit_col_type>(raw_data[in_grid_idx(x, y + i)]);
                     bit_col |= value << i;
                 }
 

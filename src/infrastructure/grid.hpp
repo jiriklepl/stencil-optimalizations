@@ -2,6 +2,7 @@
 #define INFRASTRUCTURE_GRID_HPP
 
 #include <cstddef>
+#include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -49,10 +50,6 @@ class GridTile : public GridTileBase<Dims, ElementType> {
         auto tile_size = this->tile_sizes_per_dimensions[0];
         return LowerDimTileConst(this->_data + index * tile_size, this->tile_sizes_per_dimensions + 1);
     }
-
-    size_type top_dimension_size() const {
-        return this->tile_sizes_per_dimensions[-1] / this->tile_sizes_per_dimensions[0];
-    }
 };
 
 template <typename ElementType>
@@ -65,15 +62,11 @@ class GridTile<1, ElementType> : public GridTileBase<1, ElementType> {
     }
 
     auto& operator[](int index) {
-        return this->_data[index];
+        return this->_data[index * this->tile_sizes_per_dimensions[0]];
     }
 
     const ElementType& operator[](int index) const {
-        return this->_data[index];
-    }
-
-    size_type top_dimension_size() const {
-        return this->tile_sizes_per_dimensions[-1];
+        return this->_data[index * this->tile_sizes_per_dimensions[0]];
     }
 };
 
@@ -96,29 +89,32 @@ class Grid {
         }
 
         size_type total_size = 1;
-        tile_sizes_per_dimensions.resize(DIMS);
-
-        for (int i = DIMS - 1; i >= 0; i--) {
+        
+        for (int i = 0; i < DIMS; i++) {
+            tile_sizes_per_dimensions.push_back(total_size);
             total_size *= dimension_sizes[i];
-            tile_sizes_per_dimensions[i] = total_size;
         }
+
+        tile_sizes_per_dimensions.push_back(total_size);
 
         elements.resize(total_size);
     }
 
     auto operator[](size_type index) {
-        GridTile<DIMS, ElementType> indexer(elements.data(), tile_sizes_per_dimensions.data() + 1);
-        return indexer[index];
+        return as_tile()[index];
     }
 
     auto operator[](size_type index) const {
-        GridTile<DIMS, const ElementType> indexer(static_cast<const ElementType*>(elements.data()),
-                                                  const_cast<size_type*>(tile_sizes_per_dimensions.data()) + 1);
-        return indexer[index];
+        return as_const_tile()[index];
     }
 
     auto as_tile() {
-        return GridTile<DIMS, ElementType>(elements.data(), tile_sizes_per_dimensions.data() + 1);
+        return GridTile<DIMS, ElementType>(elements.data(), tile_sizes_per_dimensions.data());
+    }
+
+    auto as_const_tile() const {
+        return GridTile<DIMS, const ElementType>(static_cast<const ElementType*>(elements.data()),
+                                            const_cast<size_type*>(tile_sizes_per_dimensions.data()));
     }
 
     static constexpr int dimensions() {
@@ -168,10 +164,6 @@ class Grid {
             }
         }
         return true;
-    }
-
-    void set(size_type x, size_type y, ElementType value) {
-        elements[y * dimension_sizes[0] + x] = value;
     }
 
   private:

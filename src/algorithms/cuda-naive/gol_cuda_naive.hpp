@@ -21,8 +21,8 @@ class GoLCudaNaive : public infrastructure::Algorithm<2, char> {
     }
 
     void initialize_data_structures() override {
-        cuda_data.x_size = grid.size_in<1>();
-        cuda_data.y_size = grid.size_in<0>();
+        cuda_data.x_size = grid.size_in<0>();
+        cuda_data.y_size = grid.size_in<1>();
 
         auto size = grid.size();
 
