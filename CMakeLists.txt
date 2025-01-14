@@ -23,6 +23,8 @@ FetchContent_Declare(
     GIT_TAG 3bf2684
 )
 
+FetchContent_MakeAvailable(cxxopts)
+
 set(Language "CUDA")
 if (UseHip)
   set(Language "HIP")
@@ -38,6 +40,7 @@ find_package(CUDAToolkit REQUIRED)
 add_subdirectory(src)
 
 target_link_libraries(stencils PRIVATE CUDA::cudart)
+target_link_libraries(stencils PRIVATE cxxopts)
 
 if (MSVC)
     target_compile_options(stencils PRIVATE /W4 /WX)
