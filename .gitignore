@@ -8,3 +8,4 @@ profile-upload.sh
 *:Zone.Identifier
 *.ncu-rep
 .envrc
+experiments-outputs/

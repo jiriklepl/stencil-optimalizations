@@ -1,0 +1,24 @@
+#!/bin/bash
+
+
+ALGORITHM="gol-cpu-bitwise-cols-macro-64" \
+GRID_DIMENSIONS_X="256" \
+GRID_DIMENSIONS_Y="512" \
+ITERATIONS="100" \
+DATA_LOADER_NAME="lexicon" \
+PATTERN_EXPRESSION="glider[100,300]" \
+MEASURE_SPEEDUP="true" \
+SPEEDUP_BENCH_ALGORITHM_NAME="gol-cpu-bitwise-cols-64" \
+VALIDATE="true" \
+PRINT_VALIDATION_DIFF="false" \
+VALIDATION_ALGORITHM_NAME="gol-cpu-naive" \
+ANIMATE_OUTPUT="false" \
+COLORFUL="false" \
+RANDOM_SEED="42" \
+THREAD_BLOCK_SIZE="42" \
+WARP_DIMS_X="5" \
+WARP_DIMS_Y="6" \
+WARP_TILE_DIMS_X="7" \
+WARP_TILE_DIMS_Y="8" \
+STREAMING_DIRECTION="in-x" \
+sbatch job.slurm.sbatch.sh
