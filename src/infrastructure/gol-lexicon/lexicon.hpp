@@ -129,18 +129,41 @@ class Lexicon {
         auto expression = PatterExpression::from(pattern_expression);
 
         for (auto&& record : expression.records()) {
-            insert(grid, record);
+            insert_record(grid, record);
         }
     }
 
+    template <typename Grid>
+    void insert_pattern(Grid& grid, const std::string& pattern_name, std::size_t x, std::size_t y) {
+        auto pattern = get_pattern(pattern_name);
+        insert_pattern_at(grid, pattern, x, y);
+    }
+
+    template <typename Grid>
+    void insert_repeating(Grid& grid, const std::string& pattern_name, std::size_t x_jump, std::size_t y_jump) {
+        auto pattern = get_pattern(pattern_name);
+        for (std::size_t x = 0; x < grid.template size_in<0>(); x += x_jump) {
+            for (std::size_t y = 0; y < grid.template size_in<1>(); y += y_jump) {
+                insert_pattern_at(grid, pattern, x, y);
+            }
+        }
+    }
+
+
+
   private:
     template <typename Grid>
-    void insert(Grid& grid, const PatternExpresionRecord& record) {
+    void insert_record(Grid& grid, const PatternExpresionRecord& record) {
         auto pattern = get_pattern(record.name());
 
         auto x_offset = record.x();
         auto y_offset = record.y();
 
+        insert_pattern_at(grid, pattern, x_offset, y_offset);
+    }
+
+    template <typename Grid>
+    void insert_pattern_at(Grid& grid, Pattern* pattern, std::size_t x_offset, std::size_t y_offset) {
         for (std::size_t y = 0; y < pattern->size(); y++) {
             auto&& row = (*pattern)[y];
 

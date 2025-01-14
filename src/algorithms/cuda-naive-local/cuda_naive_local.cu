@@ -233,37 +233,6 @@ void GoLCudaNaiveLocal<Bits, state_store_type>::run_kernel(size_type iterations)
     }
 }
 
-// template <std::size_t Bits, typename state_store_type>
-// void GoLCudaNaiveLocal<Bits, state_store_type>::run_kernel(size_type iterations) {
-//     auto block_size = thread_block_size;
-//     auto blocks = get_thread_block_count();
-//     auto warp_tile_per_block = block_size / WARP_SIZE;
-//     auto shm_size = warp_tile_per_block * sizeof(shm_private_value_t);
-
-//     cudaGraph_t graph;
-//     cudaGraphExec_t instance;
-//     cudaStream_t stream;
-//     cudaStreamCreate(&stream);
-
-//     cudaStreamBeginCapture(stream, cudaStreamCaptureModeGlobal);
-
-//     for (std::size_t i = 0; i < iterations; ++i) {
-//         if (i != 0) {
-//             std::swap(cuda_data.input, cuda_data.output);
-//             rotate_state_stores();
-//         }
-//         game_of_live_kernel<<<blocks, block_size, shm_size, stream>>>(cuda_data);
-//     }
-
-//     cudaStreamEndCapture(stream, &graph);
-//     cudaGraphInstantiate(&instance, graph, nullptr, nullptr, 0);
-
-//     cudaGraphLaunch(instance, stream);
-//     cudaStreamSynchronize(stream);
-
-//     cudaStreamDestroy(stream);
-// }
-
 } // namespace algorithms
 
 template class algorithms::cuda_naive_local::GoLCudaNaiveLocal<16, std::uint16_t>;

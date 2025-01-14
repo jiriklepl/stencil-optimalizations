@@ -104,8 +104,8 @@ class ExperimentManager {
 
         Grid<Dims, ElementType> data;
 
-        auto ms  = t.measure([&]() { data = loader->load_data(params); });
-        std::cout << label_color << "  Data loaded in " << param_color << ms << " ms" << reset_color << std::endl;
+        auto secs  = t.measure([&]() { data = loader->load_data(params); });
+        std::cout << label_color << "  Data loaded in " << param_color << secs << " s" << reset_color << std::endl;
 
         auto alg = repo.fetch_algorithm(params.algorithm_name);
         TimeReport bench_report;
@@ -207,10 +207,13 @@ class ExperimentManager {
     std::unique_ptr<Loader<Dims, ElementType>> fetch_loader(const ExperimentParams& params) {
         LoaderCtor<RandomOnesZerosDataLoader, Dims, ElementType> random_loader;
         LoaderCtor<LexiconLoader, Dims, ElementType> lexicon_loader;
+        LoaderCtor<AlwaysChangingSpaceLoader, Dims, ElementType> always_changing_loader;
+
 
         auto loaderCtor = std::map<std::string, LoaderCtorBase<Dims, ElementType>*>{
             {"random-ones-zeros", &random_loader},
             {"lexicon", &lexicon_loader},
+            {"always-changing", &always_changing_loader},
         }[params.data_loader_name];
 
         return loaderCtor->create();

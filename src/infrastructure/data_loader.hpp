@@ -100,6 +100,38 @@ class LexiconLoader<2, ElementType> : public Loader<2, ElementType> {
     }
 };
 
+template <int Dims, typename ElementType>
+class AlwaysChangingSpaceLoader : public Loader<Dims, ElementType> {
+  public:
+    Grid<Dims, ElementType> load_data(const ExperimentParams& params) {
+
+        Grid<Dims, ElementType> grid(params.grid_dimensions);
+
+        // Not supported for general dimension
+
+        return grid;
+    }
+};
+
+template <typename ElementType>
+class AlwaysChangingSpaceLoader<2, ElementType> : public Loader<2, ElementType> {
+  std::string blinker = "blinker";
+
+  std::size_t x_jump = 4;
+  std::size_t y_jump = 4;
+
+  public:
+    Grid<2, ElementType> load_data(const ExperimentParams& params) {
+
+        Grid<2, ElementType> grid(params.grid_dimensions);
+
+        lexicon::Lexicon lexicon;
+        lexicon.insert_repeating(grid, blinker, x_jump, y_jump);
+
+        return grid;
+    }
+};
+
 } // namespace infrastructure
 
 #endif // DATA_LOADER_HPP

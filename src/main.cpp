@@ -59,11 +59,12 @@ int main() {
         // .grid_dimensions = {512 * 4, 1024 * 4},
         // .grid_dimensions = {512, 1024},
         // .grid_dimensions = {64, 128},
+        // .grid_dimensions = {64, 128},
         // .grid_dimensions = {64, 256},
         .grid_dimensions = {x, y},
 
         // .iterations = 100'000,
-        .iterations = 16'000,
+        .iterations = 160'000,
         // .iterations = 16,
 
         //////////////////////////////
@@ -71,7 +72,8 @@ int main() {
         //////////////////////////////
 
         // .data_loader_name = "random-ones-zeros",
-        .data_loader_name = "lexicon",
+        // .data_loader_name = "lexicon",
+        .data_loader_name = "always-changing",
 
         // .pattern_expression = "spacefiller[" + std::to_string(x / 2 - 10) + ", " + std::to_string(y / 2 - 10) + "];",
         // .pattern_expression="glider[10,10]",
@@ -94,7 +96,7 @@ int main() {
         // VALIDATION               //
         //////////////////////////////
 
-        .validate = true,
+        // .validate = true,
         // .print_validation_diff = true,
         .validation_algorithm_name = "gol-cuda-naive",
 
