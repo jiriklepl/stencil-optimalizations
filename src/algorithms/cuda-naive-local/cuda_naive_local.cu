@@ -13,6 +13,8 @@ namespace algorithms::cuda_naive_local {
 using idx_t = std::int64_t;
 // using idx_t = std::int32_t;
 using shm_private_value_t = std::uint32_t;
+using StreamingDir = infrastructure::StreamingDirection;
+
 
 constexpr std::size_t WARP_SIZE = 32;
 
@@ -135,7 +137,77 @@ __device__ inline void cpy_to_output(
 }
 
 template <typename col_type, typename CudaData>
-__device__ inline bool compute_GOL_on_tile(
+__device__ inline bool compute_GOL_on_tile__naive_no_streaming(
+    const WarpInfo<col_type>& info, CudaData&& data) {
+    
+    bool tile_changed = false;
+
+    for (idx_t y = info.y_start; y < info.y_start + info.y_rows_in_warp; ++y) {
+        for (idx_t x = info.x_start; x < info.x_start + info.x_cols_in_warp; ++x) {
+    
+            col_type lt = load<col_type>(x - 1, y - 1, data);
+            col_type ct = load<col_type>(x + 0, y - 1, data);
+            col_type rt = load<col_type>(x + 1, y - 1, data);
+            col_type lc = load<col_type>(x - 1, y + 0, data);
+            col_type cc = load<col_type>(x + 0, y + 0, data);
+            col_type rc = load<col_type>(x + 1, y + 0, data);
+            col_type lb = load<col_type>(x - 1, y + 1, data);
+            col_type cb = load<col_type>(x + 0, y + 1, data);
+            col_type rb = load<col_type>(x + 1, y + 1, data);
+    
+            data.output[get_idx(x, y, data.x_size)] =
+                CudaBitwiseOps<col_type>::compute_center_col(lt, ct, rt, lc, cc, rc, lb, cb, rb);
+        }
+    }
+
+    return tile_changed;
+}
+
+template <typename col_type, typename CudaData>
+__device__ inline bool compute_GOL_on_tile__streaming_in_x(
+    const WarpInfo<col_type>& info, CudaData&& data) {
+    
+    bool tile_changed = false;
+
+    for (idx_t x = info.x_start; x < info.x_start + info.x_cols_in_warp; ++x) {
+        idx_t y = info.y_start;
+        
+        col_type lt, ct, rt;
+        col_type lc, cc, rc;
+        col_type lb, cb, rb;
+        
+        lc = load<col_type>(x - 1, y - 1, data);
+        cc = load<col_type>(x + 0, y - 1, data);
+        rc = load<col_type>(x + 1, y - 1, data);
+
+        lb = load<col_type>(x - 1, y + 0, data);
+        cb = load<col_type>(x + 0, y + 0, data);
+        rb = load<col_type>(x + 1, y + 0, data);
+
+        for (; y < info.y_start + info.y_rows_in_warp; ++y) {
+
+            lt = lc; 
+            ct = cc; 
+            rt = rc; 
+
+            lc = lb; 
+            cc = cb; 
+            rc = rb; 
+            
+            lb = load<col_type>(x - 1, y + 1, data);
+            cb = load<col_type>(x + 0, y + 1, data);
+            rb = load<col_type>(x + 1, y + 1, data);
+    
+            data.output[get_idx(x, y, data.x_size)] =
+                CudaBitwiseOps<col_type>::compute_center_col(lt, ct, rt, lc, cc, rc, lb, cb, rb);
+        }
+    }
+
+    return tile_changed;
+}
+
+template <typename col_type, typename CudaData>
+__device__ inline bool compute_GOL_on_tile__streaming_in_y(
     const WarpInfo<col_type>& info, CudaData&& data) {
     
     bool tile_changed = false;
@@ -182,7 +254,25 @@ __device__ inline bool compute_GOL_on_tile(
     return tile_changed;
 }
 
-template <typename col_type, typename state_store_type>
+template <typename col_type, StreamingDir DIRECTION, typename CudaData>
+__device__ inline bool compute_GOL_on_tile(
+    const WarpInfo<col_type>& info, CudaData&& data) {
+
+    if constexpr (DIRECTION == StreamingDir::in_X) {
+        return compute_GOL_on_tile__streaming_in_x<col_type>(info, data);
+    }
+    else if constexpr (DIRECTION == StreamingDir::in_Y) {
+        return compute_GOL_on_tile__streaming_in_y<col_type>(info, data);
+    }
+    else if constexpr (DIRECTION == StreamingDir::NAIVE) {
+        return compute_GOL_on_tile__naive_no_streaming<col_type>(info, data);
+    }
+    else {
+        printf("Invalid streaming direction %d\n", DIRECTION);
+    }
+}
+
+template <StreamingDir DIRECTION, typename col_type, typename state_store_type>
 __global__ void game_of_live_kernel(BitGridWithChangeInfo<col_type, state_store_type> data) {
 
     extern __shared__ shm_private_value_t block_store[];
@@ -199,7 +289,7 @@ __global__ void game_of_live_kernel(BitGridWithChangeInfo<col_type, state_store_
         entire_tile_changed = false;
     }
     else {
-        auto local_tile_changed = compute_GOL_on_tile<col_type>(info, data);
+        auto local_tile_changed = compute_GOL_on_tile<col_type, DIRECTION>(info, data);
         entire_tile_changed = __any_sync(0xFF'FF'FF'FF, local_tile_changed);
     }
 
@@ -216,6 +306,7 @@ __global__ void game_of_live_kernel(BitGridWithChangeInfo<col_type, state_store_
 }
 
 template <std::size_t Bits, typename state_store_type>
+template <StreamingDir DIRECTION>
 void GoLCudaNaiveLocal<Bits, state_store_type>::run_kernel(size_type iterations) {
     auto block_size = thread_block_size;
     auto blocks = get_thread_block_count();
@@ -229,7 +320,7 @@ void GoLCudaNaiveLocal<Bits, state_store_type>::run_kernel(size_type iterations)
             rotate_state_stores();      
         }
 
-        game_of_live_kernel<<<blocks, block_size, shm_size>>>(cuda_data);
+        game_of_live_kernel<DIRECTION ><<<blocks, block_size, shm_size>>>(cuda_data);
         // check_state_stores();
     }
 }
@@ -238,14 +329,15 @@ void GoLCudaNaiveLocal<Bits, state_store_type>::run_kernel(size_type iterations)
 // JUST TILING KERNEL
 // -----------------------------------------------------------------------------------------------
 
-template <typename col_type>
+template <StreamingDir DIRECTION, typename col_type>
 __global__ void game_of_live_kernel_just_tiling(BitGridWithTiling<col_type> data) {
     auto info = get_warp_info<col_type>(data);
-    compute_GOL_on_tile<col_type>(info, data);
+    compute_GOL_on_tile<col_type, DIRECTION>(info, data);
 }
 
 
 template <std::size_t Bits>
+template <StreamingDir DIRECTION>
 void GoLCudaNaiveJustTiling<Bits>::run_kernel(size_type iterations) {
     auto block_size = thread_block_size;
     auto blocks = get_thread_block_count();
@@ -255,7 +347,7 @@ void GoLCudaNaiveJustTiling<Bits>::run_kernel(size_type iterations) {
             std::swap(cuda_data.input, cuda_data.output);
         }
 
-        game_of_live_kernel_just_tiling<<<blocks, block_size>>>(cuda_data);
+        game_of_live_kernel_just_tiling<DIRECTION><<<blocks, block_size>>>(cuda_data);
     }
 }
 

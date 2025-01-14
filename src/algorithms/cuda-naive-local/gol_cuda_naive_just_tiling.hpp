@@ -14,6 +14,8 @@
 
 namespace algorithms::cuda_naive_local {
 
+using StreamingDir = infrastructure::StreamingDirection;
+
 template <std::size_t Bits>
 class GoLCudaNaiveJustTiling : public infrastructure::Algorithm<2, char> {
 
@@ -29,9 +31,17 @@ class GoLCudaNaiveJustTiling : public infrastructure::Algorithm<2, char> {
     void set_and_format_input_data(const DataGrid& data) override {
         bit_grid = std::make_unique<BitGrid>(data);
 
-        cuda_data.warp_dims = { .x = 8, .y = 4};
-        cuda_data.warp_tile_dims = { .x = 16, .y = 8};
-        thread_block_size = 32 * 8;
+        thread_block_size = this->params.thread_block_size;
+        
+        cuda_data.warp_dims = {
+            .x = this->params.warp_dims_x,
+            .y = this->params.warp_dims_y
+        };
+        
+        cuda_data.warp_tile_dims = {
+            .x = this->params.warp_tile_dims_x,
+            .y = this->params.warp_tile_dims_y
+        };
 
         assert(warp_size() == 32);
     }
@@ -50,7 +60,19 @@ class GoLCudaNaiveJustTiling : public infrastructure::Algorithm<2, char> {
     }
 
     void run(size_type iterations) override {
-        run_kernel(iterations);
+        switch (this->params.streaming_direction) {
+            case StreamingDir::in_X:
+                run_kernel<StreamingDir::in_X>(iterations);
+                break;
+            case StreamingDir::in_Y:
+                run_kernel<StreamingDir::in_Y>(iterations);
+                break;
+            case StreamingDir::NAIVE:
+                run_kernel<StreamingDir::NAIVE>(iterations);
+                break;
+            default:
+                throw std::runtime_error("Invalid streaming direction");
+        }
     }
 
     void finalize_data_structures() override {
@@ -74,6 +96,7 @@ class GoLCudaNaiveJustTiling : public infrastructure::Algorithm<2, char> {
 
     std::size_t thread_block_size;
 
+    template <StreamingDir Direction>
     void run_kernel(size_type iterations);
 
     std::size_t warp_tile_size() const {

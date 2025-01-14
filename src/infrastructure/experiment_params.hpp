@@ -6,6 +6,12 @@
 #include <vector>
 namespace infrastructure {
 
+enum class StreamingDirection {
+    in_X = 0,
+    in_Y = 1,
+    NAIVE = 2,
+};
+
 class ExperimentParams {
   public:
     std::string algorithm_name;
@@ -26,6 +32,15 @@ class ExperimentParams {
     bool animate_output = false;
 
     std::size_t random_seed = 42;
+
+    std::size_t thread_block_size;
+
+    std::size_t warp_dims_x;
+    std::size_t warp_dims_y;
+    std::size_t warp_tile_dims_x;
+    std::size_t warp_tile_dims_y;
+
+    StreamingDirection streaming_direction;
 };
 
 } // namespace infrastructure

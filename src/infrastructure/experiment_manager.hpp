@@ -110,7 +110,7 @@ class ExperimentManager {
         Grid<Dims, ElementType> data;
 
         auto secs  = t.measure([&]() { data = loader->load_data(params); });
-        std::cout << label_color << "  Data loaded in " << param_color << secs << " s" << reset_color << std::endl;
+        std::cout << label_color << "  Data loaded in   " << param_color << secs << " s" << reset_color << std::endl;
 
         auto alg = repo.fetch_algorithm(params.algorithm_name);
         TimeReport bench_report;
