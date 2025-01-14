@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <cxxopts.hpp>
+#include "colors.hpp"
 
 namespace infrastructure {
 
@@ -34,6 +35,7 @@ class ExperimentParams {
     std::string validation_algorithm_name = "gol-cpu-naive";
 
     bool animate_output = false;
+    bool colorful = true;
 
     std::size_t random_seed = 42;
 
@@ -49,10 +51,10 @@ class ExperimentParams {
     std::string pretty_print() {
       std::stringstream ss;
 
-      std::string title_color = "\033[35m";
-      std::string label_color = "\033[36m";
-      std::string value_color = "\033[33m";
-      std::string reset_color = "\033[0m";
+      std::string title_color = c::title_color();
+      std::string label_color = c::label_color();
+      std::string value_color = c::value_color();
+      std::string reset_color = c::reset_color();
 
       ss << title_color << "Experiment Parameter:" << std::endl;
 
@@ -67,6 +69,7 @@ class ExperimentParams {
       ss << label_color << "  print_validation_diff: " << value_color << print_validation_diff << std::endl;
       ss << label_color << "  validation_algorithm_name: " << value_color << validation_algorithm_name << std::endl << std::endl;
       ss << label_color << "  animate_output: " << value_color << animate_output << std::endl;
+      ss << label_color << "  colorful: " << value_color << colorful << std::endl << std::endl;
       ss << label_color << "  random_seed: " << value_color << random_seed << std::endl << std::endl;
       ss << label_color << "  thread_block_size: " << value_color << thread_block_size << std::endl << std::endl;
       ss << label_color << "  warp_dims_x: " << value_color << warp_dims_x << std::endl;
@@ -99,6 +102,7 @@ const std::string VALIDATE                     = "validate";
 const std::string PRINT_VALIDATION_DIFF        = "print-validation-diff";
 const std::string VALIDATION_ALGORITHM_NAME    = "validation-algorithm";
 const std::string ANIMATE_OUTPUT               = "animate-output";
+const std::string COLORFUL                     = "colorful";
 const std::string RANDOM_SEED                  = "random-seed";
 const std::string THREAD_BLOCK_SIZE            = "thread-block-size";
 const std::string WARP_DIMS_X                  = "warp-dims-x";
@@ -154,6 +158,9 @@ class ParamsParser {
         (opts::ANIMATE_OUTPUT, "Animate output",
           cxxopts::value<bool>()->default_value("false"))
         
+        (opts::COLORFUL, "Use colorful output",
+          cxxopts::value<bool>()->default_value("true"))
+        
         (opts::RANDOM_SEED, "Random seed",
           cxxopts::value<std::size_t>()->default_value("42"))
         
@@ -173,7 +180,8 @@ class ParamsParser {
           cxxopts::value<std::size_t>()->default_value("0"))
         
         (opts::STREAMING_DIRECTION, "Streaming direction (in-x|in-y|naive)",
-          cxxopts::value<std::string>()->default_value("naive"));
+          cxxopts::value<std::string>()->default_value("naive"))
+      ;
 
       auto result = optConfig.parse(argc, argv);
 
@@ -186,22 +194,31 @@ class ParamsParser {
       params.algorithm_name = result[opts::ALGORITHM_NAME].as<std::string>();
       std::size_t gx = result[opts::GRID_DIMENSIONS_X].as<std::size_t>();
       std::size_t gy = result[opts::GRID_DIMENSIONS_Y].as<std::size_t>();
+
       params.grid_dimensions = {gx, gy};
       params.iterations = result[opts::ITERATIONS].as<std::size_t>();
+
       params.data_loader_name = result[opts::DATA_LOADER_NAME].as<std::string>();
       params.pattern_expression = result[opts::PATTERN_EXPRESSION].as<std::string>();
+
       params.measure_speedup = result[opts::MEASURE_SPEEDUP].as<bool>();
       params.speedup_bench_algorithm_name =
         result[opts::SPEEDUP_BENCH_ALGORITHM_NAME].as<std::string>();
+
       params.validate = result[opts::VALIDATE].as<bool>();
       params.print_validation_diff = result[opts::PRINT_VALIDATION_DIFF].as<bool>();
       params.validation_algorithm_name =
         result[opts::VALIDATION_ALGORITHM_NAME].as<std::string>();
+
       params.animate_output = result[opts::ANIMATE_OUTPUT].as<bool>();
+      params.colorful = result[opts::COLORFUL].as<bool>();
       params.random_seed = result[opts::RANDOM_SEED].as<std::size_t>();
+
       params.thread_block_size = result[opts::THREAD_BLOCK_SIZE].as<std::size_t>();
+
       params.warp_dims_x = result[opts::WARP_DIMS_X].as<std::size_t>();
       params.warp_dims_y = result[opts::WARP_DIMS_Y].as<std::size_t>();
+
       params.warp_tile_dims_x = result[opts::WARP_TILE_DIMS_X].as<std::size_t>();
       params.warp_tile_dims_y = result[opts::WARP_TILE_DIMS_Y].as<std::size_t>();
 
@@ -210,7 +227,9 @@ class ParamsParser {
       if (dir_str == "in-x")       { params.streaming_direction = StreamingDirection::in_X; }
       else if (dir_str == "in-y")  { params.streaming_direction = StreamingDirection::in_Y; }
       else if (dir_str == "naive") { params.streaming_direction = StreamingDirection::NAIVE; }
-      else                        { throw std::runtime_error("Invalid streaming direction"); }
+      else                         { throw std::runtime_error("Invalid streaming direction"); }
+
+      params.colorful = result[opts::COLORFUL].as<bool>();
 
       return params;
     }

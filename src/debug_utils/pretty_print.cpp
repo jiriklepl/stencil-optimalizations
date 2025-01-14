@@ -1,5 +1,6 @@
 #include "pretty_print.hpp"
 #include <cstddef>
+#include "../infrastructure/colors.hpp"
 
 std::string debug_utils::pretty(const infrastructure::Grid<2, char>& grid) {
     std::string result;
@@ -11,10 +12,10 @@ std::string debug_utils::pretty(const infrastructure::Grid<2, char>& grid) {
             cell += ']';
 
             if (grid[x][y] != 0) {
-                result += "\033[31m" + cell + "\033[0m";
+                result += c::grid_print_one() + cell + c::reset_color();
             }
             else {
-                result += "\033[30m" + cell + "\033[0m";
+                result += c::grid_print_zero() + cell + c::reset_color();
             }
         }
         result += "\n";

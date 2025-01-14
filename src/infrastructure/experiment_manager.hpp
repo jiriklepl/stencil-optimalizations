@@ -100,9 +100,9 @@ class ExperimentManager {
 
         auto loader = fetch_loader<Dims, ElementType>(params);
 
-        std::cout << title_color << "Loading data... " << param_color << "             " << params.data_loader_name
-                  << ((params.data_loader_name == "lexicon") ? title_color + " with pattern " + param_color + params.pattern_expression: "") 
-                  << reset_color << std::endl;
+        std::cout << c::title_color() << "Loading data... " << c::value_color() << "             " << params.data_loader_name
+                  << ((params.data_loader_name == "lexicon") ? c::title_color() + " with pattern " + c::value_color() + params.pattern_expression: "") 
+                  << c::reset_color() << std::endl;
 
         
         Timer t;
@@ -110,7 +110,7 @@ class ExperimentManager {
         Grid<Dims, ElementType> data;
 
         auto secs  = t.measure([&]() { data = loader->load_data(params); });
-        std::cout << label_color << "  Data loaded in   " << param_color << secs << " s" << reset_color << std::endl << std::endl;
+        std::cout << c::label_color() << "  Data loaded in   " << c::value_color() << secs << " s" << c::reset_color() << std::endl << std::endl;
 
         auto alg = repo.fetch_algorithm(params.algorithm_name);
         TimeReport bench_report;
@@ -119,8 +119,8 @@ class ExperimentManager {
             bench_report = measure_speedup(params, data);
         }
 
-        std::cout << title_color << "Running experiment...        " << param_color << params.algorithm_name
-                  << reset_color << std::endl;
+        std::cout << c::title_color() << "Running experiment...        " << c::value_color() << params.algorithm_name
+                  << c::reset_color() << std::endl;
         auto [result, time_report] = perform_alg<AlgMode::Timed>(*alg, data, params);
 
         if (params.measure_speedup) {
@@ -139,8 +139,8 @@ class ExperimentManager {
     void validate(const Grid<Dims, ElementType>& original, const Grid<Dims, ElementType>& result,
                   Loader<Dims, ElementType>& loader, const ExperimentParams& params) {
 
-        std::cout << title_color << "Validating result... " << param_color << params.validation_algorithm_name
-                  << reset_color << std::endl;
+        std::cout << c::title_color() << "Validating result... " << c::value_color() << params.validation_algorithm_name
+                  << c::reset_color() << std::endl;
 
         auto validation_data = loader.load_validation_data(params);
 
@@ -152,10 +152,10 @@ class ExperimentManager {
         }
 
         if (validation_data->equals(result)) {
-            std::cout << "\033[32mValidation successful\033[0m" << std::endl;
+            std::cout << c::success_color() << "Validation successful" << c::reset_color() << std::endl;
         }
         else {
-            std::cout << "\033[31mValidation failed\033[0m" << std::endl;
+            std::cout << c::error_color() << "Validation failed" << c::reset_color() << std::endl;
 
             if (params.print_validation_diff) {
                 auto diff = debug_utils::diff(*validation_data.get(), result);
@@ -166,8 +166,8 @@ class ExperimentManager {
 
     template <int Dim, typename ElementType>
     TimeReport measure_speedup(const ExperimentParams& params, const Grid<Dim, ElementType>& init_data) {
-        std::cout << title_color << "Measuring bench algorithm... " << param_color
-                  << params.speedup_bench_algorithm_name << reset_color << std::endl;
+        std::cout << c::title_color() << "Measuring bench algorithm... " << c::value_color()
+                  << params.speedup_bench_algorithm_name << c::value_color() << std::endl;
 
         auto repo = _algs_repos.get_repository<Dim, ElementType>();
         auto alg = repo->fetch_algorithm(params.speedup_bench_algorithm_name);
@@ -225,10 +225,10 @@ class ExperimentManager {
     }
 
     void print_basic_param_info(const ExperimentParams& params) const {
-        std::cout << title_color << "Experiment parameters:" << reset_color << std::endl;
-        std::cout << label_color << "  Grid dimensions: " << param_color << print_grid_dims(params.grid_dimensions)
-                  << reset_color << std::endl;
-        std::cout << label_color << "  Iterations:      " << param_color << print_num(params.iterations) << reset_color
+        std::cout << c::title_color() << "Experiment parameters:" << c::reset_color() << std::endl;
+        std::cout << c::label_color() << "  Grid dimensions: " << c::value_color() << print_grid_dims(params.grid_dimensions)
+                  << c::reset_color() << std::endl;
+        std::cout << c::label_color() << "  Iterations:      " << c::value_color() << print_num(params.iterations) << c::reset_color()
                   << std::endl;
 
         std::cout << std::endl;
@@ -254,10 +254,6 @@ class ExperimentManager {
 
     AlgorithmReposCollection<AlgRepoParams<2, char>, AlgRepoParams<3, char>> _algs_repos;
 
-    std::string title_color = "\033[35m";
-    std::string param_color = "\033[33m";
-    std::string label_color = "\033[36m";
-    std::string reset_color = "\033[0m";
 };
 
 } // namespace infrastructure

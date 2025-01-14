@@ -10,6 +10,7 @@
 #include "experiment_params.hpp"
 #include "grid.hpp"
 #include "timer.hpp"
+#include "./colors.hpp"
 
 namespace infrastructure {
 
@@ -86,10 +87,8 @@ struct TimeReport {
     double fetch_result = INVALID;
 
     std::string pretty_print() const {
-        std::string title_color = "\033[1;34m";
-        std::string labels_color = "\033[1;33m";
-        std::string time_color = "\033[32m";
-        std::string reset_color = "\033[0m";
+        std::string title_color = c::time_report_title();
+        std::string reset_color = c::reset_color();
 
         // clang-format off
         std::string result = title_color + "Time report:\n";
@@ -97,17 +96,15 @@ struct TimeReport {
         result += pretty_print_line("  initialize_data_structures: ", initialize_data_structures);
         result += pretty_print_line("  run:                        ", run);
         result += pretty_print_line("  finalize_data_structures:   ", finalize_data_structures);
-        result += pretty_print_line("  fetch_result:               ", fetch_result);
+        result += pretty_print_line("  fetch_result:               ", fetch_result) + reset_color;
         // clang-format on
 
         return result;
     }
 
     std::string pretty_print_speedup(const TimeReport& bench) const {
-        std::string title_color = "\033[1;34m";
-        std::string labels_color = "\033[1;33m";
-        std::string time_color = "\033[34m";
-        std::string reset_color = "\033[0m";
+        std::string title_color = c::time_report_title();
+        std::string reset_color = c::reset_color();
 
         // clang-format off
         std::string result = title_color + "Time report:\n";
@@ -123,9 +120,9 @@ struct TimeReport {
 
   private:
     std::string speedup_str(double bench, double time) const {
-        std::string positive_color = "\033[32m";
-        std::string negative_color = "\033[31m";
-        std::string reset_color = "\033[0m";
+        std::string positive_color = c::time_report_positive();
+        std::string negative_color = c::time_report_negative();
+        std::string reset_color = c::reset_color();
 
         double speedup = bench / time;
 
@@ -146,9 +143,9 @@ struct TimeReport {
             return "";
         }
 
-        std::string labels_color = "\033[1;33m";
-        std::string time_color = "\033[32m";
-        std::string reset_color = "\033[0m";
+        std::string labels_color = c::time_report_labels();
+        std::string time_color = c::time_report_time();
+        std::string reset_color = c::reset_color();
 
         return labels_color + label + time_color + std::to_string(time) + "s" + reset_color + "\n";
     }
@@ -158,9 +155,9 @@ struct TimeReport {
             return "";
         }
 
-        std::string labels_color = "\033[1;33m";
-        std::string time_color = "\033[32m";
-        std::string reset_color = "\033[0m";
+        std::string labels_color = c::time_report_labels();
+        std::string time_color = c::time_report_time();
+        std::string reset_color = c::reset_color();
 
         return labels_color + label + time_color + std::to_string(time) + "s ~ " + speedup_str(bench, time) +
                reset_color + "\n";

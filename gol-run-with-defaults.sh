@@ -17,6 +17,7 @@ VALIDATE="false"
 PRINT_VALIDATION_DIFF="false"
 VALIDATION_ALGORITHM_NAME="gol-cpu-naive"
 ANIMATE_OUTPUT="false"
+COLORFUL="true"
 RANDOM_SEED="42"
 THREAD_BLOCK_SIZE="0"
 WARP_DIMS_X="0"
@@ -38,6 +39,7 @@ srun -p gpu-short -A kdss --cpus-per-task=64 --mem=256GB --gres=gpu:V100 --time=
     --print-validation-diff="$PRINT_VALIDATION_DIFF" \
     --validation-algorithm="$VALIDATION_ALGORITHM_NAME" \
     --animate-output="$ANIMATE_OUTPUT" \
+    --colorful="$COLORFUL" \
     --random-seed="$RANDOM_SEED" \
     --thread-block-size="$THREAD_BLOCK_SIZE" \
     --warp-dims-x="$WARP_DIMS_X" \

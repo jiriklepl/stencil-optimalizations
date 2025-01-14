@@ -22,6 +22,9 @@ int main(int argc, char** argv) {
     std::cout << "Hello" << std::endl;
 
     auto params = infrastructure::ParamsParser::parse(argc, argv);
+
+    c::set_colorful(params.colorful);
+
     std::cout << params.pretty_print() << std::endl;
 
     infrastructure::ExperimentManager manager;
