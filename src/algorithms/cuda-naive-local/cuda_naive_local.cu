@@ -5,6 +5,7 @@
 #include "../_shared/bitwise-cols/bitwise_ops_macros.hpp"
 #include "./models.hpp"
 #include "gol_cuda_naive_local.hpp"
+#include "gol_cuda_naive_just_tiling.hpp"
 #include <cuda_runtime.h>
 
 namespace algorithms::cuda_naive_local {
@@ -15,16 +16,16 @@ using shm_private_value_t = std::uint32_t;
 
 constexpr std::size_t WARP_SIZE = 32;
 
-template <typename col_type, typename state_store_type>
-using WarpInfo = algorithms::cuda_naive_local::WarpInformation<col_type, state_store_type, idx_t>; 
+template <typename col_type>
+using WarpInfo = algorithms::cuda_naive_local::WarpInformation<col_type, idx_t>; 
 
 __device__ inline idx_t get_idx(idx_t x, idx_t y, idx_t x_size) {
     return y * x_size + x;
 }
 
-template <typename col_type, typename state_store_type>
-__device__ inline WarpInfo<col_type, state_store_type> get_warp_info(const BitGridWithChangeInfo<col_type, state_store_type>& data) {
-    WarpInfo<col_type, state_store_type> info;
+template <typename col_type, typename CudaData>
+__device__ inline WarpInfo<col_type> get_warp_info(const CudaData& data) {
+    WarpInfo<col_type> info;
 
     auto idx = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -49,16 +50,16 @@ __device__ inline WarpInfo<col_type, state_store_type> get_warp_info(const BitGr
     return info;
 }
 
-template <typename col_type, typename state_store_type>
-__device__ inline col_type load(idx_t x, idx_t y, BitGridWithChangeInfo<col_type, state_store_type> data) {
+template <typename col_type, typename CudaData>
+__device__ inline col_type load(idx_t x, idx_t y, CudaData&& data) {
     if (x < 0 || y < 0 || x >= data.x_size || y >= data.y_size)
         return 0;
 
     return data.input[get_idx(x, y, data.x_size)];
 }
 
-template <typename col_type, typename state_store_type>
-__device__ inline idx_t store_idx(idx_t x_tile, idx_t y_tile, const WarpInfo<col_type, state_store_type>& info) {
+template <typename col_type>
+__device__ inline idx_t store_idx(idx_t x_tile, idx_t y_tile, const WarpInfo<col_type>& info) {
     auto tile_idx = y_tile * info.x_tiles + x_tile;
     auto warp_tiles_in_block = blockDim.x / WARP_SIZE;
 
@@ -66,8 +67,8 @@ __device__ inline idx_t store_idx(idx_t x_tile, idx_t y_tile, const WarpInfo<col
     return store_idx;
 }
 
-template <typename col_type, typename state_store_type>
-__device__ inline int store_bit_idx(idx_t x_tile, idx_t y_tile, const WarpInfo<col_type, state_store_type>& info) {
+template <typename col_type>
+__device__ inline int store_bit_idx(idx_t x_tile, idx_t y_tile, const WarpInfo<col_type>& info) {
     auto tile_idx = y_tile * info.x_tiles + x_tile;
     auto warp_tiles_in_block = blockDim.x / WARP_SIZE;
 
@@ -77,7 +78,7 @@ __device__ inline int store_bit_idx(idx_t x_tile, idx_t y_tile, const WarpInfo<c
 template <typename col_type, typename state_store_type>
 __device__ inline bool warp_tile_changed(
     idx_t x_tile, idx_t y_tile, 
-    const WarpInfo<col_type, state_store_type>& info, state_store_type* store) {
+    const WarpInfo<col_type>& info, state_store_type* store) {
 
     auto word = store[store_idx(x_tile, y_tile, info)];
     auto mask = 1 << store_bit_idx(x_tile, y_tile, info);
@@ -88,7 +89,7 @@ __device__ inline bool warp_tile_changed(
 template <typename col_type, typename state_store_type>
 __device__ inline bool tile_or_neighbours_changed(
     idx_t x_tile, idx_t y_tile,
-    const WarpInfo<col_type, state_store_type>& info, state_store_type* store) {
+    const WarpInfo<col_type>& info, state_store_type* store) {
 
     idx_t x_start = max(static_cast<idx_t>(0), x_tile - 1);
     idx_t y_start = max(static_cast<idx_t>(0), y_tile - 1);
@@ -124,7 +125,7 @@ __device__ inline void set_changed_state_for_block(
 
 template <typename col_type, typename state_store_type>
 __device__ inline void cpy_to_output(
-    const WarpInfo<col_type, state_store_type>& info, const BitGridWithChangeInfo<col_type, state_store_type>& data) {
+    const WarpInfo<col_type>& info, const BitGridWithChangeInfo<col_type, state_store_type>& data) {
     
     for (idx_t y = info.y_start; y < info.y_start + info.y_rows_in_warp; ++y) {
         for (idx_t x = info.x_start; x < info.x_start + info.x_cols_in_warp; ++x) {
@@ -133,9 +134,9 @@ __device__ inline void cpy_to_output(
     }
 }
 
-template <typename col_type, typename state_store_type>
+template <typename col_type, typename CudaData>
 __device__ inline bool compute_GOL_on_tile(
-    const WarpInfo<col_type, state_store_type>& info, const BitGridWithChangeInfo<col_type, state_store_type>& data) {
+    const WarpInfo<col_type>& info, CudaData&& data) {
     
     bool tile_changed = false;
 
@@ -146,13 +147,13 @@ __device__ inline bool compute_GOL_on_tile(
         col_type lc, cc, rc;
         col_type lb, cb, rb;
 
-        ct = load(x - 1, y - 1, data);
-        cc = load(x - 1, y + 0, data);
-        cb = load(x - 1, y + 1, data);
+        ct = load<col_type>(x - 1, y - 1, data);
+        cc = load<col_type>(x - 1, y + 0, data);
+        cb = load<col_type>(x - 1, y + 1, data);
 
-        rt = load(x + 0, y - 1, data);
-        rc = load(x + 0, y + 0, data);
-        rb = load(x + 0, y + 1, data);
+        rt = load<col_type>(x + 0, y - 1, data);
+        rc = load<col_type>(x + 0, y + 0, data);
+        rb = load<col_type>(x + 0, y + 1, data);
 
         for (; x < info.x_start + info.x_cols_in_warp; ++x) {
 
@@ -164,9 +165,9 @@ __device__ inline bool compute_GOL_on_tile(
             cc = rc;
             cb = rb;
 
-            rt = load(x + 1, y - 1, data);
-            rc = load(x + 1, y + 0, data);
-            rb = load(x + 1, y + 1, data);
+            rt = load<col_type>(x + 1, y - 1, data);
+            rc = load<col_type>(x + 1, y + 0, data);
+            rb = load<col_type>(x + 1, y + 1, data);
             
             auto new_cc = CudaBitwiseOps<col_type>::compute_center_col(lt, ct, rt, lc, cc, rc, lb, cb, rb); 
             
@@ -187,7 +188,7 @@ __global__ void game_of_live_kernel(BitGridWithChangeInfo<col_type, state_store_
     extern __shared__ shm_private_value_t block_store[];
     bool entire_tile_changed;
 
-    auto info = get_warp_info(data);
+    auto info = get_warp_info<col_type>(data);
 
     if (!tile_or_neighbours_changed(info.x_tile, info.y_tile, info, data.change_state_store.last)) {
         
@@ -198,7 +199,7 @@ __global__ void game_of_live_kernel(BitGridWithChangeInfo<col_type, state_store_
         entire_tile_changed = false;
     }
     else {
-        auto local_tile_changed = compute_GOL_on_tile(info, data);
+        auto local_tile_changed = compute_GOL_on_tile<col_type>(info, data);
         entire_tile_changed = __any_sync(0xFF'FF'FF'FF, local_tile_changed);
     }
 
@@ -233,6 +234,31 @@ void GoLCudaNaiveLocal<Bits, state_store_type>::run_kernel(size_type iterations)
     }
 }
 
+// -----------------------------------------------------------------------------------------------
+// JUST TILING KERNEL
+// -----------------------------------------------------------------------------------------------
+
+template <typename col_type>
+__global__ void game_of_live_kernel_just_tiling(BitGridWithTiling<col_type> data) {
+    auto info = get_warp_info<col_type>(data);
+    compute_GOL_on_tile<col_type>(info, data);
+}
+
+
+template <std::size_t Bits>
+void GoLCudaNaiveJustTiling<Bits>::run_kernel(size_type iterations) {
+    auto block_size = thread_block_size;
+    auto blocks = get_thread_block_count();
+
+    for (std::size_t i = 0; i < iterations; ++i) {
+        if (i != 0) {
+            std::swap(cuda_data.input, cuda_data.output);
+        }
+
+        game_of_live_kernel_just_tiling<<<blocks, block_size>>>(cuda_data);
+    }
+}
+
 } // namespace algorithms
 
 template class algorithms::cuda_naive_local::GoLCudaNaiveLocal<16, std::uint16_t>;
@@ -246,5 +272,9 @@ template class algorithms::cuda_naive_local::GoLCudaNaiveLocal<32, std::uint64_t
 template class algorithms::cuda_naive_local::GoLCudaNaiveLocal<64, std::uint16_t>;
 template class algorithms::cuda_naive_local::GoLCudaNaiveLocal<64, std::uint32_t>;
 template class algorithms::cuda_naive_local::GoLCudaNaiveLocal<64, std::uint64_t>;
+
+template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<16>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<32>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<64>;
 
 #endif // CUDA_NAIVE_LOCAL_CU

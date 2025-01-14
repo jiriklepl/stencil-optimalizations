@@ -118,6 +118,17 @@ class GoLCudaNaiveLocal : public infrastructure::Algorithm<2, char> {
         CUCH(cudaMemset(cuda_data.change_state_store.current, ~zero, state_store_word_count() * sizeof(state_store_type)));
     }
 
+    std::size_t tiles_per_block() {
+        return thread_block_size / warp_size();
+    }
+
+    void rotate_state_stores() {
+        std::swap(cuda_data.change_state_store.before_last, cuda_data.change_state_store.last);
+        std::swap(cuda_data.change_state_store.last, cuda_data.change_state_store.current);
+    }
+
+    // DEBUG FUNCTIONS
+
     void check_state_stores() {
         std::vector<state_store_type> last(state_store_word_count(), 0);
         std::vector<state_store_type> current(state_store_word_count(), 0);
@@ -136,15 +147,6 @@ class GoLCudaNaiveLocal : public infrastructure::Algorithm<2, char> {
         print_state_store(current.data());
 
         std::cout << std::endl;
-    }
-
-    std::size_t tiles_per_block() {
-        return thread_block_size / warp_size();
-    }
-
-    void rotate_state_stores() {
-        std::swap(cuda_data.change_state_store.before_last, cuda_data.change_state_store.last);
-        std::swap(cuda_data.change_state_store.last, cuda_data.change_state_store.current);
     }
 
     void print_state_store(state_store_type* store) {

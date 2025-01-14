@@ -16,6 +16,7 @@ struct ChangeStateStore {
     change_state_store_type* current;
 };
 
+
 template <typename col_type, typename change_state_store_type>
 struct BitGridWithChangeInfo {
     constexpr static std::size_t BITS = sizeof(col_type) * 8;
@@ -32,7 +33,21 @@ struct BitGridWithChangeInfo {
     ChangeStateStore<change_state_store_type> change_state_store;
 };
 
-template <typename col_type, typename change_state_store_type, typename idx_t>
+template <typename col_type>
+struct BitGridWithTiling {
+    constexpr static std::size_t BITS = sizeof(col_type) * 8;
+
+    col_type* input;
+    col_type* output;
+
+    std::size_t x_size;
+    std::size_t y_size;
+
+    Dims warp_dims;
+    Dims warp_tile_dims;
+};
+
+template <typename col_type, typename idx_t>
 struct WarpInformation {
     idx_t warp_idx;
     idx_t lane_idx;
