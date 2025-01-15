@@ -29,7 +29,7 @@ int main(int argc, char** argv) {
 
     std::cout << params.pretty_print() << std::endl;
 
-    infrastructure::ExperimentManager<common::INT> manager;
+    infrastructure::ExperimentManager<common::CHAR> manager;
     manager.run(params);
 
     return 0;

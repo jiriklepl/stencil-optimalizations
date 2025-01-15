@@ -158,8 +158,13 @@ __device__ __forceinline__ bool compute_GOL_on_tile__naive_no_streaming(
             col_type cb = load<col_type>(x + 0, y + 1, data);
             col_type rb = load<col_type>(x + 1, y + 1, data);
     
-            data.output[get_idx(x, y, data.x_size)] =
-                CudaBitwiseOps<col_type>::compute_center_col(lt, ct, rt, lc, cc, rc, lb, cb, rb);
+            auto new_cc = CudaBitwiseOps<col_type>::compute_center_col(lt, ct, rt, lc, cc, rc, lb, cb, rb); 
+            
+            if (new_cc != cc) {
+                tile_changed = true;
+            }
+
+            data.output[get_idx(x, y, data.x_size)] = new_cc;
         }
     }
 
@@ -201,8 +206,13 @@ __device__ __forceinline__ bool compute_GOL_on_tile__streaming_in_x(
             cb = load<col_type>(x + 0, y + 1, data);
             rb = load<col_type>(x + 1, y + 1, data);
     
-            data.output[get_idx(x, y, data.x_size)] =
-                CudaBitwiseOps<col_type>::compute_center_col(lt, ct, rt, lc, cc, rc, lb, cb, rb);
+            auto new_cc = CudaBitwiseOps<col_type>::compute_center_col(lt, ct, rt, lc, cc, rc, lb, cb, rb); 
+            
+            if (new_cc != cc) {
+                tile_changed = true;
+            }
+
+            data.output[get_idx(x, y, data.x_size)] = new_cc;
         }
     }
 
@@ -311,6 +321,7 @@ __global__ void game_of_live_kernel(BitGridWithChangeInfo<col_type, state_store_
 template <typename grid_cell_t, std::size_t Bits, typename state_store_type>
 template <StreamingDir DIRECTION>
 void GoLCudaNaiveLocal<grid_cell_t, Bits, state_store_type>::run_kernel(size_type iterations) {
+
     auto block_size = thread_block_size;
     auto blocks = get_thread_block_count();
 
@@ -321,6 +332,8 @@ void GoLCudaNaiveLocal<grid_cell_t, Bits, state_store_type>::run_kernel(size_typ
     _performed_iterations = this->params.iterations;
 
     for (std::size_t i = 0; i < iterations; ++i) {
+        cudaEventRecord(events[i], stream);
+
         if (stop_watch.time_is_up()) {
             _performed_iterations = i;
             break;
@@ -331,9 +344,11 @@ void GoLCudaNaiveLocal<grid_cell_t, Bits, state_store_type>::run_kernel(size_typ
             rotate_state_stores();      
         }
 
-        game_of_live_kernel<DIRECTION ><<<blocks, block_size, shm_size>>>(cuda_data);
-        // check_state_stores();
+        game_of_live_kernel<DIRECTION ><<<blocks, block_size, shm_size, stream>>>(cuda_data);
+
     }
+
+    cudaEventRecord(events[_performed_iterations], stream);
 }
 
 // -----------------------------------------------------------------------------------------------

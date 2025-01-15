@@ -41,7 +41,9 @@ __31="2147483648"
 # ALGORITHM="gol-cpu-bitwise-cols-naive-64"
 # ALGORITHM="gol-cpu-bitwise-cols-macro-64"
 # ALGORITHM="gol-cuda-naive-bitwise-no-macro-64"
-ALGORITHM="an5d-cpu-64"
+# ALGORITHM="an5d-cpu-64"
+ALGORITHM="gol-cuda-naive-local-64"
+# ALGORITHM="gol-cuda-naive-just-tiling-64"
 GRID_DIMENSIONS_X=$__12
 GRID_DIMENSIONS_Y=$__12
 ITERATIONS="10"
@@ -50,6 +52,7 @@ WARMUP_ROUNDS="0"
 MEASUREMENT_ROUNDS="1"
 
 DATA_LOADER_NAME="random-ones-zeros"
+# DATA_LOADER_NAME="always-changing"
 # DATA_LOADER_NAME="lexicon"
 # PATTERN_EXPRESSION="blinker[10,10]"
 PATTERN_EXPRESSION="glider[10,10]"
@@ -70,15 +73,15 @@ COLORFUL="true"
 
 RANDOM_SEED="42"
 
-THREAD_BLOCK_SIZE="0"
+THREAD_BLOCK_SIZE="512"
 
-WARP_DIMS_X="0"
-WARP_DIMS_Y="0"
+WARP_DIMS_X="32"
+WARP_DIMS_Y="1"
 
-WARP_TILE_DIMS_X="0"
-WARP_TILE_DIMS_Y="0"
+WARP_TILE_DIMS_X="32"
+WARP_TILE_DIMS_Y="8"
 
-STREAMING_DIRECTION="naive"
+STREAMING_DIRECTION="in-x"
 MAX_RUNTIME_SECONDS="10"
 
 # srun -p gpu-short -A kdss --cpus-per-task=64 --mem=256GB --gres=gpu:V100 --time=2:00:00 $GOL_EXE_NAME \

@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <iostream>
 #include <memory>
+#include <vector>
 
 namespace algorithms::cuda_naive_local {
 
@@ -50,6 +51,14 @@ class GoLCudaNaiveLocal : public infrastructure::Algorithm<2, grid_cell_t> {
     }
 
     void initialize_data_structures() override {
+        cudaStreamCreate(&stream);
+
+        events.resize(this->params.iterations + 1);
+
+        for (std::size_t i = 0; i < events.size(); i++) {
+            CUCH(cudaEventCreate(&events[i]));
+        }
+
         cuda_data.x_size = bit_grid->x_size();
         cuda_data.y_size = bit_grid->y_size();
 
@@ -95,6 +104,12 @@ class GoLCudaNaiveLocal : public infrastructure::Algorithm<2, grid_cell_t> {
         CUCH(cudaFree(cuda_data.change_state_store.before_last));
         CUCH(cudaFree(cuda_data.change_state_store.last));
         CUCH(cudaFree(cuda_data.change_state_store.current));
+
+        cudaStreamDestroy(stream);
+        
+        for (std::size_t i = 0; i < events.size(); i++) {
+            CUCH(cudaEventDestroy(events[i]));
+        }
     }
 
     DataGrid fetch_result() override {
@@ -108,6 +123,9 @@ class GoLCudaNaiveLocal : public infrastructure::Algorithm<2, grid_cell_t> {
   private:
     BitGrid_ptr bit_grid;
     BitGridWithChangeInfo<col_type, state_store_type> cuda_data;
+
+    std::vector<cudaEvent_t> events;
+    cudaStream_t stream;
 
     std::size_t thread_block_size;
 
