@@ -121,19 +121,23 @@ class ExperimentManager {
             warm_up(*alg, data, params);
         }
 
-        auto result = run_measurements(data, bench_report, repo, params);
+        auto [result, iterations] = run_measurements(data, bench_report, repo, params);
 
         if (params.validate) {
-            validate(data, *result.get(), *loader.get(), params);
+            validate(data, *result.get(), iterations, *loader.get(), params);
         }
     }
 
     template <int Dims, typename ElementType>
-    void validate(const Grid<Dims, ElementType>& original, const Grid<Dims, ElementType>& result,
+    void validate(const Grid<Dims, ElementType>& original, const Grid<Dims, ElementType>& result, std::size_t iterations,
                   Loader<Dims, ElementType>& loader, const ExperimentParams& params) {
 
         std::cout << c::title_color() << "Validating result... " << c::value_color() << params.validation_algorithm_name
                   << c::reset_color() << std::endl;
+
+        auto validation_params = params;
+        validation_params.iterations = iterations;
+        validation_params.max_runtime_seconds = std::numeric_limits<std::size_t>::max();
 
         auto validation_data = loader.load_validation_data(params);
 
@@ -141,7 +145,7 @@ class ExperimentManager {
             auto repo = _algs_repos.get_repository<Dims, ElementType>();
             auto alg = repo->fetch_algorithm(params.validation_algorithm_name);
 
-            validation_data = perform_alg<AlgMode::NotTimed>(*alg, original, params);
+            validation_data = perform_alg<AlgMode::NotTimed>(*alg, original, validation_params);
         }
 
         if (validation_data->equals(result)) {
@@ -185,11 +189,12 @@ class ExperimentManager {
 
 
     template <int Dims, typename ElementType>
-    grid_ptr<Dims, ElementType> run_measurements(Grid<Dims, ElementType>& data, TimeReport& bench_report, AlgorithmRepository<Dims, ElementType>& repo, const ExperimentParams& params) {
+    auto run_measurements(Grid<Dims, ElementType>& data, TimeReport& bench_report, AlgorithmRepository<Dims, ElementType>& repo, const ExperimentParams& params) {
         std::cout << c::title_color() << "Running experiment...        " << c::value_color() << params.algorithm_name
                   << c::reset_color() << std::endl << std::endl;
 
         grid_ptr<Dims, ElementType> last_result = nullptr;
+        std::size_t iterations = 0;
 
         for (std::size_t i = 0; i < params.measurement_rounds; i++) {
             std::cout << c::title_color() << "Measurement round " << c::value_color() << i + 1 << " / " << params.measurement_rounds
@@ -199,6 +204,7 @@ class ExperimentManager {
             auto [result, time_report] = perform_alg<AlgMode::Timed>(*alg, data, params);
             
             last_result = std::move(result);
+            iterations = time_report.actually_performed_iterations;
 
             if (params.measure_speedup) {
                 std::cout << time_report.pretty_print_speedup(bench_report) << std::endl;
@@ -208,7 +214,7 @@ class ExperimentManager {
             }
         }
 
-        return last_result;
+        return std::make_tuple(std::move(last_result), iterations);
     }
 
     template <AlgMode mode, int Dims, typename ElementType>
