@@ -16,8 +16,9 @@ class An5dCudaTimer {
         end_time = std::chrono::high_resolution_clock::now();
     }
 
-    static double elapsed_time_s() {
-        return std::chrono::duration<double>(end_time - start_time).count();
+    static double elapsed_time_ms() {
+        double nano_sec = std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time).count();
+        return nano_sec / 1e6;
     }
 
   private:

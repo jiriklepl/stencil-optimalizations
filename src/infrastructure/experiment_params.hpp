@@ -8,6 +8,7 @@
 #include <vector>
 #include <cxxopts.hpp>
 #include "colors.hpp"
+#include "./timer.hpp"
 
 namespace infrastructure {
 
@@ -22,7 +23,7 @@ class ExperimentParams {
     std::string algorithm_name;
     std::vector<std::size_t> grid_dimensions;
     std::size_t iterations;
-    std::size_t max_runtime_seconds = std::numeric_limits<std::size_t>::max();
+    std::size_t max_runtime_seconds = infrastructure::StopWatch::MAX_TIME;
 
     std::size_t warmup_rounds = 0;
     std::size_t measurement_rounds = 1;
@@ -145,7 +146,7 @@ class ParamsParser {
           cxxopts::value<std::size_t>())
 
         (opts::MAX_RUNTIME_SECONDS, "Maximum runtime in seconds",
-          cxxopts::value<std::size_t>()->default_value("18446744073709551615"))
+          cxxopts::value<std::size_t>()->default_value(std::to_string(infrastructure::StopWatch::MAX_TIME)))
 
         (opts::WARMUP_ROUNDS, "Number of warmup rounds",
           cxxopts::value<std::size_t>()->default_value("0"))

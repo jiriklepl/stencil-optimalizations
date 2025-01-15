@@ -112,8 +112,8 @@ class ExperimentManager {
         
         Grid<Dims, ElementType> data;
 
-        auto secs  = Timer::measure([&]() { data = loader->load_data(params); });
-        std::cout << c::label_color() << "  Data loaded in   " << c::value_color() << secs << " s" << c::reset_color() << std::endl << std::endl;
+        auto milli_secs  = Timer::measure_ms([&]() { data = loader->load_data(params); });
+        std::cout << c::label_color() << "  Data loaded in   " << c::value_color() << milli_secs << " ms" << c::reset_color() << std::endl << std::endl;
 
         TimeReport bench_report;
 
@@ -148,7 +148,7 @@ class ExperimentManager {
 
             auto validation_params = params;
             validation_params.iterations = iterations;
-            validation_params.max_runtime_seconds = std::numeric_limits<std::size_t>::max();
+            validation_params.max_runtime_seconds = infrastructure::StopWatch::MAX_TIME;
 
             validation_data = perform_alg<AlgMode::NotTimed>(*alg, original, validation_params);
         }

@@ -35,7 +35,7 @@ class GoLCpuNaive : public infrastructure::Algorithm<2, char> {
 
         infrastructure::StopWatch stop_watch(this->params.max_runtime_seconds);
         _performed_iterations = this->params.iterations;
-        
+
         for (size_type i = 0; i < iterations; ++i) {
             if (stop_watch.time_is_up()) {
                 _performed_iterations = i;

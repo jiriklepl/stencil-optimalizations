@@ -169,7 +169,7 @@ struct TimeReport {
         std::string time_color = c::time_report_time();
         std::string reset_color = c::reset_color();
 
-        return labels_color + label + time_color + std::to_string(time) + "s" + reset_color + "\n";
+        return labels_color + label + time_color + std::to_string(time) + " ms" + reset_color + "\n";
     }
 
     std::string pretty_print_speedup_line(const std::string& label, double time, double bench, std::size_t measured_alg_iters = 0, std::size_t bench_iters = 0) const {
@@ -189,7 +189,7 @@ struct TimeReport {
             correction = c::time_report_info() + " (estimated)" + reset_color;
         }
 
-        return labels_color + label + time_color + std::to_string(time) + "s ~ " + speedup_str(corrected_bench_time, time) +
+        return labels_color + label + time_color + std::to_string(time) + " ms ~ " + speedup_str(corrected_bench_time, time) +
                reset_color + correction + "\n";
     }
 
@@ -199,7 +199,7 @@ struct TimeReport {
         std::string reset_color = c::reset_color();
 
         auto line = labels_color + "   performed iters:  " + time_color + std::to_string(iterations) + reset_color + "\n";
-        line +=     labels_color + "   runtime per iter: " + time_color + std::to_string(runtime_per_iteration()) + "s" + reset_color + "\n";
+        line +=     labels_color + "   runtime per iter: " + time_color + std::to_string(runtime_per_iteration()) + " ms" + reset_color + "\n";
 
         return line;
     }
@@ -211,7 +211,7 @@ struct TimeReport {
 
         std::string line = labels_color + "   performed iters:  " + time_color + std::to_string(iterations) + reset_color + "\n";
         line +=            labels_color + "   runtime per iter: " + time_color + std::to_string(runtime_per_iteration()) + 
-            "s ~ " + speedup_str(bench.runtime_per_iteration(), runtime_per_iteration()) + reset_color + "\n";
+            " ms ~ " + speedup_str(bench.runtime_per_iteration(), runtime_per_iteration()) + reset_color + "\n";
 
         return line;
     }
@@ -227,26 +227,26 @@ class TimedAlgorithm : public Algorithm<Dims, ElementType> {
     }
 
     void set_and_format_input_data(const DataGrid& data) override {
-        time_report.set_and_format_input_data = Timer::measure([&]() { algorithm->set_and_format_input_data(data); });
+        time_report.set_and_format_input_data = Timer::measure_ms([&]() { algorithm->set_and_format_input_data(data); });
     }
 
     void initialize_data_structures() override {
-        time_report.initialize_data_structures = Timer::measure([&]() { algorithm->initialize_data_structures(); });
+        time_report.initialize_data_structures = Timer::measure_ms([&]() { algorithm->initialize_data_structures(); });
     }
 
     void run(size_type iterations) override {
-        time_report.run = Timer::measure([&]() { algorithm->run(iterations); });
+        time_report.run = Timer::measure_ms([&]() { algorithm->run(iterations); });
         time_report.actually_performed_iterations = algorithm->actually_performed_iterations();
     }
 
     void finalize_data_structures() override {
-        time_report.finalize_data_structures = Timer::measure([&]() { algorithm->finalize_data_structures(); });
+        time_report.finalize_data_structures = Timer::measure_ms([&]() { algorithm->finalize_data_structures(); });
     }
 
     DataGrid fetch_result() override {
         DataGrid result;
 
-        time_report.fetch_result = Timer::measure([&]() { result = algorithm->fetch_result(); });
+        time_report.fetch_result = Timer::measure_ms([&]() { result = algorithm->fetch_result(); });
 
         return result;
     }
@@ -261,7 +261,7 @@ class TimedAlgorithm : public Algorithm<Dims, ElementType> {
             time_report.set_and_format_input_data = TimeReport::INVALID;
             time_report.initialize_data_structures = TimeReport::INVALID;
 
-            time_report.run = algorithms::An5dCudaTimer::elapsed_time_s();
+            time_report.run = algorithms::An5dCudaTimer::elapsed_time_ms();
 
             time_report.finalize_data_structures = TimeReport::INVALID;
             time_report.fetch_result = TimeReport::INVALID;
