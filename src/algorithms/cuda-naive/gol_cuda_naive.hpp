@@ -9,21 +9,22 @@
 
 namespace algorithms {
 
-class GoLCudaNaive : public infrastructure::Algorithm<2, char> {
+template <typename grid_cell_t>
+class GoLCudaNaive : public infrastructure::Algorithm<2, grid_cell_t> {
 
   public:
     GoLCudaNaive() {};
 
     using size_type = std::size_t;
-    using DataGrid = infrastructure::Grid<2, char>;
+    using DataGrid = infrastructure::Grid<2, grid_cell_t>;
 
     void set_and_format_input_data(const DataGrid& data) override {
         grid = data;
     }
 
     void initialize_data_structures() override {
-        cuda_data.x_size = grid.size_in<0>();
-        cuda_data.y_size = grid.size_in<1>();
+        cuda_data.x_size = grid.template size_in<0>();
+        cuda_data.y_size = grid.template size_in<1>();
 
         auto size = grid.size();
 

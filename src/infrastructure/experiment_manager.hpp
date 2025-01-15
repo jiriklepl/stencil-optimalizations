@@ -34,6 +34,7 @@ namespace cuda_naive_local = algorithms::cuda_naive_local;
 
 namespace infrastructure {
 
+template <typename grid_cell_t = char>
 class ExperimentManager {
     template <int Dims, typename ElementType>
     using grid_ptr = std::unique_ptr<Grid<Dims, ElementType>>;
@@ -48,51 +49,51 @@ class ExperimentManager {
   public:
     ExperimentManager() {
 
-        auto _2d_repo = _algs_repos.get_repository<2, char>();
+        auto _2d_repo = _algs_repos.template get_repository<2, grid_cell_t>();
 
         // CPU
 
-        _2d_repo->register_algorithm<alg::GoLCpuNaive>("gol-cpu-naive");
+        _2d_repo-> template register_algorithm<alg::GoLCpuNaive<grid_cell_t>>("gol-cpu-naive");
 
-        _2d_repo->register_algorithm<alg::GoLCpuBitwiseNaive<16>>("gol-cpu-bitwise-cols-naive-16");
-        _2d_repo->register_algorithm<alg::GoLCpuBitwiseNaive<32>>("gol-cpu-bitwise-cols-naive-32");
-        _2d_repo->register_algorithm<alg::GoLCpuBitwiseNaive<64>>("gol-cpu-bitwise-cols-naive-64");
+        _2d_repo-> template register_algorithm<alg::GoLCpuBitwiseNaive<grid_cell_t, 16>>("gol-cpu-bitwise-cols-naive-16");
+        _2d_repo-> template register_algorithm<alg::GoLCpuBitwiseNaive<grid_cell_t, 32>>("gol-cpu-bitwise-cols-naive-32");
+        _2d_repo-> template register_algorithm<alg::GoLCpuBitwiseNaive<grid_cell_t, 64>>("gol-cpu-bitwise-cols-naive-64");
 
-        _2d_repo->register_algorithm<alg::GoLCpuBitwiseCols<16>>("gol-cpu-bitwise-cols-16");
-        _2d_repo->register_algorithm<alg::GoLCpuBitwiseCols<32>>("gol-cpu-bitwise-cols-32");
-        _2d_repo->register_algorithm<alg::GoLCpuBitwiseCols<64>>("gol-cpu-bitwise-cols-64");
+        _2d_repo-> template register_algorithm<alg::GoLCpuBitwiseCols<grid_cell_t, 16>>("gol-cpu-bitwise-cols-16");
+        _2d_repo-> template register_algorithm<alg::GoLCpuBitwiseCols<grid_cell_t, 32>>("gol-cpu-bitwise-cols-32");
+        _2d_repo-> template register_algorithm<alg::GoLCpuBitwiseCols<grid_cell_t, 64>>("gol-cpu-bitwise-cols-64");
 
-        _2d_repo->register_algorithm<alg::GoLCpuBitwiseCols<16, MacroOps>>("gol-cpu-bitwise-cols-macro-16");
-        _2d_repo->register_algorithm<alg::GoLCpuBitwiseCols<32, MacroOps>>("gol-cpu-bitwise-cols-macro-32");
-        _2d_repo->register_algorithm<alg::GoLCpuBitwiseCols<64, MacroOps>>("gol-cpu-bitwise-cols-macro-64");
+        _2d_repo-> template register_algorithm<alg::GoLCpuBitwiseCols<grid_cell_t, 16, MacroOps>>("gol-cpu-bitwise-cols-macro-16");
+        _2d_repo-> template register_algorithm<alg::GoLCpuBitwiseCols<grid_cell_t, 32, MacroOps>>("gol-cpu-bitwise-cols-macro-32");
+        _2d_repo-> template register_algorithm<alg::GoLCpuBitwiseCols<grid_cell_t, 64, MacroOps>>("gol-cpu-bitwise-cols-macro-64");
 
         // CUDA
 
-        _2d_repo->register_algorithm<alg::GoLCudaNaive>("gol-cuda-naive");
+        _2d_repo-> template register_algorithm<alg::GoLCudaNaive<grid_cell_t>>("gol-cuda-naive");
 
-        _2d_repo->register_algorithm<alg::GoLCudaNaiveBitwise<16>>("gol-cuda-naive-bitwise-cols-16");
-        _2d_repo->register_algorithm<alg::GoLCudaNaiveBitwise<32>>("gol-cuda-naive-bitwise-cols-32");
-        _2d_repo->register_algorithm<alg::GoLCudaNaiveBitwise<64>>("gol-cuda-naive-bitwise-cols-64");
+        _2d_repo-> template register_algorithm<alg::GoLCudaNaiveBitwise<grid_cell_t, 16>>("gol-cuda-naive-bitwise-cols-16");
+        _2d_repo-> template register_algorithm<alg::GoLCudaNaiveBitwise<grid_cell_t, 32>>("gol-cuda-naive-bitwise-cols-32");
+        _2d_repo-> template register_algorithm<alg::GoLCudaNaiveBitwise<grid_cell_t, 64>>("gol-cuda-naive-bitwise-cols-64");
 
-        _2d_repo->register_algorithm<alg::GoLCudaNaiveBitwiseNoMacro<16>>("gol-cuda-naive-bitwise-no-macro-16");
-        _2d_repo->register_algorithm<alg::GoLCudaNaiveBitwiseNoMacro<32>>("gol-cuda-naive-bitwise-no-macro-32");
-        _2d_repo->register_algorithm<alg::GoLCudaNaiveBitwiseNoMacro<64>>("gol-cuda-naive-bitwise-no-macro-64");
+        _2d_repo-> template register_algorithm<alg::GoLCudaNaiveBitwiseNoMacro<grid_cell_t, 16>>("gol-cuda-naive-bitwise-no-macro-16");
+        _2d_repo-> template register_algorithm<alg::GoLCudaNaiveBitwiseNoMacro<grid_cell_t, 32>>("gol-cuda-naive-bitwise-no-macro-32");
+        _2d_repo-> template register_algorithm<alg::GoLCudaNaiveBitwiseNoMacro<grid_cell_t, 64>>("gol-cuda-naive-bitwise-no-macro-64");
 
-        _2d_repo->register_algorithm<cuda_naive_local::GoLCudaNaiveLocal<16>>("gol-cuda-naive-local-16");
-        _2d_repo->register_algorithm<cuda_naive_local::GoLCudaNaiveLocal<32>>("gol-cuda-naive-local-32");
-        _2d_repo->register_algorithm<cuda_naive_local::GoLCudaNaiveLocal<64>>("gol-cuda-naive-local-64");
+        _2d_repo-> template register_algorithm<cuda_naive_local::GoLCudaNaiveLocal<grid_cell_t, 16>>("gol-cuda-naive-local-16");
+        _2d_repo-> template register_algorithm<cuda_naive_local::GoLCudaNaiveLocal<grid_cell_t, 32>>("gol-cuda-naive-local-32");
+        _2d_repo-> template register_algorithm<cuda_naive_local::GoLCudaNaiveLocal<grid_cell_t, 64>>("gol-cuda-naive-local-64");
 
-        _2d_repo->register_algorithm<cuda_naive_local::GoLCudaNaiveJustTiling<16>>("gol-cuda-naive-just-tiling-16");
-        _2d_repo->register_algorithm<cuda_naive_local::GoLCudaNaiveJustTiling<32>>("gol-cuda-naive-just-tiling-32");
-        _2d_repo->register_algorithm<cuda_naive_local::GoLCudaNaiveJustTiling<64>>("gol-cuda-naive-just-tiling-64");
+        _2d_repo-> template register_algorithm<cuda_naive_local::GoLCudaNaiveJustTiling<grid_cell_t, 16>>("gol-cuda-naive-just-tiling-16");
+        _2d_repo-> template register_algorithm<cuda_naive_local::GoLCudaNaiveJustTiling<grid_cell_t, 32>>("gol-cuda-naive-just-tiling-32");
+        _2d_repo-> template register_algorithm<cuda_naive_local::GoLCudaNaiveJustTiling<grid_cell_t, 64>>("gol-cuda-naive-just-tiling-64");
 
         // AN5D
 
-        _2d_repo->register_algorithm<alg::An5dAlg<32, alg::ExecModel::CPU>>("an5d-cpu-32");
-        _2d_repo->register_algorithm<alg::An5dAlg<64, alg::ExecModel::CPU>>("an5d-cpu-64");
+        _2d_repo-> template register_algorithm<alg::An5dAlg<32, alg::ExecModel::CPU>>("an5d-cpu-32");
+        _2d_repo-> template register_algorithm<alg::An5dAlg<64, alg::ExecModel::CPU>>("an5d-cpu-64");
 
-        _2d_repo->register_algorithm<alg::An5dAlg<32, alg::ExecModel::CUDA>>("an5d-cuda-32");
-        _2d_repo->register_algorithm<alg::An5dAlg<64, alg::ExecModel::CUDA>>("an5d-cuda-64");
+        _2d_repo-> template register_algorithm<alg::An5dAlg<32, alg::ExecModel::CUDA>>("an5d-cuda-32");
+        _2d_repo-> template register_algorithm<alg::An5dAlg<64, alg::ExecModel::CUDA>>("an5d-cuda-64");
     }
 
     void run(const ExperimentParams& params) {
@@ -148,7 +149,7 @@ class ExperimentManager {
         auto validation_data = loader.load_validation_data(params);
 
         if (validation_data == nullptr) {
-            auto repo = _algs_repos.get_repository<Dims, ElementType>();
+            auto repo = _algs_repos.template get_repository<Dims, ElementType>();
             auto alg = repo->fetch_algorithm(params.validation_algorithm_name);
 
             auto validation_params = params;
@@ -176,7 +177,7 @@ class ExperimentManager {
         std::cout << c::title_color() << "Measuring bench algorithm... " << c::value_color()
                   << params.speedup_bench_algorithm_name << c::value_color() << std::endl;
 
-        auto repo = _algs_repos.get_repository<Dim, ElementType>();
+        auto repo = _algs_repos.template get_repository<Dim, ElementType>();
         auto alg = repo->fetch_algorithm(params.speedup_bench_algorithm_name);
 
         auto [result, time_report] = perform_alg<AlgMode::Timed>(*alg, init_data, params);
@@ -302,7 +303,7 @@ class ExperimentManager {
         return result;
     }
 
-    AlgorithmReposCollection<AlgRepoParams<2, char>, AlgRepoParams<3, char>> _algs_repos;
+    AlgorithmReposCollection<AlgRepoParams<2, grid_cell_t>, AlgRepoParams<3, grid_cell_t>> _algs_repos;
 
 };
 

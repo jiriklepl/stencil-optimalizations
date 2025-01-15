@@ -122,8 +122,9 @@ __global__ void game_of_live_kernel(BitGridData<col_type> data) {
         }
     }
 }
-template <std::size_t Bits>
-void GoLCudaNaiveBitwiseNoMacro<Bits>::run_kernel(size_type iterations) {
+
+template <typename grid_cell_t, std::size_t Bits>
+void GoLCudaNaiveBitwiseNoMacro<grid_cell_t, Bits>::run_kernel(size_type iterations) {
     dim3 block(16, 16);
     dim3 grid((cuda_data.x_size + block.x - 1) / block.x, (cuda_data.y_size + block.y - 1) / block.y);
 
@@ -146,8 +147,8 @@ void GoLCudaNaiveBitwiseNoMacro<Bits>::run_kernel(size_type iterations) {
 
 } // namespace algorithms
 
-template class algorithms::GoLCudaNaiveBitwiseNoMacro<16>;
-template class algorithms::GoLCudaNaiveBitwiseNoMacro<32>;
-template class algorithms::GoLCudaNaiveBitwiseNoMacro<64>;
+template class algorithms::GoLCudaNaiveBitwiseNoMacro<char, 16>;
+template class algorithms::GoLCudaNaiveBitwiseNoMacro<char, 32>;
+template class algorithms::GoLCudaNaiveBitwiseNoMacro<char, 64>;
 
 #endif // CUDA_NAIVE_KERNEL_CU

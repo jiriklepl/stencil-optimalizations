@@ -9,10 +9,11 @@
 
 namespace algorithms {
 
-class GoLCpuNaive : public infrastructure::Algorithm<2, char> {
+template <typename grid_cell_t>
+class GoLCpuNaive : public infrastructure::Algorithm<2, grid_cell_t> {
   public:
     using size_type = std::size_t;
-    using DataGrid = infrastructure::Grid<2, char>;
+    using DataGrid = infrastructure::Grid<2, grid_cell_t>;
 
     void set_and_format_input_data(const DataGrid& data) override {
         _result = data;
@@ -26,8 +27,8 @@ class GoLCpuNaive : public infrastructure::Algorithm<2, char> {
         DataGrid* source = &_result;
         DataGrid* target = &_intermediate;
 
-        auto x_size = _result.size_in<0>();
-        auto y_size = _result.size_in<1>();
+        auto x_size = _result.template size_in<0>();
+        auto y_size = _result.template size_in<1>();
 
         if (this->params.animate_output) {
             print(*source, 0);
@@ -91,8 +92,8 @@ class GoLCpuNaive : public infrastructure::Algorithm<2, char> {
     size_type count_alive_neighbours(const DataGrid& grid, size_type x, size_type y) {
         size_type alive_neighbours = 0;
 
-        size_type x_size = grid.size_in<0>();
-        size_type y_size = grid.size_in<1>();
+        size_type x_size = grid.template size_in<0>();
+        size_type y_size = grid.template size_in<1>();
 
         for (int i = -1; i <= 1; ++i) {
             for (int j = -1; j <= 1; ++j) {
@@ -116,8 +117,8 @@ class GoLCpuNaive : public infrastructure::Algorithm<2, char> {
     }
 
     void move_cursor_up_left(const DataGrid& grid) {
-        std::cout << "\033[" << grid.size_in<0>() + 2 << "A";
-        std::cout << "\033[" << grid.size_in<1>() << "D";
+        std::cout << "\033[" << grid.template size_in<0>() + 2 << "A";
+        std::cout << "\033[" << grid.template size_in<1>() << "D";
     }
 
     void print(const DataGrid& grid, size_type iter) {

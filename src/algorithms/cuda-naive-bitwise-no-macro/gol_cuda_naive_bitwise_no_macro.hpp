@@ -11,15 +11,15 @@
 
 namespace algorithms {
 
-template <std::size_t Bits>
-class GoLCudaNaiveBitwiseNoMacro : public infrastructure::Algorithm<2, char> {
+template <typename grid_cell_t, std::size_t Bits>
+class GoLCudaNaiveBitwiseNoMacro : public infrastructure::Algorithm<2, grid_cell_t> {
 
   public:
     GoLCudaNaiveBitwiseNoMacro() {};
 
     using size_type = std::size_t;
     using col_type = typename BitsConst<Bits>::col_type;
-    using DataGrid = infrastructure::Grid<2, char>;
+    using DataGrid = infrastructure::Grid<2, grid_cell_t>;
     using BitGrid = BitColsGrid<col_type>;
     using BitGrid_ptr = std::unique_ptr<BitGrid>;
     

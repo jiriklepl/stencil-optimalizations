@@ -49,7 +49,8 @@ __global__ void game_of_live_kernel(NaiveGridOnCuda data) {
     }
 }
 
-void GoLCudaNaive::run_kernel(size_type iterations) {
+template <typename grid_cell_t>
+void GoLCudaNaive<grid_cell_t>::run_kernel(size_type iterations) {
     dim3 block(16, 16);
     dim3 grid((cuda_data.x_size + block.x - 1) / block.x, (cuda_data.y_size + block.y - 1) / block.y);
 
@@ -71,5 +72,7 @@ void GoLCudaNaive::run_kernel(size_type iterations) {
 }
 
 } // namespace algorithms
+
+template class algorithms::GoLCudaNaive<char>;
 
 #endif // CUDA_NAIVE_KERNEL_CU

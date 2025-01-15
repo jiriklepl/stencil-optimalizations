@@ -48,8 +48,8 @@ __global__ void game_of_live_kernel(BitGridOnCuda<col_type> data) {
         CudaBitwiseOps<col_type>::compute_center_col(lt, ct, rt, lc, cc, rc, lb, cb, rb);
 }
 
-template <std::size_t Bits>
-void GoLCudaNaiveBitwise<Bits>::run_kernel(size_type iterations) { // Added template parameter
+template <typename grid_cell_t, std::size_t Bits>
+void GoLCudaNaiveBitwise<grid_cell_t, Bits>::run_kernel(size_type iterations) { // Added template parameter
     dim3 block(16, 16);
     dim3 grid((cuda_data.x_size + block.x - 1) / block.x, (cuda_data.y_size + block.y - 1) / block.y);
 
@@ -72,8 +72,8 @@ void GoLCudaNaiveBitwise<Bits>::run_kernel(size_type iterations) { // Added temp
 
 } // namespace algorithms
 
-template class algorithms::GoLCudaNaiveBitwise<16>;
-template class algorithms::GoLCudaNaiveBitwise<32>;
-template class algorithms::GoLCudaNaiveBitwise<64>;
+template class algorithms::GoLCudaNaiveBitwise<char, 16>;
+template class algorithms::GoLCudaNaiveBitwise<char, 32>;
+template class algorithms::GoLCudaNaiveBitwise<char, 64>;
 
 #endif // CUDA_NAIVE_KERNEL_CU

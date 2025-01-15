@@ -10,19 +10,19 @@
 
 namespace algorithms {
 
-template <std::size_t Bits, template <typename col_type> class BitOps = BitwiseColsOps>
-class GoLCpuBitwiseCols : public infrastructure::Algorithm<2, char> {
+template <typename grid_cell_t, std::size_t Bits, template <typename col_type> class BitOps = BitwiseColsOps>
+class GoLCpuBitwiseCols : public infrastructure::Algorithm<2, grid_cell_t> {
   public:
     using col_type = typename BitsConst<Bits>::col_type;
     using BitGrid = algorithms::BitColsGrid<col_type>;
-    using DataGrid = infrastructure::Grid<2, char>;
+    using DataGrid = infrastructure::Grid<2, grid_cell_t>;
     using size_type = BitGrid::size_type;
 
     void set_and_format_input_data(const DataGrid& data) override {
         bit_grid = std::make_unique<BitGrid>(data);
 
-        original_x_size = data.size_in<0>();
-        original_y_size = data.size_in<1>();
+        original_x_size = data.template size_in<0>();
+        original_y_size = data.template size_in<1>();
     }
 
     void initialize_data_structures() override {

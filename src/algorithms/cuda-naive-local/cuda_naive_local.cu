@@ -307,9 +307,9 @@ __global__ void game_of_live_kernel(BitGridWithChangeInfo<col_type, state_store_
     }
 }
 
-template <std::size_t Bits, typename state_store_type>
+template <typename grid_cell_t, std::size_t Bits, typename state_store_type>
 template <StreamingDir DIRECTION>
-void GoLCudaNaiveLocal<Bits, state_store_type>::run_kernel(size_type iterations) {
+void GoLCudaNaiveLocal<grid_cell_t, Bits, state_store_type>::run_kernel(size_type iterations) {
     auto block_size = thread_block_size;
     auto blocks = get_thread_block_count();
 
@@ -346,9 +346,9 @@ __global__ void game_of_live_kernel_just_tiling(BitGridWithTiling<col_type> data
 }
 
 
-template <std::size_t Bits>
+template <typename grid_cell_t, std::size_t Bits>
 template <StreamingDir DIRECTION>
-void GoLCudaNaiveJustTiling<Bits>::run_kernel(size_type iterations) {
+void GoLCudaNaiveJustTiling<grid_cell_t, Bits>::run_kernel(size_type iterations) {
     auto block_size = thread_block_size;
     auto blocks = get_thread_block_count();
 
@@ -371,20 +371,20 @@ void GoLCudaNaiveJustTiling<Bits>::run_kernel(size_type iterations) {
 
 } // namespace algorithms
 
-template class algorithms::cuda_naive_local::GoLCudaNaiveLocal<16, std::uint16_t>;
-template class algorithms::cuda_naive_local::GoLCudaNaiveLocal<16, std::uint32_t>;
-template class algorithms::cuda_naive_local::GoLCudaNaiveLocal<16, std::uint64_t>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocal<char, 16, std::uint16_t>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocal<char, 16, std::uint32_t>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocal<char, 16, std::uint64_t>;
 
-template class algorithms::cuda_naive_local::GoLCudaNaiveLocal<32, std::uint16_t>;
-template class algorithms::cuda_naive_local::GoLCudaNaiveLocal<32, std::uint32_t>;
-template class algorithms::cuda_naive_local::GoLCudaNaiveLocal<32, std::uint64_t>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocal<char, 32, std::uint16_t>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocal<char, 32, std::uint32_t>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocal<char, 32, std::uint64_t>;
 
-template class algorithms::cuda_naive_local::GoLCudaNaiveLocal<64, std::uint16_t>;
-template class algorithms::cuda_naive_local::GoLCudaNaiveLocal<64, std::uint32_t>;
-template class algorithms::cuda_naive_local::GoLCudaNaiveLocal<64, std::uint64_t>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocal<char, 64, std::uint16_t>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocal<char, 64, std::uint32_t>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocal<char, 64, std::uint64_t>;
 
-template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<16>;
-template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<32>;
-template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<64>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<char, 16>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<char, 32>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<char, 64>;
 
 #endif // CUDA_NAIVE_LOCAL_CU

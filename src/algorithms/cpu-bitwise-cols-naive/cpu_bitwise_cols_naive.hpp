@@ -12,19 +12,19 @@
 
 namespace algorithms {
 
-template <std::size_t Bits>
-class GoLCpuBitwiseNaive : public infrastructure::Algorithm<2, char> {
+template <typename grid_cell_t, std::size_t Bits>
+class GoLCpuBitwiseNaive : public infrastructure::Algorithm<2, grid_cell_t> {
   public:
     using size_type = std::size_t;
     using col_type = typename BitsConst<Bits>::col_type;
-    using DataGrid = infrastructure::Grid<2, char>;
+    using DataGrid = infrastructure::Grid<2, grid_cell_t>;
     using BitGrid = BitColsGrid<col_type>;
 
     void set_and_format_input_data(const DataGrid& data) override {
         _initial_source_bit_grid = std::make_unique<BitGrid>(data);
 
-        x_size = data.size_in<0>();
-        y_size = data.size_in<1>();
+        x_size = data.template size_in<0>();
+        y_size = data.template size_in<1>();
     }
 
     void initialize_data_structures() override {
