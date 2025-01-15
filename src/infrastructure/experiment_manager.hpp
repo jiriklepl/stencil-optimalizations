@@ -103,7 +103,6 @@ class ExperimentManager {
         std::cout << c::title_color() << "Loading data... " << c::value_color() << "             " << params.data_loader_name
                   << ((params.data_loader_name == "lexicon") ? c::title_color() + " with pattern " + c::value_color() + params.pattern_expression: "") 
                   << c::reset_color() << std::endl;
-
         
         Timer t;
 
@@ -112,23 +111,18 @@ class ExperimentManager {
         auto secs  = t.measure([&]() { data = loader->load_data(params); });
         std::cout << c::label_color() << "  Data loaded in   " << c::value_color() << secs << " s" << c::reset_color() << std::endl << std::endl;
 
-        auto alg = repo.fetch_algorithm(params.algorithm_name);
         TimeReport bench_report;
 
         if (params.measure_speedup) {
             bench_report = measure_speedup(params, data);
         }
 
-        std::cout << c::title_color() << "Running experiment...        " << c::value_color() << params.algorithm_name
-                  << c::reset_color() << std::endl;
-        auto [result, time_report] = perform_alg<AlgMode::Timed>(*alg, data, params);
+        if (params.warmup_rounds != 0) {
+            auto alg = repo.fetch_algorithm(params.algorithm_name);
+            warm_up(*alg, data, params);
+        }
 
-        if (params.measure_speedup) {
-            std::cout << time_report.pretty_print_speedup(bench_report) << std::endl;
-        }
-        else {
-            std::cout << time_report.pretty_print() << std::endl;
-        }
+        auto result = run_measurements(data, bench_report, repo, params);
 
         if (params.validate) {
             validate(data, *result.get(), *loader.get(), params);
@@ -175,6 +169,47 @@ class ExperimentManager {
         auto [result, time_report] = perform_alg<AlgMode::Timed>(*alg, init_data, params);
 
         return time_report;
+    }
+
+    template <int Dims, typename ElementType>
+    void warm_up(Algorithm<Dims, ElementType>& alg, const Grid<Dims, ElementType>& init_data,
+                 const ExperimentParams& params) {
+
+        for (std::size_t i = 0; i < params.warmup_rounds; i++) {
+            std::cout << c::title_color() << "Warming up... " << c::value_color()  << i + 1 << " / " <<  params.warmup_rounds << c::reset_color() << std::endl;
+            perform_alg<AlgMode::NotTimed>(alg, init_data, params);
+            std::cout << c::line_up();
+        }
+
+        std::cout << std::endl << std::endl;
+    }
+
+
+    template <int Dims, typename ElementType>
+    grid_ptr<Dims, ElementType> run_measurements(Grid<Dims, ElementType>& data, TimeReport& bench_report, AlgorithmRepository<Dims, ElementType>& repo, const ExperimentParams& params) {
+        std::cout << c::title_color() << "Running experiment...        " << c::value_color() << params.algorithm_name
+                  << c::reset_color() << std::endl << std::endl;
+
+        grid_ptr<Dims, ElementType> last_result = nullptr;
+
+        for (std::size_t i = 0; i < params.measurement_rounds; i++) {
+            std::cout << c::title_color() << "Measurement round " << c::value_color() << i + 1 << " / " << params.measurement_rounds
+                      << c::reset_color() << std::endl;
+
+            auto alg = repo.fetch_algorithm(params.algorithm_name);
+            auto [result, time_report] = perform_alg<AlgMode::Timed>(*alg, data, params);
+            
+            last_result = std::move(result);
+
+            if (params.measure_speedup) {
+                std::cout << time_report.pretty_print_speedup(bench_report) << std::endl;
+            }
+            else {
+                std::cout << time_report.pretty_print() << std::endl;
+            }
+        }
+
+        return last_result;
     }
 
     template <AlgMode mode, int Dims, typename ElementType>

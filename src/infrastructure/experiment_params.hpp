@@ -23,6 +23,9 @@ class ExperimentParams {
     std::vector<std::size_t> grid_dimensions;
     std::size_t iterations;
 
+    std::size_t warmup_rounds = 0;
+    std::size_t measurement_rounds = 1;
+
     std::string data_loader_name;
     std::string pattern_expression;
 
@@ -56,11 +59,13 @@ class ExperimentParams {
       std::string value_color = c::value_color();
       std::string reset_color = c::reset_color();
 
-      ss << title_color << "Experiment Parameter:" << std::endl;
+      ss << title_color << "Experiment Parameters:" << std::endl;
 
       ss << label_color << "  algorithm_name: " << value_color << algorithm_name << std::endl;
       ss << label_color << "  grid_dimensions: " << value_color << grid_dimensions[0] << "x" << grid_dimensions[1] << std::endl;
       ss << label_color << "  iterations: " << value_color << iterations << std::endl << std::endl;
+      ss << label_color << "  warmup_rounds: " << value_color << warmup_rounds << std::endl;
+      ss << label_color << "  measurement_rounds: " << value_color << measurement_rounds << std::endl << std::endl;
       ss << label_color << "  data_loader_name: " << value_color << data_loader_name << std::endl;
       ss << label_color << "  pattern_expression: " << value_color << pattern_expression << std::endl << std::endl;
       ss << label_color << "  measure_speedup: " << value_color << measure_speedup << std::endl;
@@ -94,6 +99,8 @@ const std::string ALGORITHM_NAME               = "algorithm";
 const std::string GRID_DIMENSIONS_X            = "grid-dimensions-x";
 const std::string GRID_DIMENSIONS_Y            = "grid-dimensions-y";
 const std::string ITERATIONS                   = "iterations";
+const std::string WARMUP_ROUNDS                = "warmup-rounds";
+const std::string MEASUREMENT_ROUNDS           = "measurement-rounds";
 const std::string DATA_LOADER_NAME             = "data-loader";
 const std::string PATTERN_EXPRESSION           = "pattern-expression";
 const std::string MEASURE_SPEEDUP              = "measure-speedup";
@@ -133,6 +140,12 @@ class ParamsParser {
         
         (opts::ITERATIONS, "Number of iterations",
           cxxopts::value<std::size_t>())
+
+        (opts::WARMUP_ROUNDS, "Number of warmup rounds",
+          cxxopts::value<std::size_t>()->default_value("0"))
+
+        (opts::MEASUREMENT_ROUNDS, "Number of measurements",
+          cxxopts::value<std::size_t>()->default_value("1"))
         
         (opts::DATA_LOADER_NAME, "Data loader",
           cxxopts::value<std::string>()->default_value("random-ones-zeros"))
@@ -197,6 +210,8 @@ class ParamsParser {
 
       params.grid_dimensions = {gx, gy};
       params.iterations = result[opts::ITERATIONS].as<std::size_t>();
+      params.warmup_rounds = result[opts::WARMUP_ROUNDS].as<std::size_t>();
+      params.measurement_rounds = result[opts::MEASUREMENT_ROUNDS].as<std::size_t>();
 
       params.data_loader_name = result[opts::DATA_LOADER_NAME].as<std::string>();
       params.pattern_expression = result[opts::PATTERN_EXPRESSION].as<std::string>();

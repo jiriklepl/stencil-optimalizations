@@ -29,6 +29,10 @@ public:
         return should_be_colorful ? "\033[32m" : "";
     }
 
+    static std::string line_up() {
+        return should_be_colorful ? "\033[1A" : "";
+    }
+
     // TIME REPORT COLORS
 
     static std::string time_report_title() {

@@ -9,6 +9,8 @@ ALGORITHM="gol-cpu-naive"
 GRID_DIMENSIONS_X="256"
 GRID_DIMENSIONS_Y="256"
 ITERATIONS="100"
+WARMUP_ROUNDS="3"
+MEASUREMENT_ROUNDS="2"
 DATA_LOADER_NAME="random-ones-zeros"
 PATTERN_EXPRESSION=""
 MEASURE_SPEEDUP="false"
@@ -31,6 +33,8 @@ srun -p gpu-short -A kdss --cpus-per-task=64 --mem=256GB --gres=gpu:V100 --time=
     --grid-dimensions-x="$GRID_DIMENSIONS_X" \
     --grid-dimensions-y="$GRID_DIMENSIONS_Y" \
     --iterations="$ITERATIONS" \
+    --warmup-rounds="$WARMUP_ROUNDS" \
+    --measurement-rounds="$MEASUREMENT_ROUNDS" \
     --data-loader="$DATA_LOADER_NAME" \
     --pattern-expression="$PATTERN_EXPRESSION" \
     --measure-speedup="$MEASURE_SPEEDUP" \

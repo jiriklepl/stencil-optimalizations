@@ -17,6 +17,8 @@ $EXECUTABLE \
     --grid-dimensions-x="$GRID_DIMENSIONS_X" \
     --grid-dimensions-y="$GRID_DIMENSIONS_Y" \
     --iterations="$ITERATIONS" \
+    --warmup-rounds="$WARMUP_ROUNDS" \
+    --measurement-rounds="$MEASUREMENT_ROUNDS" \
     --data-loader="$DATA_LOADER_NAME" \
     --pattern-expression="$PATTERN_EXPRESSION" \
     --measure-speedup="$MEASURE_SPEEDUP" \
