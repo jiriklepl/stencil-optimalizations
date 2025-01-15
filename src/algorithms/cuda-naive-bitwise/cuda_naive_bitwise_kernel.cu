@@ -12,12 +12,12 @@ namespace algorithms {
 
 using idx_t = std::int64_t;
 
-__device__ inline idx_t get_idx(idx_t x, idx_t y, idx_t x_size) {
+__device__ __forceinline__ idx_t get_idx(idx_t x, idx_t y, idx_t x_size) {
     return y * x_size + x;
 }
 
 template <typename col_type>
-__device__ inline col_type load(idx_t x, idx_t y, BitGridOnCuda<col_type> data) {
+__device__ __forceinline__ col_type load(idx_t x, idx_t y, BitGridOnCuda<col_type> data) {
     if (x < 0 || y < 0 || x >= data.x_size || y >= data.y_size)
         return 0;
 

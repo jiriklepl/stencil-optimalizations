@@ -23,12 +23,12 @@ constexpr std::size_t WARP_SIZE = 32;
 template <typename col_type>
 using WarpInfo = algorithms::cuda_naive_local::WarpInformation<col_type, idx_t>; 
 
-__device__ inline idx_t get_idx(idx_t x, idx_t y, idx_t x_size) {
+__device__ __forceinline__ idx_t get_idx(idx_t x, idx_t y, idx_t x_size) {
     return y * x_size + x;
 }
 
 template <typename col_type, typename CudaData>
-__device__ inline WarpInfo<col_type> get_warp_info(const CudaData& data) {
+__device__ __forceinline__ WarpInfo<col_type> get_warp_info(const CudaData& data) {
     WarpInfo<col_type> info;
 
     auto idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -55,7 +55,7 @@ __device__ inline WarpInfo<col_type> get_warp_info(const CudaData& data) {
 }
 
 template <typename col_type, typename CudaData>
-__device__ inline col_type load(idx_t x, idx_t y, CudaData&& data) {
+__device__ __forceinline__ col_type load(idx_t x, idx_t y, CudaData&& data) {
     if (x < 0 || y < 0 || x >= data.x_size || y >= data.y_size)
         return 0;
 
@@ -63,7 +63,7 @@ __device__ inline col_type load(idx_t x, idx_t y, CudaData&& data) {
 }
 
 template <typename col_type>
-__device__ inline idx_t store_idx(idx_t x_tile, idx_t y_tile, const WarpInfo<col_type>& info) {
+__device__ __forceinline__ idx_t store_idx(idx_t x_tile, idx_t y_tile, const WarpInfo<col_type>& info) {
     auto tile_idx = y_tile * info.x_tiles + x_tile;
     auto warp_tiles_in_block = blockDim.x / WARP_SIZE;
 
@@ -72,7 +72,7 @@ __device__ inline idx_t store_idx(idx_t x_tile, idx_t y_tile, const WarpInfo<col
 }
 
 template <typename col_type>
-__device__ inline int store_bit_idx(idx_t x_tile, idx_t y_tile, const WarpInfo<col_type>& info) {
+__device__ __forceinline__ int store_bit_idx(idx_t x_tile, idx_t y_tile, const WarpInfo<col_type>& info) {
     auto tile_idx = y_tile * info.x_tiles + x_tile;
     auto warp_tiles_in_block = blockDim.x / WARP_SIZE;
 
@@ -80,7 +80,7 @@ __device__ inline int store_bit_idx(idx_t x_tile, idx_t y_tile, const WarpInfo<c
 }
 
 template <typename col_type, typename state_store_type>
-__device__ inline bool warp_tile_changed(
+__device__ __forceinline__ bool warp_tile_changed(
     idx_t x_tile, idx_t y_tile, 
     const WarpInfo<col_type>& info, state_store_type* store) {
 
@@ -91,7 +91,7 @@ __device__ inline bool warp_tile_changed(
 }
 
 template <typename col_type, typename state_store_type>
-__device__ inline bool tile_or_neighbours_changed(
+__device__ __forceinline__ bool tile_or_neighbours_changed(
     idx_t x_tile, idx_t y_tile,
     const WarpInfo<col_type>& info, state_store_type* store) {
 
@@ -112,7 +112,7 @@ __device__ inline bool tile_or_neighbours_changed(
 }
 
 template <typename state_store_type>
-__device__ inline void set_changed_state_for_block(
+__device__ __forceinline__ void set_changed_state_for_block(
     shm_private_value_t* block_store,
     state_store_type* global_store) {
         
@@ -128,7 +128,7 @@ __device__ inline void set_changed_state_for_block(
 }
 
 template <typename col_type, typename state_store_type>
-__device__ inline void cpy_to_output(
+__device__ __forceinline__ void cpy_to_output(
     const WarpInfo<col_type>& info, const BitGridWithChangeInfo<col_type, state_store_type>& data) {
     
     for (idx_t y = info.y_start; y < info.y_start + info.y_rows_in_warp; ++y) {
@@ -139,7 +139,7 @@ __device__ inline void cpy_to_output(
 }
 
 template <typename col_type, typename CudaData>
-__device__ inline bool compute_GOL_on_tile__naive_no_streaming(
+__device__ __forceinline__ bool compute_GOL_on_tile__naive_no_streaming(
     const WarpInfo<col_type>& info, CudaData&& data) {
     
     bool tile_changed = false;
@@ -166,7 +166,7 @@ __device__ inline bool compute_GOL_on_tile__naive_no_streaming(
 }
 
 template <typename col_type, typename CudaData>
-__device__ inline bool compute_GOL_on_tile__streaming_in_x(
+__device__ __forceinline__ bool compute_GOL_on_tile__streaming_in_x(
     const WarpInfo<col_type>& info, CudaData&& data) {
     
     bool tile_changed = false;
@@ -209,7 +209,7 @@ __device__ inline bool compute_GOL_on_tile__streaming_in_x(
 }
 
 template <typename col_type, typename CudaData>
-__device__ inline bool compute_GOL_on_tile__streaming_in_y(
+__device__ __forceinline__ bool compute_GOL_on_tile__streaming_in_y(
     const WarpInfo<col_type>& info, CudaData&& data) {
     
     bool tile_changed = false;
@@ -257,7 +257,7 @@ __device__ inline bool compute_GOL_on_tile__streaming_in_y(
 }
 
 template <typename col_type, StreamingDir DIRECTION, typename CudaData>
-__device__ inline bool compute_GOL_on_tile(
+__device__ __forceinline__ bool compute_GOL_on_tile(
     const WarpInfo<col_type>& info, CudaData&& data) {
 
     if constexpr (DIRECTION == StreamingDir::in_X) {

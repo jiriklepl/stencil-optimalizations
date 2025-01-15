@@ -11,7 +11,7 @@
 namespace debug_utils {
 
 template <int Dims, typename ElementType>
-inline std::string diff(const infrastructure::Grid<Dims, ElementType>& original,
+std::string diff(const infrastructure::Grid<Dims, ElementType>& original,
                         const infrastructure::Grid<Dims, ElementType>& other) {
 
     std::ostringstream diff_str;
@@ -31,7 +31,7 @@ inline std::string diff(const infrastructure::Grid<Dims, ElementType>& original,
 }
 
 template <typename ElementType>
-inline std::string diff(const infrastructure::Grid<2, ElementType>& original,
+std::string diff(const infrastructure::Grid<2, ElementType>& original,
                         const infrastructure::Grid<2, ElementType>& other) {
 
     std::ostringstream diff_str;

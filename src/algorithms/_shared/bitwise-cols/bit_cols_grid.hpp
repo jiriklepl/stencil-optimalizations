@@ -27,6 +27,10 @@ class BitColsGrid {
     using size_type = std::size_t;
     using Grid = infrastructure::Grid<2, char>;
 
+    using ONE_CELL_STATE = bool;
+    constexpr static ONE_CELL_STATE DEAD = 0;
+    constexpr static ONE_CELL_STATE ALIVE = 1;
+
     BitColsGrid(size_type original_x_size, size_t original_y_size)
         : _x_size(original_x_size), _y_size(original_y_size) {
         _x_size = original_x_size;
@@ -46,6 +50,29 @@ class BitColsGrid {
     }
 
   public:
+    ONE_CELL_STATE get_value_at(std::size_t x, std::size_t y) const {
+        bit_col_type col = get_bit_col(x, y / BITS_IN_COL);
+        auto bit = y % BITS_IN_COL;
+
+        return ((col >> bit) & 1) ? ALIVE : DEAD;
+    }
+
+    void set_value_at(std::size_t x, std::size_t y, ONE_CELL_STATE state) {
+        auto col = get_bit_col(x, y / BITS_IN_COL);
+        auto bit = y % BITS_IN_COL;
+
+        bit_col_type one = 1;
+
+        if (state) {
+            col |= one << bit;
+        }
+        else {
+            col &= ~(one << bit);
+        }
+
+        set_bit_col(x, y / BITS_IN_COL, col);
+    }
+
     bit_col_type get_bit_col(std::size_t x, std::size_t y) const {
         return bit_cols_grid[idx(x, y)];
     }

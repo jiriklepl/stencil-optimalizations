@@ -185,12 +185,9 @@ struct TimeReport {
         std::string correction = "";
 
         if (measured_alg_iters != bench_iters) {
-            auto correction_coefficient = measured_alg_iters / bench_iters;
-            corrected_bench_time = bench * correction_coefficient;
-
+            corrected_bench_time = bench * measured_alg_iters / bench_iters;
             correction = c::time_report_info() + " (estimated)" + reset_color;
         }
-
 
         return labels_color + label + time_color + std::to_string(time) + "s ~ " + speedup_str(corrected_bench_time, time) +
                reset_color + correction + "\n";

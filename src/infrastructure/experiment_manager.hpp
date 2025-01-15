@@ -4,6 +4,7 @@
 #include "../algorithms/an5d/an5d-cpu-alg.hpp"
 #include "../algorithms/cpu-bitwise-cols-macro/gol_cpu_bitwise_cols_macro.hpp"
 #include "../algorithms/cpu-bitwise-cols/gol_cpu_bitwise_cols.hpp"
+#include "../algorithms/cpu-bitwise-cols-naive/cpu_bitwise_cols_naive.hpp"
 #include "../algorithms/cpu-naive/gol_cpu_naive.hpp"
 #include "../algorithms/cuda-naive-bitwise/gol_cuda_naive_bitwise.hpp"
 #include "../algorithms/cuda-naive/gol_cuda_naive.hpp"
@@ -51,6 +52,10 @@ class ExperimentManager {
         // CPU
 
         _2d_repo->register_algorithm<alg::GoLCpuNaive>("gol-cpu-naive");
+
+        _2d_repo->register_algorithm<alg::GoLCpuBitwiseNaive<16>>("gol-cpu-bitwise-cols-naive-16");
+        _2d_repo->register_algorithm<alg::GoLCpuBitwiseNaive<32>>("gol-cpu-bitwise-cols-naive-32");
+        _2d_repo->register_algorithm<alg::GoLCpuBitwiseNaive<64>>("gol-cpu-bitwise-cols-naive-64");
 
         _2d_repo->register_algorithm<alg::GoLCpuBitwiseCols<16>>("gol-cpu-bitwise-cols-16");
         _2d_repo->register_algorithm<alg::GoLCpuBitwiseCols<32>>("gol-cpu-bitwise-cols-32");
@@ -135,15 +140,15 @@ class ExperimentManager {
         std::cout << c::title_color() << "Validating result... " << c::value_color() << params.validation_algorithm_name
                   << c::reset_color() << std::endl;
 
-        auto validation_params = params;
-        validation_params.iterations = iterations;
-        validation_params.max_runtime_seconds = std::numeric_limits<std::size_t>::max();
-
         auto validation_data = loader.load_validation_data(params);
 
         if (validation_data == nullptr) {
             auto repo = _algs_repos.get_repository<Dims, ElementType>();
             auto alg = repo->fetch_algorithm(params.validation_algorithm_name);
+
+            auto validation_params = params;
+            validation_params.iterations = iterations;
+            validation_params.max_runtime_seconds = std::numeric_limits<std::size_t>::max();
 
             validation_data = perform_alg<AlgMode::NotTimed>(*alg, original, validation_params);
         }

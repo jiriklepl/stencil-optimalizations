@@ -5,29 +5,40 @@ cd $WORK_DIR || exit 1
 
 GOL_EXE_NAME="./stencils"
 
-ALGORITHM="gol-cpu-bitwise-cols-macro-64"
-GRID_DIMENSIONS_X="256"
-GRID_DIMENSIONS_Y="256"
-ITERATIONS="1000"
+ALGORITHM="gol-cpu-bitwise-cols-naive-64"
+GRID_DIMENSIONS_X="512"
+GRID_DIMENSIONS_Y="1024"
+ITERATIONS="100"
+
 WARMUP_ROUNDS="0"
-MEASUREMENT_ROUNDS="3"
+MEASUREMENT_ROUNDS="1"
+
 DATA_LOADER_NAME="random-ones-zeros"
-PATTERN_EXPRESSION=""
+# DATA_LOADER_NAME="lexicon"
+PATTERN_EXPRESSION="glider[10,10]"
+
 MEASURE_SPEEDUP="true"
 SPEEDUP_BENCH_ALGORITHM_NAME="gol-cpu-naive"
+
 VALIDATE="true"
-PRINT_VALIDATION_DIFF="false"
+PRINT_VALIDATION_DIFF="true"
 VALIDATION_ALGORITHM_NAME="gol-cpu-naive"
+
 ANIMATE_OUTPUT="false"
 COLORFUL="true"
+
 RANDOM_SEED="42"
+
 THREAD_BLOCK_SIZE="0"
+
 WARP_DIMS_X="0"
 WARP_DIMS_Y="0"
+
 WARP_TILE_DIMS_X="0"
 WARP_TILE_DIMS_Y="0"
+
 STREAMING_DIRECTION="naive"
-MAX_RUNTIME_SECONDS="6"
+MAX_RUNTIME_SECONDS="10"
 
 # srun -p gpu-short -A kdss --cpus-per-task=64 --mem=256GB --gres=gpu:V100 --time=2:00:00 $GOL_EXE_NAME \
 srun -p gpu-short -A kdss --cpus-per-task=64 --mem=256GB --gres=gpu:H100 --time=2:00:00 $GOL_EXE_NAME \

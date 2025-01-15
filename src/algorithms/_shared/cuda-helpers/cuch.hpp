@@ -39,7 +39,7 @@ class CudaError : public std::exception {
 /**
  * CUDA error code check. This is internal function used by CUCH macro.
  */
-inline void _cuda_check(cudaError_t status, int line, const char* srcFile, const char* errMsg = NULL) {
+__forceinline__ void _cuda_check(cudaError_t status, int line, const char* srcFile, const char* errMsg = NULL) {
     if (status != cudaSuccess) {
         throw(CudaError(status) << "CUDA Error (" << status << "): " << cudaGetErrorString(status) << "\n"
                                 << "at " << srcFile << ":" << line << ":" << errMsg);
