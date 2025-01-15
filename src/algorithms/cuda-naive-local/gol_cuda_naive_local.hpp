@@ -17,7 +17,7 @@ namespace algorithms::cuda_naive_local {
 
 using StreamingDir = infrastructure::StreamingDirection;
 
-template <typename grid_cell_t, std::size_t Bits, typename state_store_type = std::uint32_t>
+template <typename grid_cell_t, std::size_t Bits, typename state_store_type>
 class GoLCudaNaiveLocal : public infrastructure::Algorithm<2, grid_cell_t> {
 
   public:

@@ -42,11 +42,12 @@ __31="2147483648"
 # ALGORITHM="gol-cpu-bitwise-cols-macro-64"
 # ALGORITHM="gol-cuda-naive-bitwise-no-macro-64"
 # ALGORITHM="an5d-cpu-64"
-ALGORITHM="gol-cuda-naive-local-64"
+# ALGORITHM="gol-cuda-naive-local-64-state-64"
+ALGORITHM="gol-cuda-naive-local-64-state-32"
 # ALGORITHM="gol-cuda-naive-just-tiling-64"
-GRID_DIMENSIONS_X=$__12
-GRID_DIMENSIONS_Y=$__12
-ITERATIONS="10"
+GRID_DIMENSIONS_X=$__14
+GRID_DIMENSIONS_Y=$__14
+ITERATIONS="10000"
 
 WARMUP_ROUNDS="0"
 MEASUREMENT_ROUNDS="1"
@@ -57,11 +58,12 @@ DATA_LOADER_NAME="random-ones-zeros"
 # PATTERN_EXPRESSION="blinker[10,10]"
 PATTERN_EXPRESSION="glider[10,10]"
 
-# MEASURE_SPEEDUP="true"
-MEASURE_SPEEDUP="false"
+MEASURE_SPEEDUP="true"
+# MEASURE_SPEEDUP="false"
 # SPEEDUP_BENCH_ALGORITHM_NAME="gol-cpu-naive"
 # SPEEDUP_BENCH_ALGORITHM_NAME="gol-cpu-bitwise-cols-naive-64"
-SPEEDUP_BENCH_ALGORITHM_NAME="gol-cuda-naive"
+# SPEEDUP_BENCH_ALGORITHM_NAME="gol-cuda-naive"
+SPEEDUP_BENCH_ALGORITHM_NAME="gol-cuda-naive-just-tiling-64"
 
 VALIDATE="true"
 PRINT_VALIDATION_DIFF="false"
