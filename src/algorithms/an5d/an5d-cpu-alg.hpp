@@ -18,14 +18,15 @@ enum class ExecModel {
     CUDA = 1,
 };
 
-template <std::size_t Bits, ExecModel Model>
-class An5dAlg : public infrastructure::Algorithm<2, char> {
+template <typename grid_cell_t, std::size_t Bits, ExecModel Model>
+class An5dAlg : public infrastructure::Algorithm<2, grid_cell_t> {
   public:
     An5dAlg() {};
 
     using col_type = typename BitsConst<Bits>::col_type;
     using BitGrid = algorithms::BitColsGrid<col_type>;
-    using DataGrid = infrastructure::Grid<2, char>;
+    
+    using DataGrid = infrastructure::Grid<2, grid_cell_t>;
     using size_type = BitGrid::size_type;
 
     bool is_an5d_cuda_alg() const override {
@@ -35,8 +36,8 @@ class An5dAlg : public infrastructure::Algorithm<2, char> {
     void set_and_format_input_data(const DataGrid& data) override {
         input_bit_grid = std::make_unique<BitGrid>(data);
 
-        original_x_size = data.size_in<0>();
-        original_y_size = data.size_in<1>();
+        original_x_size = data.template size_in<0>();
+        original_y_size = data.template size_in<1>();
     }
 
     void initialize_data_structures() override {
@@ -49,7 +50,7 @@ class An5dAlg : public infrastructure::Algorithm<2, char> {
     }
 
     DataGrid fetch_result() override {
-        return result_bit_grid->to_grid();
+        return result_bit_grid->template to_grid<grid_cell_t>();
     }
 
     std::size_t actually_performed_iterations() const override {

@@ -90,11 +90,11 @@ class ExperimentManager {
 
         // AN5D
 
-        // _2d_repo-> template register_algorithm<alg::An5dAlg<32, alg::ExecModel::CPU>>("an5d-cpu-32");
-        // _2d_repo-> template register_algorithm<alg::An5dAlg<64, alg::ExecModel::CPU>>("an5d-cpu-64");
+        _2d_repo-> template register_algorithm<alg::An5dAlg<grid_cell_t, 32, alg::ExecModel::CPU>>("an5d-cpu-32");
+        _2d_repo-> template register_algorithm<alg::An5dAlg<grid_cell_t, 64, alg::ExecModel::CPU>>("an5d-cpu-64");
 
-        // _2d_repo-> template register_algorithm<alg::An5dAlg<32, alg::ExecModel::CUDA>>("an5d-cuda-32");
-        // _2d_repo-> template register_algorithm<alg::An5dAlg<64, alg::ExecModel::CUDA>>("an5d-cuda-64");
+        _2d_repo-> template register_algorithm<alg::An5dAlg<grid_cell_t, 32, alg::ExecModel::CUDA>>("an5d-cuda-32");
+        _2d_repo-> template register_algorithm<alg::An5dAlg<grid_cell_t, 64, alg::ExecModel::CUDA>>("an5d-cuda-64");
     }
 
     void run(const ExperimentParams& params) {

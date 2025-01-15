@@ -40,10 +40,11 @@ __31="2147483648"
 
 # ALGORITHM="gol-cpu-bitwise-cols-naive-64"
 # ALGORITHM="gol-cpu-bitwise-cols-macro-64"
-ALGORITHM="gol-cuda-naive-bitwise-no-macro-64"
+# ALGORITHM="gol-cuda-naive-bitwise-no-macro-64"
+ALGORITHM="an5d-cpu-64"
 GRID_DIMENSIONS_X=$__12
 GRID_DIMENSIONS_Y=$__12
-ITERATIONS="100000"
+ITERATIONS="10"
 
 WARMUP_ROUNDS="0"
 MEASUREMENT_ROUNDS="1"
