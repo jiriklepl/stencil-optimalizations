@@ -130,7 +130,8 @@ struct TimeReport {
         std::string result = title_color + "Time report:\n";
         result += pretty_print_speedup_line("  set_and_format_input_data:  ", set_and_format_input_data, bench.set_and_format_input_data);
         result += pretty_print_speedup_line("  initialize_data_structures: ", initialize_data_structures, bench.initialize_data_structures);
-        result += pretty_print_speedup_line("  run:                        ", run, bench.run);
+        result += pretty_print_speedup_line("  run:                        ", run, bench.run, 
+            actually_performed_iterations, bench.actually_performed_iterations);
         result += pretty_number_of_iterations_speedup(actually_performed_iterations, bench);
         result += pretty_print_speedup_line("  finalize_data_structures:   ", finalize_data_structures, bench.finalize_data_structures);
         result += pretty_print_speedup_line("  fetch_result:               ", fetch_result, bench.fetch_result) + reset_color;
@@ -171,7 +172,7 @@ struct TimeReport {
         return labels_color + label + time_color + std::to_string(time) + "s" + reset_color + "\n";
     }
 
-    std::string pretty_print_speedup_line(const std::string& label, double time, double bench) const {
+    std::string pretty_print_speedup_line(const std::string& label, double time, double bench, std::size_t measured_alg_iters = 0, std::size_t bench_iters = 0) const {
         if (time == INVALID || bench == INVALID) {
             return "";
         }
@@ -180,8 +181,19 @@ struct TimeReport {
         std::string time_color = c::time_report_time();
         std::string reset_color = c::reset_color();
 
-        return labels_color + label + time_color + std::to_string(time) + "s ~ " + speedup_str(bench, time) +
-               reset_color + "\n";
+        double corrected_bench_time = bench;
+        std::string correction = "";
+
+        if (measured_alg_iters != bench_iters) {
+            auto correction_coefficient = measured_alg_iters / bench_iters;
+            corrected_bench_time = bench * correction_coefficient;
+
+            correction = c::time_report_info() + " (estimated)" + reset_color;
+        }
+
+
+        return labels_color + label + time_color + std::to_string(time) + "s ~ " + speedup_str(corrected_bench_time, time) +
+               reset_color + correction + "\n";
     }
 
     std::string pretty_number_of_iterations(std::size_t iterations) const {

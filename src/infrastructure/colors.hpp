@@ -63,6 +63,10 @@ public:
         return should_be_colorful ? "\033[31m" : "";
     }
 
+    static std::string time_report_info() {
+        return should_be_colorful ? "\033[36m" : "";
+    }
+
     // GRID COLORS
 
     static std::string grid_print_zero() {
