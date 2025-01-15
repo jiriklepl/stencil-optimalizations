@@ -1,5 +1,6 @@
 #include "algorithms/_shared/bitwise-cols/bit_cols_grid.hpp"
 #include "algorithms/_shared/bitwise-cols/bitwise_cols_gol_operations.hpp"
+#include "algorithms/_shared/common_grid_types.hpp"
 #include "algorithms/cpu-bitwise-cols-macro/gol_cpu_bitwise_cols_macro.hpp"
 #include "algorithms/cpu-bitwise-cols/gol_cpu_bitwise_cols.hpp"
 #include "algorithms/cuda-naive-bitwise/gol_cuda_naive_bitwise.hpp"
@@ -18,6 +19,7 @@
 
 using namespace debug_utils;
 
+
 int main(int argc, char** argv) {
     std::cout << "Hello" << std::endl;
 
@@ -27,7 +29,7 @@ int main(int argc, char** argv) {
 
     std::cout << params.pretty_print() << std::endl;
 
-    infrastructure::ExperimentManager manager;
+    infrastructure::ExperimentManager<common::INT> manager;
     manager.run(params);
 
     return 0;

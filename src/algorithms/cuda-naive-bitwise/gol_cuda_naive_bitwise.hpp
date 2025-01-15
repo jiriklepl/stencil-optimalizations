@@ -55,7 +55,7 @@ class GoLCudaNaiveBitwise : public infrastructure::Algorithm<2, grid_cell_t> {
     }
 
     DataGrid fetch_result() override {
-        return bit_grid->to_grid();
+        return bit_grid->template to_grid<grid_cell_t>();
     }
 
     

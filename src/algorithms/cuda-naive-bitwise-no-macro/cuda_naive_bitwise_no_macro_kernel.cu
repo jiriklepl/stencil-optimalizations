@@ -7,6 +7,7 @@
 #include "gol_cuda_naive_bitwise_no_macro.hpp"
 #include <cuda_runtime.h>
 #include "../../infrastructure/timer.hpp"
+#include "../_shared/common_grid_types.hpp"
 
 namespace algorithms {
 
@@ -147,8 +148,12 @@ void GoLCudaNaiveBitwiseNoMacro<grid_cell_t, Bits>::run_kernel(size_type iterati
 
 } // namespace algorithms
 
-template class algorithms::GoLCudaNaiveBitwiseNoMacro<char, 16>;
-template class algorithms::GoLCudaNaiveBitwiseNoMacro<char, 32>;
-template class algorithms::GoLCudaNaiveBitwiseNoMacro<char, 64>;
+template class algorithms::GoLCudaNaiveBitwiseNoMacro<common::CHAR, 16>;
+template class algorithms::GoLCudaNaiveBitwiseNoMacro<common::CHAR, 32>;
+template class algorithms::GoLCudaNaiveBitwiseNoMacro<common::CHAR, 64>;
+
+template class algorithms::GoLCudaNaiveBitwiseNoMacro<common::INT, 16>;
+template class algorithms::GoLCudaNaiveBitwiseNoMacro<common::INT, 32>;
+template class algorithms::GoLCudaNaiveBitwiseNoMacro<common::INT, 64>;
 
 #endif // CUDA_NAIVE_KERNEL_CU

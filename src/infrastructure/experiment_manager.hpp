@@ -17,6 +17,7 @@
 #include "data_loader.hpp"
 #include "experiment_params.hpp"
 #include <cstddef>
+#include <cstdint>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -34,7 +35,7 @@ namespace cuda_naive_local = algorithms::cuda_naive_local;
 
 namespace infrastructure {
 
-template <typename grid_cell_t = char>
+template <typename grid_cell_t>
 class ExperimentManager {
     template <int Dims, typename ElementType>
     using grid_ptr = std::unique_ptr<Grid<Dims, ElementType>>;
@@ -89,11 +90,11 @@ class ExperimentManager {
 
         // AN5D
 
-        _2d_repo-> template register_algorithm<alg::An5dAlg<32, alg::ExecModel::CPU>>("an5d-cpu-32");
-        _2d_repo-> template register_algorithm<alg::An5dAlg<64, alg::ExecModel::CPU>>("an5d-cpu-64");
+        // _2d_repo-> template register_algorithm<alg::An5dAlg<32, alg::ExecModel::CPU>>("an5d-cpu-32");
+        // _2d_repo-> template register_algorithm<alg::An5dAlg<64, alg::ExecModel::CPU>>("an5d-cpu-64");
 
-        _2d_repo-> template register_algorithm<alg::An5dAlg<32, alg::ExecModel::CUDA>>("an5d-cuda-32");
-        _2d_repo-> template register_algorithm<alg::An5dAlg<64, alg::ExecModel::CUDA>>("an5d-cuda-64");
+        // _2d_repo-> template register_algorithm<alg::An5dAlg<32, alg::ExecModel::CUDA>>("an5d-cuda-32");
+        // _2d_repo-> template register_algorithm<alg::An5dAlg<64, alg::ExecModel::CUDA>>("an5d-cuda-64");
     }
 
     void run(const ExperimentParams& params) {

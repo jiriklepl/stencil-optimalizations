@@ -28,10 +28,10 @@ class GoLCudaNaive : public infrastructure::Algorithm<2, grid_cell_t> {
 
         auto size = grid.size();
 
-        CUCH(cudaMalloc(&cuda_data.input, size * sizeof(char)));
-        CUCH(cudaMalloc(&cuda_data.output, size * sizeof(char)));
+        CUCH(cudaMalloc(&cuda_data.input, size * sizeof(grid_cell_t)));
+        CUCH(cudaMalloc(&cuda_data.output, size * sizeof(grid_cell_t)));
 
-        CUCH(cudaMemcpy(cuda_data.input, grid.data(), size * sizeof(char), cudaMemcpyHostToDevice));
+        CUCH(cudaMemcpy(cuda_data.input, grid.data(), size * sizeof(grid_cell_t), cudaMemcpyHostToDevice));
     }
 
     void run(size_type iterations) override {
@@ -43,7 +43,7 @@ class GoLCudaNaive : public infrastructure::Algorithm<2, grid_cell_t> {
 
         auto data = grid.data();
 
-        CUCH(cudaMemcpy(data, cuda_data.output, grid.size() * sizeof(char), cudaMemcpyDeviceToHost));
+        CUCH(cudaMemcpy(data, cuda_data.output, grid.size() * sizeof(grid_cell_t), cudaMemcpyDeviceToHost));
 
         CUCH(cudaFree(cuda_data.input));
         CUCH(cudaFree(cuda_data.output));
@@ -59,7 +59,7 @@ class GoLCudaNaive : public infrastructure::Algorithm<2, grid_cell_t> {
 
   private:
     DataGrid grid;
-    NaiveGridOnCuda cuda_data;
+    NaiveGridOnCuda<grid_cell_t> cuda_data;
 
     void run_kernel(size_type iterations);
 

@@ -7,6 +7,7 @@
 #include "gol_cuda_naive_bitwise.hpp"
 #include <cuda_runtime.h>
 #include "../../infrastructure/timer.hpp"
+#include "../_shared/common_grid_types.hpp"
 
 namespace algorithms {
 
@@ -72,8 +73,12 @@ void GoLCudaNaiveBitwise<grid_cell_t, Bits>::run_kernel(size_type iterations) { 
 
 } // namespace algorithms
 
-template class algorithms::GoLCudaNaiveBitwise<char, 16>;
-template class algorithms::GoLCudaNaiveBitwise<char, 32>;
-template class algorithms::GoLCudaNaiveBitwise<char, 64>;
+template class algorithms::GoLCudaNaiveBitwise<common::CHAR, 16>;
+template class algorithms::GoLCudaNaiveBitwise<common::CHAR, 32>;
+template class algorithms::GoLCudaNaiveBitwise<common::CHAR, 64>;
+
+template class algorithms::GoLCudaNaiveBitwise<common::INT, 16>;
+template class algorithms::GoLCudaNaiveBitwise<common::INT, 32>;
+template class algorithms::GoLCudaNaiveBitwise<common::INT, 64>;
 
 #endif // CUDA_NAIVE_KERNEL_CU

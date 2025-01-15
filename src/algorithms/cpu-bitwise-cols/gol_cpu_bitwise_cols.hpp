@@ -79,7 +79,7 @@ class GoLCpuBitwiseCols : public infrastructure::Algorithm<2, grid_cell_t> {
     }
 
     DataGrid fetch_result() override {
-        return final_bit_grid->to_grid();
+        return final_bit_grid->template to_grid<grid_cell_t>();
     }
 
     std::size_t actually_performed_iterations() const override {

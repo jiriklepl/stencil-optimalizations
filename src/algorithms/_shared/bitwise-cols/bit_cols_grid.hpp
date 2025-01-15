@@ -25,7 +25,9 @@ class BitColsGrid {
     constexpr static std::size_t BITS_IN_COL = sizeof(bit_col_type) * 8;
 
     using size_type = std::size_t;
-    using Grid = infrastructure::Grid<2, char>;
+
+    template <typename grid_cell_t>
+    using Grid = infrastructure::Grid<2, grid_cell_t>;
 
     using ONE_CELL_STATE = bool;
     constexpr static ONE_CELL_STATE DEAD = 0;
@@ -39,11 +41,12 @@ class BitColsGrid {
         bit_cols_grid.resize(x_size() * y_size(), 0);
     }
 
-    BitColsGrid(const Grid& grid) {
+    template <typename grid_cell_t>
+    BitColsGrid(const Grid<grid_cell_t>& grid) {
         assert_dim_has_correct_size(grid);
 
-        _x_size = grid.size_in<0>();
-        _y_size = grid.size_in<1>() / BITS_IN_COL;
+        _x_size = grid.template size_in<0>();
+        _y_size = grid.template size_in<1>() / BITS_IN_COL;
 
         bit_cols_grid.resize(x_size() * y_size(), 0);
         fill_grid(grid);
@@ -133,11 +136,12 @@ class BitColsGrid {
         return &bit_cols_grid;
     }
 
-    Grid to_grid() const {
+    template <typename grid_cell_t>
+    Grid<grid_cell_t> to_grid() const {
         auto _original_x_size = original_x_size();
         auto _original_y_size = original_y_size();
 
-        Grid grid(_original_x_size, _original_y_size);
+        Grid<grid_cell_t> grid(_original_x_size, _original_y_size);
         auto raw_data = grid.data();
         
         for (size_type y = 0; y < _original_y_size; y += BITS_IN_COL) {
@@ -146,7 +150,7 @@ class BitColsGrid {
 
                 for (size_type bit = 0; bit < BITS_IN_COL; ++bit) {
                     auto value = (col >> bit) & 1;
-                    raw_data[in_grid_idx(x,y + bit)] = value;
+                    raw_data[in_grid_idx(x,y + bit)] = static_cast<grid_cell_t>(value);
                 }
             }
         }
@@ -159,17 +163,19 @@ class BitColsGrid {
         return y * _x_size + x;
     }
 
-    void assert_dim_has_correct_size(const Grid& grid) {
-        if (grid.size_in<1>() % BITS_IN_COL != 0) {
+    template <typename grid_cell_t>
+    void assert_dim_has_correct_size(const Grid<grid_cell_t>& grid) {
+        if (grid.template size_in<1>() % BITS_IN_COL != 0) {
             throw std::invalid_argument("Grid dimensions must be a multiple of " + std::to_string(BITS_IN_COL));
         }
     }
 
-    void fill_grid(const Grid& grid) {
+    template <typename grid_cell_t>
+    void fill_grid(const Grid<grid_cell_t>& grid) {
         auto raw_data = grid.data();
 
-        for (std::size_t y = 0; y < grid.size_in<1>(); y += BITS_IN_COL) {
-            for (std::size_t x = 0; x < grid.size_in<0>(); ++x) {
+        for (std::size_t y = 0; y < grid.template size_in<1>(); y += BITS_IN_COL) {
+            for (std::size_t x = 0; x < grid.template size_in<0>(); ++x) {
                 bit_col_type bit_col = 0;
 
                 for (std::size_t i = 0; i < BITS_IN_COL; ++i) {

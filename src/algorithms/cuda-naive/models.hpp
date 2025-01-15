@@ -4,9 +4,10 @@
 #include <cstddef>
 namespace algorithms {
 
+template <typename grid_cell_t>
 struct NaiveGridOnCuda {
-    char* input;
-    char* output;
+    grid_cell_t* input;
+    grid_cell_t* output;
     std::size_t x_size;
     std::size_t y_size;
 };

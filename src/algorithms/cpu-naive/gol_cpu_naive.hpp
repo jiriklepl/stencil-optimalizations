@@ -125,7 +125,7 @@ class GoLCpuNaive : public infrastructure::Algorithm<2, grid_cell_t> {
 
         std::cout << "Iteration: " << iter << std::endl;
 
-        std::cout << debug_utils::pretty(grid) << std::endl;
+        std::cout << debug_utils::pretty_g<2, grid_cell_t>(grid) << std::endl;
 
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
