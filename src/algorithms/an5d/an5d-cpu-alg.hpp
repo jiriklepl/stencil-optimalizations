@@ -52,6 +52,10 @@ class An5dAlg : public infrastructure::Algorithm<2, char> {
         return result_bit_grid->to_grid();
     }
 
+    std::size_t actually_performed_iterations() const override {
+        return this->params.iterations;
+    }
+
   private:
     size_type original_x_size;
     size_type original_y_size;

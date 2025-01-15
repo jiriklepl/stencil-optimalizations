@@ -6,6 +6,7 @@
 #include "./models.hpp"
 #include "gol_cuda_naive_bitwise.hpp"
 #include <cuda_runtime.h>
+#include "../../infrastructure/timer.hpp"
 
 namespace algorithms {
 
@@ -52,7 +53,15 @@ void GoLCudaNaiveBitwise<Bits>::run_kernel(size_type iterations) { // Added temp
     dim3 block(16, 16);
     dim3 grid((cuda_data.x_size + block.x - 1) / block.x, (cuda_data.y_size + block.y - 1) / block.y);
 
+    infrastructure::StopWatch stop_watch(this->params.max_runtime_seconds);
+    _performed_iterations = this->params.iterations;
+
     for (std::size_t i = 0; i < iterations; ++i) {
+        if (stop_watch.time_is_up()) {
+            _performed_iterations = i;
+            return;
+        }
+        
         if (i != 0) {
             std::swap(cuda_data.input, cuda_data.output);
         }

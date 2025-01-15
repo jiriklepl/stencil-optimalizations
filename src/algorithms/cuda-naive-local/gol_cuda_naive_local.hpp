@@ -101,11 +101,18 @@ class GoLCudaNaiveLocal : public infrastructure::Algorithm<2, char> {
         return bit_grid->to_grid();
     }
 
+    std::size_t actually_performed_iterations() const override {
+        return _performed_iterations;
+    }
+
   private:
     BitGrid_ptr bit_grid;
     BitGridWithChangeInfo<col_type, state_store_type> cuda_data;
 
     std::size_t thread_block_size;
+
+    std::size_t _performed_iterations;
+
     
     template <StreamingDir Direction>
     void run_kernel(size_type iterations);

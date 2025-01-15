@@ -36,7 +36,15 @@ class GoLCpuBitwiseCols : public infrastructure::Algorithm<2, char> {
         auto source = bit_grid.get();
         auto target = intermediate_bit_grid.get();
 
+        infrastructure::StopWatch stop_watch(this->params.max_runtime_seconds);
+        _performed_iterations = this->params.iterations;
+
         for (size_type i = 0; i < iterations; ++i) {
+            if (stop_watch.time_is_up()) {
+                _performed_iterations = i;
+                break;
+            }
+
             for (size_type y = 0; y < y_size; ++y) {
                 for (size_type x = 0; x < x_size; ++x) {
                     // clang-format off
@@ -72,6 +80,10 @@ class GoLCpuBitwiseCols : public infrastructure::Algorithm<2, char> {
 
     DataGrid fetch_result() override {
         return final_bit_grid->to_grid();
+    }
+
+    std::size_t actually_performed_iterations() const override {
+        return _performed_iterations;
     }
 
   private:
@@ -116,6 +128,8 @@ class GoLCpuBitwiseCols : public infrastructure::Algorithm<2, char> {
     std::unique_ptr<BitGrid> intermediate_bit_grid;
 
     BitGrid* final_bit_grid;
+
+    std::size_t _performed_iterations;
 };
 
 } // namespace algorithms

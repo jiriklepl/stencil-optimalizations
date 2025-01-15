@@ -3,10 +3,12 @@
 
 #include "../_shared/bitwise-cols/bitwise_ops_cuda_bit_ops.cuh"
 #include "../_shared/bitwise-cols/bitwise_ops_macros.hpp"
+#include "../../infrastructure/timer.hpp"
 #include "./models.hpp"
 #include "gol_cuda_naive_local.hpp"
 #include "gol_cuda_naive_just_tiling.hpp"
 #include <cuda_runtime.h>
+
 
 namespace algorithms::cuda_naive_local {
 
@@ -314,7 +316,15 @@ void GoLCudaNaiveLocal<Bits, state_store_type>::run_kernel(size_type iterations)
     auto warp_tile_per_block = block_size / WARP_SIZE;
     auto shm_size = warp_tile_per_block * sizeof(shm_private_value_t);
 
+    infrastructure::StopWatch stop_watch(this->params.max_runtime_seconds);
+    _performed_iterations = this->params.iterations;
+
     for (std::size_t i = 0; i < iterations; ++i) {
+        if (stop_watch.time_is_up()) {
+            _performed_iterations = i;
+            break;
+        }
+
         if (i != 0) {
             std::swap(cuda_data.input, cuda_data.output);
             rotate_state_stores();      
@@ -342,7 +352,15 @@ void GoLCudaNaiveJustTiling<Bits>::run_kernel(size_type iterations) {
     auto block_size = thread_block_size;
     auto blocks = get_thread_block_count();
 
+    infrastructure::StopWatch stop_watch(this->params.max_runtime_seconds);
+    _performed_iterations = this->params.iterations;
+
     for (std::size_t i = 0; i < iterations; ++i) {
+        if (stop_watch.time_is_up()) {
+            _performed_iterations = i;
+            break;
+        }
+
         if (i != 0) {
             std::swap(cuda_data.input, cuda_data.output);
         }

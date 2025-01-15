@@ -23,4 +23,5 @@ WARP_DIMS_Y="6" \
 WARP_TILE_DIMS_X="7" \
 WARP_TILE_DIMS_Y="8" \
 STREAMING_DIRECTION="in-x" \
+MAX_RUNTIME_SECONDS="900" \
 sbatch job.slurm.sbatch.sh

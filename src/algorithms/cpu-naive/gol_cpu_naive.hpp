@@ -33,7 +33,15 @@ class GoLCpuNaive : public infrastructure::Algorithm<2, char> {
             print(*source, 0);
         }
 
+        infrastructure::StopWatch stop_watch(this->params.max_runtime_seconds);
+        _performed_iterations = this->params.iterations;
+        
         for (size_type i = 0; i < iterations; ++i) {
+            if (stop_watch.time_is_up()) {
+                _performed_iterations = i;
+                break;
+            }
+
             for (size_type x = 0; x < x_size; ++x) {
                 for (size_type y = 0; y < y_size; ++y) {
 
@@ -73,6 +81,10 @@ class GoLCpuNaive : public infrastructure::Algorithm<2, char> {
 
     DataGrid fetch_result() override {
         return std::move(_result);
+    }
+
+    std::size_t actually_performed_iterations() const override {
+        return _performed_iterations;
     }
 
   private:
@@ -119,6 +131,8 @@ class GoLCpuNaive : public infrastructure::Algorithm<2, char> {
 
     DataGrid _result;
     DataGrid _intermediate;
+
+    std::size_t _performed_iterations;
 };
 
 } // namespace algorithms

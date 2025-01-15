@@ -23,6 +23,29 @@ class Timer {
     }
 };
 
+class StopWatch {
+  public:
+    StopWatch(std::size_t count_down_seconds) : count_down_seconds(count_down_seconds) {
+        restart();
+    }
+
+    void restart() {
+        start_time = std::chrono::high_resolution_clock::now();
+    }
+
+    bool time_is_up() {
+        auto now = std::chrono::high_resolution_clock::now();
+        auto elapsed_seconds = std::chrono::duration<double>(now - start_time).count();
+
+        return elapsed_seconds >= count_down_seconds;
+    }
+
+  private:
+    std::size_t count_down_seconds;
+    std::chrono::time_point<std::chrono::high_resolution_clock> start_time;
+};
+
+
 } // namespace infrastructure
 
 #endif // TIMER_HPP

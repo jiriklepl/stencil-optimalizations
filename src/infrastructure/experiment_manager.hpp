@@ -25,6 +25,7 @@
 #include "../debug_utils/diff_grid.hpp"
 #include "../debug_utils/pretty_print.hpp"
 #include "grid.hpp"
+
 using namespace debug_utils;
 namespace alg = algorithms;
 namespace cuda_naive_local = algorithms::cuda_naive_local;
@@ -104,11 +105,9 @@ class ExperimentManager {
                   << ((params.data_loader_name == "lexicon") ? c::title_color() + " with pattern " + c::value_color() + params.pattern_expression: "") 
                   << c::reset_color() << std::endl;
         
-        Timer t;
-
         Grid<Dims, ElementType> data;
 
-        auto secs  = t.measure([&]() { data = loader->load_data(params); });
+        auto secs  = Timer::measure([&]() { data = loader->load_data(params); });
         std::cout << c::label_color() << "  Data loaded in   " << c::value_color() << secs << " s" << c::reset_color() << std::endl << std::endl;
 
         TimeReport bench_report;

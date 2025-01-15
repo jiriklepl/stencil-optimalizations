@@ -33,6 +33,10 @@ public:
         return should_be_colorful ? "\033[1A" : "";
     }
 
+    static std::string extra_line_in_params() {
+        return should_be_colorful ? "\n" : "";
+    }
+
     // TIME REPORT COLORS
 
     static std::string time_report_title() {
@@ -41,6 +45,10 @@ public:
 
     static std::string time_report_labels() {
         return should_be_colorful ? "\033[1;33m" : "";
+    }
+
+    static std::string time_report_sublabels() {
+        return should_be_colorful ? "\033[33m" : "";
     }
 
     static std::string time_report_time() {

@@ -61,6 +61,14 @@ class Algorithm {
     virtual DataGrid fetch_result() = 0;
 
     /**
+     * @brief Returns the number of iterations actually performed by the algorithm.
+     * This is useful when the algorithm is stopped prematurely due to params.max_runtime_seconds.
+     *
+     * @return std::size_t The number of iterations actually performed.
+     */
+    virtual std::size_t actually_performed_iterations() const = 0;
+
+    /**
      * @brief Sets the experiment parameters.
      *
      * @param params The experiment parameters.
@@ -68,6 +76,7 @@ class Algorithm {
     void set_params(const ExperimentParams& params) {
         this->params = params;
     }
+
 
     virtual bool is_an5d_cuda_alg() const {
         return false;
@@ -86,6 +95,16 @@ struct TimeReport {
     double finalize_data_structures = INVALID;
     double fetch_result = INVALID;
 
+    std::size_t actually_performed_iterations = 0;
+
+    double runtime_per_iteration() const {
+        if (run == INVALID || actually_performed_iterations == 0) {
+            return INVALID;
+        }
+
+        return run / actually_performed_iterations;
+    }
+
     std::string pretty_print() const {
         std::string title_color = c::time_report_title();
         std::string reset_color = c::reset_color();
@@ -95,6 +114,7 @@ struct TimeReport {
         result += pretty_print_line("  set_and_format_input_data:  ", set_and_format_input_data);
         result += pretty_print_line("  initialize_data_structures: ", initialize_data_structures);
         result += pretty_print_line("  run:                        ", run);
+        result += pretty_number_of_iterations(actually_performed_iterations);
         result += pretty_print_line("  finalize_data_structures:   ", finalize_data_structures);
         result += pretty_print_line("  fetch_result:               ", fetch_result) + reset_color;
         // clang-format on
@@ -111,6 +131,7 @@ struct TimeReport {
         result += pretty_print_speedup_line("  set_and_format_input_data:  ", set_and_format_input_data, bench.set_and_format_input_data);
         result += pretty_print_speedup_line("  initialize_data_structures: ", initialize_data_structures, bench.initialize_data_structures);
         result += pretty_print_speedup_line("  run:                        ", run, bench.run);
+        result += pretty_number_of_iterations_speedup(actually_performed_iterations, bench);
         result += pretty_print_speedup_line("  finalize_data_structures:   ", finalize_data_structures, bench.finalize_data_structures);
         result += pretty_print_speedup_line("  fetch_result:               ", fetch_result, bench.fetch_result) + reset_color;
         // clang-format on
@@ -162,6 +183,29 @@ struct TimeReport {
         return labels_color + label + time_color + std::to_string(time) + "s ~ " + speedup_str(bench, time) +
                reset_color + "\n";
     }
+
+    std::string pretty_number_of_iterations(std::size_t iterations) const {
+        std::string labels_color = c::time_report_sublabels();
+        std::string time_color = c::time_report_time();
+        std::string reset_color = c::reset_color();
+
+        auto line = labels_color + "   performed iters:  " + time_color + std::to_string(iterations) + reset_color + "\n";
+        line +=     labels_color + "   runtime per iter: " + time_color + std::to_string(runtime_per_iteration()) + "s" + reset_color + "\n";
+
+        return line;
+    }
+
+    std::string pretty_number_of_iterations_speedup(std::size_t iterations, const TimeReport& bench) const {
+        std::string labels_color = c::time_report_sublabels();
+        std::string time_color = c::time_report_time();
+        std::string reset_color = c::reset_color();
+
+        std::string line = labels_color + "   performed iters:  " + time_color + std::to_string(iterations) + reset_color + "\n";
+        line +=            labels_color + "   runtime per iter: " + time_color + std::to_string(runtime_per_iteration()) + 
+            "s ~ " + speedup_str(bench.runtime_per_iteration(), runtime_per_iteration()) + reset_color + "\n";
+
+        return line;
+    }
 };
 
 template <int Dims, typename ElementType>
@@ -174,37 +218,32 @@ class TimedAlgorithm : public Algorithm<Dims, ElementType> {
     }
 
     void set_and_format_input_data(const DataGrid& data) override {
-        Timer t;
-
-        time_report.set_and_format_input_data = t.measure([&]() { algorithm->set_and_format_input_data(data); });
+        time_report.set_and_format_input_data = Timer::measure([&]() { algorithm->set_and_format_input_data(data); });
     }
 
     void initialize_data_structures() override {
-        Timer t;
-
-        time_report.initialize_data_structures = t.measure([&]() { algorithm->initialize_data_structures(); });
+        time_report.initialize_data_structures = Timer::measure([&]() { algorithm->initialize_data_structures(); });
     }
 
     void run(size_type iterations) override {
-        Timer t;
-
-        time_report.run = t.measure([&]() { algorithm->run(iterations); });
+        time_report.run = Timer::measure([&]() { algorithm->run(iterations); });
+        time_report.actually_performed_iterations = algorithm->actually_performed_iterations();
     }
 
     void finalize_data_structures() override {
-        Timer t;
-
-        time_report.finalize_data_structures = t.measure([&]() { algorithm->finalize_data_structures(); });
+        time_report.finalize_data_structures = Timer::measure([&]() { algorithm->finalize_data_structures(); });
     }
 
     DataGrid fetch_result() override {
-        Timer t;
-
         DataGrid result;
 
-        time_report.fetch_result = t.measure([&]() { result = algorithm->fetch_result(); });
+        time_report.fetch_result = Timer::measure([&]() { result = algorithm->fetch_result(); });
 
         return result;
+    }
+
+    std::size_t actually_performed_iterations() const override {
+        return algorithm->actually_performed_iterations();
     }
 
     TimeReport get_time_report() {

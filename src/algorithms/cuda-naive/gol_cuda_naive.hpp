@@ -4,6 +4,7 @@
 #include "../../infrastructure/algorithm.hpp"
 #include "../_shared/cuda-helpers/cuch.hpp"
 #include "models.hpp"
+#include <cstddef>
 #include <iostream>
 
 namespace algorithms {
@@ -51,11 +52,17 @@ class GoLCudaNaive : public infrastructure::Algorithm<2, char> {
         return std::move(grid);
     }
 
+    std::size_t actually_performed_iterations() const override {
+        return _performed_iterations;
+    }
+
   private:
     DataGrid grid;
     NaiveGridOnCuda cuda_data;
 
     void run_kernel(size_type iterations);
+
+    std::size_t _performed_iterations;
 };
 
 } // namespace algorithms

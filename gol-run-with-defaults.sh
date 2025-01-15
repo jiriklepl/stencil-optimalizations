@@ -5,12 +5,12 @@ cd $WORK_DIR || exit 1
 
 GOL_EXE_NAME="./stencils"
 
-ALGORITHM="gol-cpu-naive"
+ALGORITHM="gol-cpu-bitwise-cols-macro-64"
 GRID_DIMENSIONS_X="256"
 GRID_DIMENSIONS_Y="256"
-ITERATIONS="100"
-WARMUP_ROUNDS="3"
-MEASUREMENT_ROUNDS="2"
+ITERATIONS="10000"
+WARMUP_ROUNDS="0"
+MEASUREMENT_ROUNDS="3"
 DATA_LOADER_NAME="random-ones-zeros"
 PATTERN_EXPRESSION=""
 MEASURE_SPEEDUP="false"
@@ -27,12 +27,15 @@ WARP_DIMS_Y="0"
 WARP_TILE_DIMS_X="0"
 WARP_TILE_DIMS_Y="0"
 STREAMING_DIRECTION="naive"
+MAX_RUNTIME_SECONDS="6"
 
-srun -p gpu-short -A kdss --cpus-per-task=64 --mem=256GB --gres=gpu:V100 --time=2:00:00 $GOL_EXE_NAME \
+# srun -p gpu-short -A kdss --cpus-per-task=64 --mem=256GB --gres=gpu:V100 --time=2:00:00 $GOL_EXE_NAME \
+srun -p gpu-short -A kdss --cpus-per-task=64 --mem=256GB --gres=gpu:H100 --time=2:00:00 $GOL_EXE_NAME \
     --algorithm="$ALGORITHM" \
     --grid-dimensions-x="$GRID_DIMENSIONS_X" \
     --grid-dimensions-y="$GRID_DIMENSIONS_Y" \
     --iterations="$ITERATIONS" \
+    --max-runtime-seconds="$MAX_RUNTIME_SECONDS" \
     --warmup-rounds="$WARMUP_ROUNDS" \
     --measurement-rounds="$MEASUREMENT_ROUNDS" \
     --data-loader="$DATA_LOADER_NAME" \

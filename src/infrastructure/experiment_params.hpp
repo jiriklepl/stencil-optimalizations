@@ -22,6 +22,7 @@ class ExperimentParams {
     std::string algorithm_name;
     std::vector<std::size_t> grid_dimensions;
     std::size_t iterations;
+    std::size_t max_runtime_seconds = std::numeric_limits<std::size_t>::max();
 
     std::size_t warmup_rounds = 0;
     std::size_t measurement_rounds = 1;
@@ -63,24 +64,25 @@ class ExperimentParams {
 
       ss << label_color << "  algorithm_name: " << value_color << algorithm_name << std::endl;
       ss << label_color << "  grid_dimensions: " << value_color << grid_dimensions[0] << "x" << grid_dimensions[1] << std::endl;
-      ss << label_color << "  iterations: " << value_color << iterations << std::endl << std::endl;
+      ss << label_color << "  iterations: " << value_color << iterations << std::endl << c::extra_line_in_params();
+      ss << label_color << "  max_runtime_seconds: " << value_color << max_runtime_seconds << std::endl << c::extra_line_in_params();
       ss << label_color << "  warmup_rounds: " << value_color << warmup_rounds << std::endl;
-      ss << label_color << "  measurement_rounds: " << value_color << measurement_rounds << std::endl << std::endl;
+      ss << label_color << "  measurement_rounds: " << value_color << measurement_rounds << std::endl << c::extra_line_in_params();
       ss << label_color << "  data_loader_name: " << value_color << data_loader_name << std::endl;
-      ss << label_color << "  pattern_expression: " << value_color << pattern_expression << std::endl << std::endl;
+      ss << label_color << "  pattern_expression: " << value_color << pattern_expression << std::endl << c::extra_line_in_params();
       ss << label_color << "  measure_speedup: " << value_color << measure_speedup << std::endl;
-      ss << label_color << "  speedup_bench_algorithm_name: " << value_color << speedup_bench_algorithm_name << std::endl << std::endl;
+      ss << label_color << "  speedup_bench_algorithm_name: " << value_color << speedup_bench_algorithm_name << std::endl << c::extra_line_in_params();
       ss << label_color << "  validate: " << value_color << validate << std::endl;
       ss << label_color << "  print_validation_diff: " << value_color << print_validation_diff << std::endl;
-      ss << label_color << "  validation_algorithm_name: " << value_color << validation_algorithm_name << std::endl << std::endl;
+      ss << label_color << "  validation_algorithm_name: " << value_color << validation_algorithm_name << std::endl << c::extra_line_in_params();
       ss << label_color << "  animate_output: " << value_color << animate_output << std::endl;
-      ss << label_color << "  colorful: " << value_color << colorful << std::endl << std::endl;
-      ss << label_color << "  random_seed: " << value_color << random_seed << std::endl << std::endl;
-      ss << label_color << "  thread_block_size: " << value_color << thread_block_size << std::endl << std::endl;
+      ss << label_color << "  colorful: " << value_color << colorful << std::endl << c::extra_line_in_params();
+      ss << label_color << "  random_seed: " << value_color << random_seed << std::endl << c::extra_line_in_params();
+      ss << label_color << "  thread_block_size: " << value_color << thread_block_size << std::endl << c::extra_line_in_params();
       ss << label_color << "  warp_dims_x: " << value_color << warp_dims_x << std::endl;
-      ss << label_color << "  warp_dims_y: " << value_color << warp_dims_y << std::endl << std::endl;
+      ss << label_color << "  warp_dims_y: " << value_color << warp_dims_y << std::endl << c::extra_line_in_params();
       ss << label_color << "  warp_tile_dims_x: " << value_color << warp_tile_dims_x << std::endl;
-      ss << label_color << "  warp_tile_dims_y: " << value_color << warp_tile_dims_y << std::endl << std::endl;
+      ss << label_color << "  warp_tile_dims_y: " << value_color << warp_tile_dims_y << std::endl << c::extra_line_in_params();
       ss << label_color << "  streaming_direction: " << value_color;
       switch (streaming_direction) {
         case StreamingDirection::in_X: ss << "in-x"; break;
@@ -99,6 +101,7 @@ const std::string ALGORITHM_NAME               = "algorithm";
 const std::string GRID_DIMENSIONS_X            = "grid-dimensions-x";
 const std::string GRID_DIMENSIONS_Y            = "grid-dimensions-y";
 const std::string ITERATIONS                   = "iterations";
+const std::string MAX_RUNTIME_SECONDS          = "max-runtime-seconds";
 const std::string WARMUP_ROUNDS                = "warmup-rounds";
 const std::string MEASUREMENT_ROUNDS           = "measurement-rounds";
 const std::string DATA_LOADER_NAME             = "data-loader";
@@ -140,6 +143,9 @@ class ParamsParser {
         
         (opts::ITERATIONS, "Number of iterations",
           cxxopts::value<std::size_t>())
+
+        (opts::MAX_RUNTIME_SECONDS, "Maximum runtime in seconds",
+          cxxopts::value<std::size_t>()->default_value("18446744073709551615"))
 
         (opts::WARMUP_ROUNDS, "Number of warmup rounds",
           cxxopts::value<std::size_t>()->default_value("0"))
@@ -210,6 +216,9 @@ class ParamsParser {
 
       params.grid_dimensions = {gx, gy};
       params.iterations = result[opts::ITERATIONS].as<std::size_t>();
+      
+      params.max_runtime_seconds = result[opts::MAX_RUNTIME_SECONDS].as<std::size_t>();
+
       params.warmup_rounds = result[opts::WARMUP_ROUNDS].as<std::size_t>();
       params.measurement_rounds = result[opts::MEASUREMENT_ROUNDS].as<std::size_t>();
 
