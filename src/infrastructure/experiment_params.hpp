@@ -25,6 +25,8 @@ class ExperimentParams {
     std::size_t iterations;
     std::size_t max_runtime_seconds = infrastructure::StopWatch::MAX_TIME;
 
+    std::string base_grid_encoding = "char"; // char, int
+
     std::size_t warmup_rounds = 0;
     std::size_t measurement_rounds = 1;
 
@@ -43,6 +45,8 @@ class ExperimentParams {
     bool colorful = true;
 
     std::size_t random_seed = 42;
+
+    std::size_t state_bits_count = 64;
 
     std::size_t thread_block_size;
 
@@ -66,6 +70,7 @@ class ExperimentParams {
       ss << label_color << "  algorithm_name: " << value_color << algorithm_name << std::endl;
       ss << label_color << "  grid_dimensions: " << value_color << grid_dimensions[0] << "x" << grid_dimensions[1] << std::endl;
       ss << label_color << "  iterations: " << value_color << iterations << std::endl << c::extra_line_in_params();
+      ss << label_color << "  base_grid_encoding: " << value_color << base_grid_encoding << std::endl << c::extra_line_in_params();
       ss << label_color << "  max_runtime_seconds: " << value_color << max_runtime_seconds << std::endl << c::extra_line_in_params();
       ss << label_color << "  warmup_rounds: " << value_color << warmup_rounds << std::endl;
       ss << label_color << "  measurement_rounds: " << value_color << measurement_rounds << std::endl << c::extra_line_in_params();
@@ -79,6 +84,7 @@ class ExperimentParams {
       ss << label_color << "  animate_output: " << value_color << animate_output << std::endl;
       ss << label_color << "  colorful: " << value_color << colorful << std::endl << c::extra_line_in_params();
       ss << label_color << "  random_seed: " << value_color << random_seed << std::endl << c::extra_line_in_params();
+      ss << label_color << "  state_bits_count: " << value_color << state_bits_count << std::endl << c::extra_line_in_params();
       ss << label_color << "  thread_block_size: " << value_color << thread_block_size << std::endl << c::extra_line_in_params();
       ss << label_color << "  warp_dims_x: " << value_color << warp_dims_x << std::endl;
       ss << label_color << "  warp_dims_y: " << value_color << warp_dims_y << std::endl << c::extra_line_in_params();
@@ -121,6 +127,8 @@ const std::string WARP_DIMS_Y                  = "warp-dims-y";
 const std::string WARP_TILE_DIMS_X             = "warp-tile-dims-x";
 const std::string WARP_TILE_DIMS_Y             = "warp-tile-dims-y";
 const std::string STREAMING_DIRECTION          = "streaming-direction";
+const std::string STATE_BITS_COUNT             = "state-bits-count";
+const std::string BASE_GRID_ENCODING           = "base-grid-encoding";
 // clang-format on
 }
 
@@ -201,6 +209,12 @@ class ParamsParser {
         
         (opts::STREAMING_DIRECTION, "Streaming direction (in-x|in-y|naive)",
           cxxopts::value<std::string>()->default_value("naive"))
+
+        (opts::STATE_BITS_COUNT, "Number of state bits",
+          cxxopts::value<std::size_t>()->default_value("64"))
+
+        (opts::BASE_GRID_ENCODING, "Base grid encoding (char|int)",
+          cxxopts::value<std::string>()->default_value("char"))
       ;
 
       auto result = optConfig.parse(argc, argv);
@@ -238,6 +252,7 @@ class ParamsParser {
       params.animate_output = result[opts::ANIMATE_OUTPUT].as<bool>();
       params.colorful = result[opts::COLORFUL].as<bool>();
       params.random_seed = result[opts::RANDOM_SEED].as<std::size_t>();
+      params.state_bits_count = result[opts::STATE_BITS_COUNT].as<std::size_t>();
 
       params.thread_block_size = result[opts::THREAD_BLOCK_SIZE].as<std::size_t>();
 
@@ -255,6 +270,10 @@ class ParamsParser {
       else                         { throw std::runtime_error("Invalid streaming direction"); }
 
       params.colorful = result[opts::COLORFUL].as<bool>();
+
+      params.state_bits_count = result[opts::STATE_BITS_COUNT].as<std::size_t>();
+
+      params.base_grid_encoding = result[opts::BASE_GRID_ENCODING].as<std::string>();
 
       return params;
     }

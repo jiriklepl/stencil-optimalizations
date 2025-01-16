@@ -83,13 +83,9 @@ class ExperimentManager {
         _2d_repo-> template register_algorithm<alg::GoLCudaNaiveBitwiseNoMacro<grid_cell_t, 32>>("gol-cuda-naive-bitwise-no-macro-32");
         _2d_repo-> template register_algorithm<alg::GoLCudaNaiveBitwiseNoMacro<grid_cell_t, 64>>("gol-cuda-naive-bitwise-no-macro-64");
 
-        _2d_repo-> template register_algorithm<cuda_naive_local::GoLCudaNaiveLocal<grid_cell_t, 16, state_in_32_bits_t>>("gol-cuda-naive-local-16-state-32");
-        _2d_repo-> template register_algorithm<cuda_naive_local::GoLCudaNaiveLocal<grid_cell_t, 32, state_in_32_bits_t>>("gol-cuda-naive-local-32-state-32");
-        _2d_repo-> template register_algorithm<cuda_naive_local::GoLCudaNaiveLocal<grid_cell_t, 64, state_in_32_bits_t>>("gol-cuda-naive-local-64-state-32");
-
-        _2d_repo-> template register_algorithm<cuda_naive_local::GoLCudaNaiveLocal<grid_cell_t, 16, state_in_64_bits_t>>("gol-cuda-naive-local-16-state-64");
-        _2d_repo-> template register_algorithm<cuda_naive_local::GoLCudaNaiveLocal<grid_cell_t, 32, state_in_64_bits_t>>("gol-cuda-naive-local-32-state-64");
-        _2d_repo-> template register_algorithm<cuda_naive_local::GoLCudaNaiveLocal<grid_cell_t, 64, state_in_64_bits_t>>("gol-cuda-naive-local-64-state-64");
+        _2d_repo-> template register_algorithm<cuda_naive_local::GoLCudaNaiveLocal<grid_cell_t, 16>>("gol-cuda-naive-local-16");
+        _2d_repo-> template register_algorithm<cuda_naive_local::GoLCudaNaiveLocal<grid_cell_t, 32>>("gol-cuda-naive-local-32");
+        _2d_repo-> template register_algorithm<cuda_naive_local::GoLCudaNaiveLocal<grid_cell_t, 64>>("gol-cuda-naive-local-64");
 
         _2d_repo-> template register_algorithm<cuda_naive_local::GoLCudaNaiveJustTiling<grid_cell_t, 16>>("gol-cuda-naive-just-tiling-16");
         _2d_repo-> template register_algorithm<cuda_naive_local::GoLCudaNaiveJustTiling<grid_cell_t, 32>>("gol-cuda-naive-just-tiling-32");

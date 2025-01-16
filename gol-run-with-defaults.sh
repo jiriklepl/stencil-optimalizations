@@ -42,12 +42,13 @@ __31="2147483648"
 # ALGORITHM="gol-cpu-bitwise-cols-macro-64"
 # ALGORITHM="gol-cuda-naive-bitwise-no-macro-64"
 # ALGORITHM="an5d-cpu-64"
-# ALGORITHM="gol-cuda-naive-local-64-state-64"
-ALGORITHM="gol-cuda-naive-local-64-state-32"
+ALGORITHM="gol-cuda-naive-local-64"
 # ALGORITHM="gol-cuda-naive-just-tiling-64"
-GRID_DIMENSIONS_X=$__14
-GRID_DIMENSIONS_Y=$__14
-ITERATIONS="10000"
+GRID_DIMENSIONS_X=$__15
+GRID_DIMENSIONS_Y=$__15
+ITERATIONS="100000"
+
+BASE_GRID_ENCODING="char"
 
 WARMUP_ROUNDS="0"
 MEASUREMENT_ROUNDS="1"
@@ -57,15 +58,18 @@ DATA_LOADER_NAME="random-ones-zeros"
 # DATA_LOADER_NAME="lexicon"
 # PATTERN_EXPRESSION="blinker[10,10]"
 PATTERN_EXPRESSION="glider[10,10]"
+# PATTERN_EXPRESSION="spacefiller[$((GRID_DIMENSIONS_X/2)),$((GRID_DIMENSIONS_Y/2))]"
 
 MEASURE_SPEEDUP="true"
 # MEASURE_SPEEDUP="false"
 # SPEEDUP_BENCH_ALGORITHM_NAME="gol-cpu-naive"
 # SPEEDUP_BENCH_ALGORITHM_NAME="gol-cpu-bitwise-cols-naive-64"
-# SPEEDUP_BENCH_ALGORITHM_NAME="gol-cuda-naive"
-SPEEDUP_BENCH_ALGORITHM_NAME="gol-cuda-naive-just-tiling-64"
+# SPEEDUP_BENCH_ALGORITHM_NAME="gol-cuda-naive-bitwise-cols-64"
+SPEEDUP_BENCH_ALGORITHM_NAME="gol-cuda-naive"
+# SPEEDUP_BENCH_ALGORITHM_NAME="gol-cuda-naive-just-tiling-64"
 
-VALIDATE="true"
+# VALIDATE="true"
+VALIDATE="false"
 PRINT_VALIDATION_DIFF="false"
 # VALIDATION_ALGORITHM_NAME="gol-cpu-naive"
 VALIDATION_ALGORITHM_NAME="gol-cuda-naive"
@@ -75,6 +79,8 @@ COLORFUL="true"
 
 RANDOM_SEED="42"
 
+STATE_BITS_COUNT="32"
+
 THREAD_BLOCK_SIZE="512"
 
 WARP_DIMS_X="32"
@@ -83,7 +89,8 @@ WARP_DIMS_Y="1"
 WARP_TILE_DIMS_X="32"
 WARP_TILE_DIMS_Y="8"
 
-STREAMING_DIRECTION="in-x"
+# STREAMING_DIRECTION="in-x"
+STREAMING_DIRECTION="in-y"
 MAX_RUNTIME_SECONDS="10"
 
 # srun -p gpu-short -A kdss --cpus-per-task=64 --mem=256GB --gres=gpu:V100 --time=2:00:00 $GOL_EXE_NAME \
@@ -110,4 +117,5 @@ srun -p gpu-short -A kdss --cpus-per-task=64 --mem=256GB --gres=gpu:H100 --time=
     --warp-dims-y="$WARP_DIMS_Y" \
     --warp-tile-dims-x="$WARP_TILE_DIMS_X" \
     --warp-tile-dims-y="$WARP_TILE_DIMS_Y" \
-    --streaming-direction="$STREAMING_DIRECTION"
+    --streaming-direction="$STREAMING_DIRECTION" \
+    --state-bits-count="$STATE_BITS_COUNT"

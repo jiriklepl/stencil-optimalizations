@@ -18,10 +18,10 @@ namespace algorithms::cuda_naive_local {
 using StreamingDir = infrastructure::StreamingDirection;
 
 template <typename grid_cell_t, std::size_t Bits, typename state_store_type>
-class GoLCudaNaiveLocal : public infrastructure::Algorithm<2, grid_cell_t> {
+class GoLCudaNaiveLocalWithState : public infrastructure::Algorithm<2, grid_cell_t> {
 
   public:
-    GoLCudaNaiveLocal() {};
+    GoLCudaNaiveLocalWithState() {};
 
     using size_type = std::size_t;
     using col_type = typename BitsConst<Bits>::col_type;
@@ -240,6 +240,66 @@ class GoLCudaNaiveLocal : public infrastructure::Algorithm<2, grid_cell_t> {
     }
     
 };
+
+
+template <typename grid_cell_t, std::size_t Bits>
+class GoLCudaNaiveLocal : public infrastructure::Algorithm<2, grid_cell_t> {
+  public:
+    
+    void set_and_format_input_data(const infrastructure::Grid<2, grid_cell_t>& data) override {
+        fetch_implementation()->set_and_format_input_data(data);
+    }
+
+    void initialize_data_structures() override {
+        fetch_implementation()->initialize_data_structures();
+    }
+
+    void run(std::size_t iterations) override {
+        fetch_implementation()->run(iterations);
+    }
+
+    void finalize_data_structures() override {
+        fetch_implementation()->finalize_data_structures();
+    }
+
+    infrastructure::Grid<2, grid_cell_t> fetch_result() override {
+        return fetch_implementation()->fetch_result();
+    }
+
+    std::size_t actually_performed_iterations() const override {
+        return fetch_implementation()->actually_performed_iterations();
+    }
+
+    void set_params(const infrastructure::ExperimentParams& params) override {
+        this->params = params;
+        fetch_implementation()->set_params(params);
+    }
+
+  private:
+    GoLCudaNaiveLocalWithState<grid_cell_t, Bits, std::uint32_t> implementation_32_state;    
+    GoLCudaNaiveLocalWithState<grid_cell_t, Bits, std::uint64_t> implementation_64_state;    
+
+    infrastructure::Algorithm<2, grid_cell_t>* fetch_implementation() {
+        if (this->params.state_bits_count == 32) {
+            return &implementation_32_state;
+        } else if (this->params.state_bits_count == 64) {
+            return &implementation_64_state;
+        } else {
+            throw std::runtime_error("Invalid state bits count");
+        }
+    }
+
+    const infrastructure::Algorithm<2, grid_cell_t>* fetch_implementation() const {
+        if (this->params.state_bits_count == 32) {
+            return &implementation_32_state;
+        } else if (this->params.state_bits_count == 64) {
+            return &implementation_64_state;
+        } else {
+            throw std::runtime_error("Invalid state bits count");
+        }
+    }
+};
+
 
 } // namespace algorithms
 

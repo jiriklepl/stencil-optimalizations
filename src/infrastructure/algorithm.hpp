@@ -73,7 +73,7 @@ class Algorithm {
      *
      * @param params The experiment parameters.
      */
-    void set_params(const ExperimentParams& params) {
+    virtual void set_params(const ExperimentParams& params) {
         this->params = params;
     }
 

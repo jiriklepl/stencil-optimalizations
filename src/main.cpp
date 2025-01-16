@@ -29,8 +29,18 @@ int main(int argc, char** argv) {
 
     std::cout << params.pretty_print() << std::endl;
 
-    infrastructure::ExperimentManager<common::CHAR> manager;
-    manager.run(params);
+    if (params.base_grid_encoding == "char") {
+        infrastructure::ExperimentManager<common::CHAR> manager;
+        manager.run(params);
+
+    } else if (params.base_grid_encoding == "int") {
+        infrastructure::ExperimentManager<common::INT> manager;
+        manager.run(params);
+        
+    } else {
+        std::cerr << "Invalid base grid encoding: " << params.base_grid_encoding << std::endl;
+        exit(1);
+    }
 
     return 0;
 }
