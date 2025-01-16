@@ -84,7 +84,10 @@ class Experiment:
             return int(both_dims[1])
         
     def _load_raw(self, key: str):
-        return self.content.split(f'{key}:')[1].split('\n')[0].strip()
+        try:
+            return self.content.split(f'{key}:')[1].split('\n')[0].strip()
+        except:
+            return None
     
     def get_measurements(self) -> list[Measurement]:
         measurements = []
@@ -92,6 +95,28 @@ class Experiment:
             measurements.append(Measurement(measurement_content))
         return measurements
         
+    def matches(self, key_vals: list[tuple[str, any]]):
+        for key, val in key_vals:
+            if self.get_param(key) != val:
+                return False
+        return True
+    
+    def get_median_runtime_per_iter(self) -> float:
+        measurements = self.get_measurements()
+        runtimes = [m.get_value(MeasurementKey.runtime_per_iter) for m in measurements]
+
+        if len(runtimes) == 0:
+            return None
+        
+        if len(runtimes) == 1:
+            return runtimes[0]
+
+        runtimes.sort()
+        return runtimes[(len(runtimes) + 1) // 2]
+
+    def __str__(self):
+        return f'Experiment: {self.get_param(Key.algorithm_name)} on grid {self.get_param(Key.grid_dimensions)} ...'
+
 class Results:
     def __init__(self, results_content: str):
         self.experiments: list[Experiment] = []
@@ -113,7 +138,6 @@ class Results:
 
         for file_name in os.listdir(dir_name):
             file_path = os.path.join(dir_name, file_name)
-            print ('path: ', file_path)
             if os.path.isfile(file_path):
                 f_results = Results.from_file(file_path)
 
@@ -124,18 +148,8 @@ class Results:
 
         return results
 
+    def get_experiments_with(self, key_vals: list[tuple[str, any]]) -> list[Experiment]:
+        return [exp for exp in self.experiments if exp.matches(key_vals)]
+
     def extend_with(self, results: 'Results'):
         self.experiments.extend(results.experiments)
-
-
-x = Results.from_directory('./experiments-outputs')
-
-# name = x.experiments[0].get_param(Key.algorithm_name)
-# name = x.experiments[0].get_param(Key.iterations)
-name = x.experiments[0].get_param(Key.grid_dim_x)
-print(name)
-
-measurement = x.experiments[0].get_measurements()[0]
-
-print(measurement.get_value(MeasurementKey.performed_iters))
-print(measurement.get_value(MeasurementKey.runtime_per_iter))

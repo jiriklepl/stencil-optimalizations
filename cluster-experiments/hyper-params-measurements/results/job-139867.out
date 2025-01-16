@@ -1,0 +1,2309 @@
+Starting job 139867
+Node:  ampere01
+ARGS: 4
+WORKER_ID: 4
+exp-108
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive-bitwise-cols-32
+  grid_dimensions: 16384x16384
+  iterations: 1000000
+  base_grid_encoding: char
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[8192,8192]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 256
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[8192,8192]
+  Data loaded in   463.292 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive-bitwise-cols-32
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  834.589405 ms
+  initialize_data_structures: 1.769279 ms
+  run:                        10162.953733 ms
+   performed iters:  63865
+   runtime per iter: 0.159132 ms
+  finalize_data_structures:   2.265324 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  834.273315 ms
+  initialize_data_structures: 1.805985 ms
+  run:                        10162.778427 ms
+   performed iters:  63660
+   runtime per iter: 0.159642 ms
+  finalize_data_structures:   2.272425 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  834.572049 ms
+  initialize_data_structures: 1.763781 ms
+  run:                        10163.734810 ms
+   performed iters:  63370
+   runtime per iter: 0.160387 ms
+  finalize_data_structures:   2.305124 ms
+
+exp-109
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive
+  grid_dimensions: 16384x16384
+  iterations: 1000000
+  base_grid_encoding: char
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[8192,8192]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 32
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[8192,8192]
+  Data loaded in   437.628 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  13.206959 ms
+  initialize_data_structures: 11.194328 ms
+  run:                        14539.104303 ms
+   performed iters:  3274
+   runtime per iter: 4.440777 ms
+  finalize_data_structures:   13.176081 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  12.832879 ms
+  initialize_data_structures: 11.255552 ms
+  run:                        14539.108770 ms
+   performed iters:  3274
+   runtime per iter: 4.440778 ms
+  finalize_data_structures:   13.162511 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  12.868724 ms
+  initialize_data_structures: 11.241180 ms
+  run:                        14539.101809 ms
+   performed iters:  3274
+   runtime per iter: 4.440776 ms
+  finalize_data_structures:   13.183312 ms
+
+exp-110
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive
+  grid_dimensions: 8192x8192
+  iterations: 1000000
+  base_grid_encoding: char
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[4096,4096]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 256
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[4096,4096]
+  Data loaded in   412.555 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  3.256711 ms
+  initialize_data_structures: 3.045119 ms
+  run:                        10422.408840 ms
+   performed iters:  25277
+   runtime per iter: 0.412328 ms
+  finalize_data_structures:   4.268008 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  3.131290 ms
+  initialize_data_structures: 3.055745 ms
+  run:                        10425.758208 ms
+   performed iters:  24995
+   runtime per iter: 0.417114 ms
+  finalize_data_structures:   4.280597 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  3.316692 ms
+  initialize_data_structures: 3.077097 ms
+  run:                        10430.196544 ms
+   performed iters:  24732
+   runtime per iter: 0.421729 ms
+  finalize_data_structures:   4.045540 ms
+
+exp-111
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive
+  grid_dimensions: 65536x65536
+  iterations: 1000000
+  base_grid_encoding: int
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[32768,32768]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 1024
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[32768,32768]
+  Data loaded in   5095.67 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  785.683995 ms
+  initialize_data_structures: 696.546503 ms
+  run:                        55567.573679 ms
+   performed iters:  1247
+   runtime per iter: 44.561005 ms
+  finalize_data_structures:   691.655038 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  788.652998 ms
+  initialize_data_structures: 694.976707 ms
+  run:                        55567.840925 ms
+   performed iters:  1247
+   runtime per iter: 44.561220 ms
+  finalize_data_structures:   702.723012 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  796.797467 ms
+  initialize_data_structures: 699.553173 ms
+  run:                        55567.819913 ms
+   performed iters:  1247
+   runtime per iter: 44.561203 ms
+  finalize_data_structures:   691.752797 ms
+
+exp-112
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive
+  grid_dimensions: 8192x8192
+  iterations: 1000000
+  base_grid_encoding: char
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[4096,4096]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 512
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[4096,4096]
+  Data loaded in   441.463 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  3.109497 ms
+  initialize_data_structures: 2.996395 ms
+  run:                        10421.851770 ms
+   performed iters:  25377
+   runtime per iter: 0.410681 ms
+  finalize_data_structures:   4.275198 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  3.258343 ms
+  initialize_data_structures: 3.034202 ms
+  run:                        10420.841594 ms
+   performed iters:  25301
+   runtime per iter: 0.411875 ms
+  finalize_data_structures:   4.293416 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  3.115817 ms
+  initialize_data_structures: 2.972849 ms
+  run:                        10419.405091 ms
+   performed iters:  25247
+   runtime per iter: 0.412699 ms
+  finalize_data_structures:   4.267657 ms
+
+exp-113
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive-bitwise-no-macro-32
+  grid_dimensions: 65536x65536
+  iterations: 1000000
+  base_grid_encoding: char
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[32768,32768]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 256
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[32768,32768]
+  Data loaded in   819.168 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive-bitwise-no-macro-32
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  29063.644664 ms
+  initialize_data_structures: 22.651811 ms
+  run:                        59869.094920 ms
+   performed iters:  1235
+   runtime per iter: 48.477000 ms
+  finalize_data_structures:   42.758454 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  28783.811771 ms
+  initialize_data_structures: 22.323548 ms
+  run:                        59178.809955 ms
+   performed iters:  1238
+   runtime per iter: 47.801947 ms
+  finalize_data_structures:   23.947105 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  29092.152719 ms
+  initialize_data_structures: 23.125206 ms
+  run:                        59676.628033 ms
+   performed iters:  1236
+   runtime per iter: 48.282062 ms
+  finalize_data_structures:   43.164411 ms
+
+exp-114
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive
+  grid_dimensions: 16384x16384
+  iterations: 1000000
+  base_grid_encoding: char
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[8192,8192]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 512
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[8192,8192]
+  Data loaded in   437.598 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  12.731109 ms
+  initialize_data_structures: 11.516482 ms
+  run:                        11649.613163 ms
+   performed iters:  7303
+   runtime per iter: 1.595182 ms
+  finalize_data_structures:   13.185440 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  13.321767 ms
+  initialize_data_structures: 11.120010 ms
+  run:                        11658.229268 ms
+   performed iters:  7265
+   runtime per iter: 1.604712 ms
+  finalize_data_structures:   13.172149 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  12.867787 ms
+  initialize_data_structures: 11.310690 ms
+  run:                        11664.298031 ms
+   performed iters:  7238
+   runtime per iter: 1.611536 ms
+  finalize_data_structures:   13.162214 ms
+
+exp-115
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive-bitwise-cols-64
+  grid_dimensions: 32768x32768
+  iterations: 1000000
+  base_grid_encoding: char
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[16384,16384]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 128
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[16384,16384]
+  Data loaded in   519.34 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive-bitwise-cols-64
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  3995.505820 ms
+  initialize_data_structures: 5.915060 ms
+  run:                        10898.578294 ms
+   performed iters:  12587
+   runtime per iter: 0.865860 ms
+  finalize_data_structures:   12.650727 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  3999.857415 ms
+  initialize_data_structures: 5.835709 ms
+  run:                        10895.038595 ms
+   performed iters:  12637
+   runtime per iter: 0.862154 ms
+  finalize_data_structures:   7.784001 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  3983.002738 ms
+  initialize_data_structures: 5.926968 ms
+  run:                        10905.324997 ms
+   performed iters:  12505
+   runtime per iter: 0.872077 ms
+  finalize_data_structures:   12.782567 ms
+
+exp-116
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive-bitwise-no-macro-32
+  grid_dimensions: 16384x16384
+  iterations: 1000000
+  base_grid_encoding: char
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[8192,8192]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 512
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[8192,8192]
+  Data loaded in   440.896 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive-bitwise-no-macro-32
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  833.633482 ms
+  initialize_data_structures: 1.756750 ms
+  run:                        12860.144807 ms
+   performed iters:  4650
+   runtime per iter: 2.765623 ms
+  finalize_data_structures:   2.298914 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  833.172381 ms
+  initialize_data_structures: 1.883563 ms
+  run:                        12871.739850 ms
+   performed iters:  4634
+   runtime per iter: 2.777674 ms
+  finalize_data_structures:   2.296720 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  833.844764 ms
+  initialize_data_structures: 1.749709 ms
+  run:                        12883.425279 ms
+   performed iters:  4618
+   runtime per iter: 2.789828 ms
+  finalize_data_structures:   2.316410 ms
+
+exp-117
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive
+  grid_dimensions: 32768x32768
+  iterations: 1000000
+  base_grid_encoding: int
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[16384,16384]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 512
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[16384,16384]
+  Data loaded in   1633.97 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  195.971679 ms
+  initialize_data_structures: 174.224478 ms
+  run:                        21357.646096 ms
+   performed iters:  1923
+   runtime per iter: 11.106420 ms
+  finalize_data_structures:   174.720651 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  197.802041 ms
+  initialize_data_structures: 173.885002 ms
+  run:                        21357.092495 ms
+   performed iters:  1923
+   runtime per iter: 11.106132 ms
+  finalize_data_structures:   174.734693 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  197.118632 ms
+  initialize_data_structures: 176.637655 ms
+  run:                        21351.138857 ms
+   performed iters:  1923
+   runtime per iter: 11.103036 ms
+  finalize_data_structures:   174.778089 ms
+
+exp-118
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive-bitwise-no-macro-64
+  grid_dimensions: 32768x32768
+  iterations: 1000000
+  base_grid_encoding: char
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[16384,16384]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 32
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[16384,16384]
+  Data loaded in   520.292 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive-bitwise-no-macro-64
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  3918.464713 ms
+  initialize_data_structures: 5.939517 ms
+  run:                        25037.202635 ms
+   performed iters:  1712
+   runtime per iter: 14.624534 ms
+  finalize_data_structures:   9.048603 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  3988.415736 ms
+  initialize_data_structures: 5.966357 ms
+  run:                        24765.009374 ms
+   performed iters:  1723
+   runtime per iter: 14.373192 ms
+  finalize_data_structures:   6.706853 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  4012.382109 ms
+  initialize_data_structures: 5.827848 ms
+  run:                        24953.212263 ms
+   performed iters:  1715
+   runtime per iter: 14.549978 ms
+  finalize_data_structures:   10.134999 ms
+
+exp-119
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive
+  grid_dimensions: 8192x8192
+  iterations: 1000000
+  base_grid_encoding: int
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[4096,4096]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 512
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[4096,4096]
+  Data loaded in   491.195 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  13.007383 ms
+  initialize_data_structures: 11.480233 ms
+  run:                        10684.382276 ms
+   performed iters:  15796
+   runtime per iter: 0.676398 ms
+  finalize_data_structures:   13.162519 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  12.841351 ms
+  initialize_data_structures: 11.229222 ms
+  run:                        10684.676603 ms
+   performed iters:  15799
+   runtime per iter: 0.676288 ms
+  finalize_data_structures:   13.182319 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  13.067385 ms
+  initialize_data_structures: 11.330455 ms
+  run:                        10684.306770 ms
+   performed iters:  15806
+   runtime per iter: 0.675965 ms
+  finalize_data_structures:   13.193777 ms
+
+exp-120
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive
+  grid_dimensions: 32768x32768
+  iterations: 1000000
+  base_grid_encoding: int
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[16384,16384]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 1024
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[16384,16384]
+  Data loaded in   1594.55 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  196.062967 ms
+  initialize_data_structures: 174.524301 ms
+  run:                        21424.357639 ms
+   performed iters:  1918
+   runtime per iter: 11.170155 ms
+  finalize_data_structures:   174.746218 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  196.667305 ms
+  initialize_data_structures: 174.566125 ms
+  run:                        21424.353372 ms
+   performed iters:  1918
+   runtime per iter: 11.170153 ms
+  finalize_data_structures:   174.713859 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  196.512620 ms
+  initialize_data_structures: 174.156823 ms
+  run:                        21424.689834 ms
+   performed iters:  1918
+   runtime per iter: 11.170328 ms
+  finalize_data_structures:   174.727830 ms
+
+exp-121
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive-bitwise-no-macro-32
+  grid_dimensions: 32768x32768
+  iterations: 1000000
+  base_grid_encoding: char
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[16384,16384]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 256
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[16384,16384]
+  Data loaded in   525.343 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive-bitwise-no-macro-32
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  3848.092916 ms
+  initialize_data_structures: 5.970832 ms
+  run:                        22640.045366 ms
+   performed iters:  1842
+   runtime per iter: 12.291013 ms
+  finalize_data_structures:   7.801133 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  3960.587769 ms
+  initialize_data_structures: 6.199530 ms
+  run:                        22581.301411 ms
+   performed iters:  1846
+   runtime per iter: 12.232558 ms
+  finalize_data_structures:   9.380182 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  3830.670524 ms
+  initialize_data_structures: 5.951934 ms
+  run:                        22577.307603 ms
+   performed iters:  1846
+   runtime per iter: 12.230394 ms
+  finalize_data_structures:   7.842445 ms
+
+exp-122
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive-bitwise-cols-64
+  grid_dimensions: 8192x8192
+  iterations: 1000000
+  base_grid_encoding: char
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[4096,4096]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 512
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[4096,4096]
+  Data loaded in   418.845 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive-bitwise-cols-64
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  209.348773 ms
+  initialize_data_structures: 0.705602 ms
+  run:                        10052.047230 ms
+   performed iters:  197457
+   runtime per iter: 0.050908 ms
+  finalize_data_structures:   0.796730 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  208.144844 ms
+  initialize_data_structures: 0.712132 ms
+  run:                        10052.065959 ms
+   performed iters:  197465
+   runtime per iter: 0.050906 ms
+  finalize_data_structures:   0.801988 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  207.365780 ms
+  initialize_data_structures: 0.701265 ms
+  run:                        10052.046458 ms
+   performed iters:  197457
+   runtime per iter: 0.050908 ms
+  finalize_data_structures:   0.782960 ms
+
+exp-123
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive-bitwise-no-macro-32
+  grid_dimensions: 8192x8192
+  iterations: 1000000
+  base_grid_encoding: char
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[4096,4096]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 1024
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[4096,4096]
+  Data loaded in   423.092 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive-bitwise-no-macro-32
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  208.967123 ms
+  initialize_data_structures: 0.723970 ms
+  run:                        10729.614842 ms
+   performed iters:  15030
+   runtime per iter: 0.713880 ms
+  finalize_data_structures:   0.813176 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  209.854432 ms
+  initialize_data_structures: 0.715257 ms
+  run:                        10733.208001 ms
+   performed iters:  14963
+   runtime per iter: 0.717317 ms
+  finalize_data_structures:   0.780576 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  208.647327 ms
+  initialize_data_structures: 0.676057 ms
+  run:                        10737.522266 ms
+   performed iters:  14894
+   runtime per iter: 0.720929 ms
+  finalize_data_structures:   0.789830 ms
+
+exp-124
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive-bitwise-cols-64
+  grid_dimensions: 32768x32768
+  iterations: 1000000
+  base_grid_encoding: char
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[16384,16384]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 64
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[16384,16384]
+  Data loaded in   523.531 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive-bitwise-cols-64
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  3986.747767 ms
+  initialize_data_structures: 6.246691 ms
+  run:                        10957.936762 ms
+   performed iters:  11884
+   runtime per iter: 0.922075 ms
+  finalize_data_structures:   7.802825 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  3985.620013 ms
+  initialize_data_structures: 5.877721 ms
+  run:                        10926.577425 ms
+   performed iters:  12236
+   runtime per iter: 0.892986 ms
+  finalize_data_structures:   7.791027 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  3986.655466 ms
+  initialize_data_structures: 6.153650 ms
+  run:                        10936.879478 ms
+   performed iters:  12135
+   runtime per iter: 0.901267 ms
+  finalize_data_structures:   7.797388 ms
+
+exp-125
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive
+  grid_dimensions: 16384x16384
+  iterations: 1000000
+  base_grid_encoding: int
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[8192,8192]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 512
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[8192,8192]
+  Data loaded in   713.182 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  49.076686 ms
+  initialize_data_structures: 43.883326 ms
+  run:                        12829.723051 ms
+   performed iters:  4631
+   runtime per iter: 2.770400 ms
+  finalize_data_structures:   45.478920 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  49.618890 ms
+  initialize_data_structures: 43.680898 ms
+  run:                        12829.743021 ms
+   performed iters:  4631
+   runtime per iter: 2.770404 ms
+  finalize_data_structures:   45.474744 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  50.070547 ms
+  initialize_data_structures: 43.419962 ms
+  run:                        12829.537039 ms
+   performed iters:  4631
+   runtime per iter: 2.770360 ms
+  finalize_data_structures:   45.488485 ms
+
+exp-126
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive-bitwise-no-macro-32
+  grid_dimensions: 8192x8192
+  iterations: 1000000
+  base_grid_encoding: char
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[4096,4096]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 128
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[4096,4096]
+  Data loaded in   428.327 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive-bitwise-no-macro-32
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  209.385870 ms
+  initialize_data_structures: 0.724992 ms
+  run:                        10758.610888 ms
+   performed iters:  14428
+   runtime per iter: 0.745676 ms
+  finalize_data_structures:   0.811393 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  209.735831 ms
+  initialize_data_structures: 0.702758 ms
+  run:                        10760.162956 ms
+   performed iters:  14386
+   runtime per iter: 0.747961 ms
+  finalize_data_structures:   0.784562 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  209.237073 ms
+  initialize_data_structures: 0.674835 ms
+  run:                        10751.999913 ms
+   performed iters:  14511
+   runtime per iter: 0.740955 ms
+  finalize_data_structures:   0.798623 ms
+
+exp-127
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive-bitwise-cols-64
+  grid_dimensions: 8192x8192
+  iterations: 1000000
+  base_grid_encoding: char
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[4096,4096]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 1024
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[4096,4096]
+  Data loaded in   517.112 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive-bitwise-cols-64
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  207.689972 ms
+  initialize_data_structures: 0.722748 ms
+  run:                        10056.260572 ms
+   performed iters:  182692
+   runtime per iter: 0.055045 ms
+  finalize_data_structures:   0.849471 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  207.595900 ms
+  initialize_data_structures: 0.746414 ms
+  run:                        10056.263186 ms
+   performed iters:  182692
+   runtime per iter: 0.055045 ms
+  finalize_data_structures:   0.790161 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  207.151339 ms
+  initialize_data_structures: 0.690870 ms
+  run:                        10056.292789 ms
+   performed iters:  182694
+   runtime per iter: 0.055044 ms
+  finalize_data_structures:   0.787807 ms
+
+exp-128
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive
+  grid_dimensions: 32768x32768
+  iterations: 1000000
+  base_grid_encoding: char
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[16384,16384]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 256
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[16384,16384]
+  Data loaded in   519.562 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  48.890693 ms
+  initialize_data_structures: 43.887060 ms
+  run:                        17372.082589 ms
+   performed iters:  2427
+   runtime per iter: 7.157842 ms
+  finalize_data_structures:   45.719214 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  50.867627 ms
+  initialize_data_structures: 44.989395 ms
+  run:                        17419.789765 ms
+   performed iters:  2414
+   runtime per iter: 7.216152 ms
+  finalize_data_structures:   45.512720 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  48.830612 ms
+  initialize_data_structures: 43.887220 ms
+  run:                        17456.438856 ms
+   performed iters:  2408
+   runtime per iter: 7.249352 ms
+  finalize_data_structures:   45.513171 ms
+
+exp-129
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive-bitwise-cols-64
+  grid_dimensions: 8192x8192
+  iterations: 1000000
+  base_grid_encoding: char
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[4096,4096]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 256
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[4096,4096]
+  Data loaded in   427.793 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive-bitwise-cols-64
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  203.015468 ms
+  initialize_data_structures: 0.682097 ms
+  run:                        10049.798821 ms
+   performed iters:  206452
+   runtime per iter: 0.048679 ms
+  finalize_data_structures:   0.802970 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  208.008066 ms
+  initialize_data_structures: 0.689077 ms
+  run:                        10049.765741 ms
+   performed iters:  206450
+   runtime per iter: 0.048679 ms
+  finalize_data_structures:   0.781497 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  207.324467 ms
+  initialize_data_structures: 0.671630 ms
+  run:                        10049.760973 ms
+   performed iters:  206450
+   runtime per iter: 0.048679 ms
+  finalize_data_structures:   0.818925 ms
+
+exp-130
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive-bitwise-cols-32
+  grid_dimensions: 8192x8192
+  iterations: 1000000
+  base_grid_encoding: char
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[4096,4096]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 512
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[4096,4096]
+  Data loaded in   424.868 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive-bitwise-cols-32
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  208.440672 ms
+  initialize_data_structures: 0.726744 ms
+  run:                        10041.872876 ms
+   performed iters:  245340
+   runtime per iter: 0.040930 ms
+  finalize_data_structures:   0.799465 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  209.085602 ms
+  initialize_data_structures: 0.714065 ms
+  run:                        10041.856953 ms
+   performed iters:  245332
+   runtime per iter: 0.040932 ms
+  finalize_data_structures:   0.791343 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  208.399760 ms
+  initialize_data_structures: 0.666603 ms
+  run:                        10041.862651 ms
+   performed iters:  245332
+   runtime per iter: 0.040932 ms
+  finalize_data_structures:   0.787046 ms
+
+exp-131
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive-bitwise-no-macro-32
+  grid_dimensions: 32768x32768
+  iterations: 1000000
+  base_grid_encoding: char
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[16384,16384]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 1024
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[16384,16384]
+  Data loaded in   515.211 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive-bitwise-no-macro-32
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  3807.012957 ms
+  initialize_data_structures: 5.821256 ms
+  run:                        21818.939583 ms
+   performed iters:  1897
+   runtime per iter: 11.501813 ms
+  finalize_data_structures:   7.798010 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  3807.109154 ms
+  initialize_data_structures: 5.975821 ms
+  run:                        21815.439092 ms
+   performed iters:  1899
+   runtime per iter: 11.487856 ms
+  finalize_data_structures:   8.126239 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  3804.576645 ms
+  initialize_data_structures: 5.854917 ms
+  run:                        21970.352186 ms
+   performed iters:  1889
+   runtime per iter: 11.630679 ms
+  finalize_data_structures:   7.789296 ms
+
+exp-132
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive-bitwise-cols-64
+  grid_dimensions: 8192x8192
+  iterations: 1000000
+  base_grid_encoding: char
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[4096,4096]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 128
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[4096,4096]
+  Data loaded in   420.766 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive-bitwise-cols-64
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  207.266238 ms
+  initialize_data_structures: 0.720535 ms
+  run:                        10050.075561 ms
+   performed iters:  205149
+   runtime per iter: 0.048989 ms
+  finalize_data_structures:   0.862210 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  207.985421 ms
+  initialize_data_structures: 0.709308 ms
+  run:                        10050.094059 ms
+   performed iters:  205173
+   runtime per iter: 0.048984 ms
+  finalize_data_structures:   0.779445 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  207.403357 ms
+  initialize_data_structures: 0.680474 ms
+  run:                        10049.937141 ms
+   performed iters:  205673
+   runtime per iter: 0.048864 ms
+  finalize_data_structures:   0.799525 ms
+
+exp-133
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive-bitwise-cols-32
+  grid_dimensions: 32768x32768
+  iterations: 1000000
+  base_grid_encoding: char
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[16384,16384]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 32
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[16384,16384]
+  Data loaded in   527.827 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive-bitwise-cols-32
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  3796.983687 ms
+  initialize_data_structures: 5.842017 ms
+  run:                        10891.928556 ms
+   performed iters:  12717
+   runtime per iter: 0.856486 ms
+  finalize_data_structures:   7.824721 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  3799.973580 ms
+  initialize_data_structures: 5.794665 ms
+  run:                        10887.554980 ms
+   performed iters:  12766
+   runtime per iter: 0.852856 ms
+  finalize_data_structures:   8.442268 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  3797.705233 ms
+  initialize_data_structures: 5.984504 ms
+  run:                        10884.179751 ms
+   performed iters:  12815
+   runtime per iter: 0.849331 ms
+  finalize_data_structures:   7.792732 ms
+
+exp-134
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive-bitwise-cols-32
+  grid_dimensions: 32768x32768
+  iterations: 1000000
+  base_grid_encoding: char
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[16384,16384]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 256
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[16384,16384]
+  Data loaded in   523.067 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive-bitwise-cols-32
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  3805.187073 ms
+  initialize_data_structures: 5.801195 ms
+  run:                        10794.029660 ms
+   performed iters:  14144
+   runtime per iter: 0.763153 ms
+  finalize_data_structures:   9.242985 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  3790.182953 ms
+  initialize_data_structures: 5.815708 ms
+  run:                        10793.140339 ms
+   performed iters:  14161
+   runtime per iter: 0.762174 ms
+  finalize_data_structures:   7.779292 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  3804.487871 ms
+  initialize_data_structures: 5.863800 ms
+  run:                        10813.637847 ms
+   performed iters:  13841
+   runtime per iter: 0.781276 ms
+  finalize_data_structures:   9.277478 ms
+
+exp-135
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive-bitwise-no-macro-64
+  grid_dimensions: 32768x32768
+  iterations: 1000000
+  base_grid_encoding: char
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[16384,16384]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 512
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[16384,16384]
+  Data loaded in   519.204 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive-bitwise-no-macro-64
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  3993.320046 ms
+  initialize_data_structures: 5.949371 ms
+  run:                        23047.019781 ms
+   performed iters:  1820
+   runtime per iter: 12.663198 ms
+  finalize_data_structures:   7.859013 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  3993.277742 ms
+  initialize_data_structures: 6.036083 ms
+  run:                        23092.876454 ms
+   performed iters:  1817
+   runtime per iter: 12.709343 ms
+  finalize_data_structures:   7.772961 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  3992.450135 ms
+  initialize_data_structures: 5.868067 ms
+  run:                        23211.124196 ms
+   performed iters:  1814
+   runtime per iter: 12.795548 ms
+  finalize_data_structures:   7.883520 ms
+
+exp-136
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive-bitwise-cols-32
+  grid_dimensions: 16384x16384
+  iterations: 1000000
+  base_grid_encoding: char
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[8192,8192]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 1024
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[8192,8192]
+  Data loaded in   480.109 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive-bitwise-cols-32
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  834.082560 ms
+  initialize_data_structures: 1.807196 ms
+  run:                        10173.842797 ms
+   performed iters:  59704
+   runtime per iter: 0.170405 ms
+  finalize_data_structures:   2.311482 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  833.804247 ms
+  initialize_data_structures: 1.726564 ms
+  run:                        10173.850939 ms
+   performed iters:  59712
+   runtime per iter: 0.170382 ms
+  finalize_data_structures:   2.263850 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  835.036339 ms
+  initialize_data_structures: 1.855529 ms
+  run:                        10173.998354 ms
+   performed iters:  59702
+   runtime per iter: 0.170413 ms
+  finalize_data_structures:   2.395100 ms
+
+exp-137
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive-bitwise-cols-32
+  grid_dimensions: 8192x8192
+  iterations: 1000000
+  base_grid_encoding: char
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[4096,4096]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 128
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[4096,4096]
+  Data loaded in   421.322 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive-bitwise-cols-32
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  209.054424 ms
+  initialize_data_structures: 0.721637 ms
+  run:                        10043.123853 ms
+   performed iters:  239907
+   runtime per iter: 0.041863 ms
+  finalize_data_structures:   0.809290 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  209.835951 ms
+  initialize_data_structures: 0.721066 ms
+  run:                        10043.129792 ms
+   performed iters:  239677
+   runtime per iter: 0.041903 ms
+  finalize_data_structures:   0.823241 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  209.040453 ms
+  initialize_data_structures: 0.688787 ms
+  run:                        10042.848905 ms
+   performed iters:  239686
+   runtime per iter: 0.041900 ms
+  finalize_data_structures:   0.801748 ms
+
+exp-138
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive-bitwise-no-macro-32
+  grid_dimensions: 32768x32768
+  iterations: 1000000
+  base_grid_encoding: char
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[16384,16384]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 32
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[16384,16384]
+  Data loaded in   526.187 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive-bitwise-no-macro-32
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  3925.580555 ms
+  initialize_data_structures: 5.823219 ms
+  run:                        23618.877125 ms
+   performed iters:  1783
+   runtime per iter: 13.246706 ms
+  finalize_data_structures:   7.831851 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  3927.788260 ms
+  initialize_data_structures: 6.246772 ms
+  run:                        23787.016093 ms
+   performed iters:  1774
+   runtime per iter: 13.408690 ms
+  finalize_data_structures:   7.926145 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  3924.693828 ms
+  initialize_data_structures: 5.889149 ms
+  run:                        23585.037762 ms
+   performed iters:  1785
+   runtime per iter: 13.212906 ms
+  finalize_data_structures:   7.794755 ms
+
+exp-139
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive-bitwise-cols-64
+  grid_dimensions: 65536x65536
+  iterations: 1000000
+  base_grid_encoding: char
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[32768,32768]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 128
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[32768,32768]
+  Data loaded in   829.8 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive-bitwise-cols-64
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  25968.653555 ms
+  initialize_data_structures: 22.412608 ms
+  run:                        13403.933741 ms
+   performed iters:  4071
+   runtime per iter: 3.292541 ms
+  finalize_data_structures:   24.011388 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  26368.685332 ms
+  initialize_data_structures: 22.592111 ms
+  run:                        13361.960387 ms
+   performed iters:  4106
+   runtime per iter: 3.254252 ms
+  finalize_data_structures:   27.426568 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  26025.213024 ms
+  initialize_data_structures: 22.635327 ms
+  run:                        13338.941177 ms
+   performed iters:  4122
+   runtime per iter: 3.236036 ms
+  finalize_data_structures:   23.986170 ms
+
+exp-140
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive
+  grid_dimensions: 16384x16384
+  iterations: 1000000
+  base_grid_encoding: int
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[8192,8192]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 256
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[8192,8192]
+  Data loaded in   710.162 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  48.629338 ms
+  initialize_data_structures: 43.841342 ms
+  run:                        12759.512114 ms
+   performed iters:  4726
+   runtime per iter: 2.699854 ms
+  finalize_data_structures:   51.256221 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  49.762611 ms
+  initialize_data_structures: 43.748310 ms
+  run:                        12767.407122 ms
+   performed iters:  4718
+   runtime per iter: 2.706106 ms
+  finalize_data_structures:   50.906168 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  49.575686 ms
+  initialize_data_structures: 44.130141 ms
+  run:                        12764.603702 ms
+   performed iters:  4723
+   runtime per iter: 2.702647 ms
+  finalize_data_structures:   50.584790 ms
+
+exp-141
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive-bitwise-cols-32
+  grid_dimensions: 32768x32768
+  iterations: 1000000
+  base_grid_encoding: char
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[16384,16384]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 512
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[16384,16384]
+  Data loaded in   520.864 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive-bitwise-cols-32
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  3844.610631 ms
+  initialize_data_structures: 6.202996 ms
+  run:                        10730.901044 ms
+   performed iters:  15291
+   runtime per iter: 0.701779 ms
+  finalize_data_structures:   7.821866 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  3841.907464 ms
+  initialize_data_structures: 5.888248 ms
+  run:                        10732.406021 ms
+   performed iters:  15272
+   runtime per iter: 0.702751 ms
+  finalize_data_structures:   8.120740 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  3850.704513 ms
+  initialize_data_structures: 5.902420 ms
+  run:                        10742.550006 ms
+   performed iters:  15110
+   runtime per iter: 0.710956 ms
+  finalize_data_structures:   7.793193 ms
+
+exp-142
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive-bitwise-no-macro-64
+  grid_dimensions: 8192x8192
+  iterations: 1000000
+  base_grid_encoding: char
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[4096,4096]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 1024
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[4096,4096]
+  Data loaded in   425.711 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive-bitwise-no-macro-64
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  207.798955 ms
+  initialize_data_structures: 0.736920 ms
+  run:                        10836.355986 ms
+   performed iters:  13220
+   runtime per iter: 0.819694 ms
+  finalize_data_structures:   0.826065 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  208.205964 ms
+  initialize_data_structures: 0.681796 ms
+  run:                        10847.247681 ms
+   performed iters:  13180
+   runtime per iter: 0.823008 ms
+  finalize_data_structures:   0.807717 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  207.458792 ms
+  initialize_data_structures: 0.677260 ms
+  run:                        10845.463133 ms
+   performed iters:  13167
+   runtime per iter: 0.823685 ms
+  finalize_data_structures:   0.804553 ms
+
+exp-143
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: gol-cuda-naive-bitwise-cols-32
+  grid_dimensions: 32768x32768
+  iterations: 1000000
+  base_grid_encoding: char
+  max_runtime_seconds: 10
+  warmup_rounds: 1
+  measurement_rounds: 3
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[16384,16384]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  state_bits_count: 32
+  thread_block_size: 64
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[16384,16384]
+  Data loaded in   530.448 ms
+
+Warming up... 1 / 1
+
+
+Running experiment...        gol-cuda-naive-bitwise-cols-32
+
+Measurement round 1 / 3
+Time report:
+  set_and_format_input_data:  4022.858443 ms
+  initialize_data_structures: 5.921589 ms
+  run:                        10863.294291 ms
+   performed iters:  13078
+   runtime per iter: 0.830654 ms
+  finalize_data_structures:   7.100510 ms
+
+Measurement round 2 / 3
+Time report:
+  set_and_format_input_data:  4017.724150 ms
+  initialize_data_structures: 5.836600 ms
+  run:                        10873.185372 ms
+   performed iters:  12952
+   runtime per iter: 0.839499 ms
+  finalize_data_structures:   6.720843 ms
+
+Measurement round 3 / 3
+Time report:
+  set_and_format_input_data:  4038.181429 ms
+  initialize_data_structures: 6.000599 ms
+  run:                        10856.931522 ms
+   performed iters:  13180
+   runtime per iter: 0.823743 ms
+  finalize_data_structures:   7.054220 ms
+
+./run-jobs.sh: line 14: EXE: command not found

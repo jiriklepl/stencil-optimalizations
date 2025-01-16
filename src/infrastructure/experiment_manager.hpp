@@ -268,12 +268,14 @@ class ExperimentManager {
         LoaderCtor<RandomOnesZerosDataLoader, Dims, ElementType> random_loader;
         LoaderCtor<LexiconLoader, Dims, ElementType> lexicon_loader;
         LoaderCtor<AlwaysChangingSpaceLoader, Dims, ElementType> always_changing_loader;
+        LoaderCtor<ZerosLoader, Dims, ElementType> zeros_loader;
 
 
         auto loaderCtor = std::map<std::string, LoaderCtorBase<Dims, ElementType>*>{
             {"random-ones-zeros", &random_loader},
             {"lexicon", &lexicon_loader},
             {"always-changing", &always_changing_loader},
+            {"zeros", &zeros_loader},
         }[params.data_loader_name];
 
         return loaderCtor->create();

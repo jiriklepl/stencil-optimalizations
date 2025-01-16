@@ -64,8 +64,9 @@ class RandomOnesZerosDataLoader : public Loader<Dims, ElementType> {
         std::uniform_int_distribution<int> dist(0, 1);
 
         auto grid_data = grid.data();
+        auto grid_size = grid.size();
 
-        for (std::size_t i = 0; i < grid.size(); ++i) {
+        for (std::size_t i = 0; i < grid_size; ++i) {
             grid_data[i] = static_cast<ElementType>(dist(rng));
         }
 
@@ -131,6 +132,25 @@ class AlwaysChangingSpaceLoader<2, ElementType> : public Loader<2, ElementType> 
         return grid;
     }
 };
+
+template <int Dims, typename ElementType>
+class ZerosLoader : public Loader<Dims, ElementType> {
+  public:
+    Grid<Dims, ElementType> load_data(const ExperimentParams& params) {
+
+        Grid<Dims, ElementType> grid(params.grid_dimensions);
+
+        auto grid_data = grid.data();
+        auto grid_size = grid.size();
+
+        for(std::size_t i = 0; i < grid_size; ++i) {
+            grid_data[i] = 0;
+        }
+
+        return grid;
+    }
+};
+
 
 } // namespace infrastructure
 

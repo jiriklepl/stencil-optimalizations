@@ -8,6 +8,7 @@
 #include <cuda_runtime.h>
 #include "../../infrastructure/timer.hpp"
 #include "../_shared/common_grid_types.hpp"
+#include "../_shared/cuda-helpers/block_to_2dim.hpp"
 
 namespace algorithms {
 
@@ -126,7 +127,7 @@ __global__ void game_of_live_kernel(BitGridData<col_type> data) {
 
 template <typename grid_cell_t, std::size_t Bits>
 void GoLCudaNaiveBitwiseNoMacro<grid_cell_t, Bits>::run_kernel(size_type iterations) {
-    dim3 block(16, 16);
+    dim3 block = get_2d_block(this->params.thread_block_size);
     dim3 grid((cuda_data.x_size + block.x - 1) / block.x, (cuda_data.y_size + block.y - 1) / block.y);
 
     infrastructure::StopWatch stop_watch(this->params.max_runtime_seconds);

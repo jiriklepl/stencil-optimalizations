@@ -47,7 +47,7 @@ class GoLCudaNaiveLocalWithState : public infrastructure::Algorithm<2, grid_cell
         };
 
         assert(warp_size() == 32);
-        assert(tiles_per_block() < STATE_STORE_BITS);
+        assert(tiles_per_block() <= STATE_STORE_BITS);
     }
 
     void initialize_data_structures() override {

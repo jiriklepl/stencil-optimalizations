@@ -9,3 +9,5 @@ profile-upload.sh
 *.ncu-rep
 .envrc
 experiments-outputs/
+_test/
+*/__pycache__/
