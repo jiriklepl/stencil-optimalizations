@@ -1,4 +1,5 @@
 import os
+from typing import Callable
 
 EXPERIMENTS_SEPARATOR = 'next-experiment'
 MEASUREMENTS_SEPARATOR = 'Time report:'
@@ -40,12 +41,16 @@ class MeasurementKey:
     finalize_data_structures='finalize_data_structures'
 
 class Measurement:
-    def __init__(self, content: str):
+    def __init__(self, content: str, experiment: 'Experiment'):
         self.content: str = content.strip()
+        self.experiment: 'Experiment' = experiment
 
     def get_value(self, key: str) -> float:
         raw = self._load_raw(key)
-        return raw
+        try:
+            return float(raw)
+        except:
+            return raw
     
     def _load_raw(self, key: str):
         splitted_by_key = self.content.split(f'{key}:')
@@ -58,6 +63,57 @@ class Measurement:
         else:
             return splitted_by_key[1].split('ms')[0].strip()
 
+    def compute_runtime_per_iter(self):
+        iterations = self.get_value(MeasurementKey.performed_iters)
+        runtime = self.get_value(MeasurementKey.run)
+
+        if None not in [iterations, runtime]:
+            return runtime / iterations
+
+    def compute_runtime_per_cell_per_iter(self):
+        runtime_per_iter = self.compute_runtime_per_iter()
+        cell_count = self.experiment.compute_grid_size()
+        
+        if None not in [runtime_per_iter, cell_count]:
+            return runtime_per_iter / cell_count
+
+class MeasurementSet:
+    def __init__(self, measurements: list[Measurement]):    
+        self.measurements: list[Measurement] = measurements
+
+    def get_median(self, prop_accessor: Callable[[Measurement], float]) -> float:
+        
+        values = self.get_valid_vals(prop_accessor) 
+        values.sort()
+
+        if len(values) == 0:
+            return None
+        
+        if len(values) == 1:
+            return values[0]
+        
+        return values[(len(values) + 1) // 2]
+
+    def get_mean(self, prop_accessor: Callable[[Measurement], float]) -> float:
+        values = self.get_valid_vals(prop_accessor)
+        return sum(values) / len(values)
+
+    def get_min(self, prop_accessor: Callable[[Measurement], float]) -> float:
+        values = self.get_valid_vals(prop_accessor)
+        return min(values)
+    
+    def get_max(self, prop_accessor: Callable[[Measurement], float]) -> float:
+        values = self.get_valid_vals(prop_accessor)
+        return max(values)
+    
+    def get_variance(self, prop_accessor: Callable[[Measurement], float]) -> float:
+        values = self.get_valid_vals(prop_accessor)
+        mean = self.get_mean(prop_accessor)
+        return sum([(v - mean) ** 2 for v in values]) / len(values)
+    
+    def get_valid_vals(self, prop_accessor: Callable[[Measurement], float]) -> list[float]:
+        vals = [prop_accessor(m) for m in self.measurements]
+        return [v for v in vals if v is not None]
 
 class Experiment:
     def __init__(self, content: str):
@@ -92,8 +148,11 @@ class Experiment:
     def get_measurements(self) -> list[Measurement]:
         measurements = []
         for measurement_content in self.content.split(MEASUREMENTS_SEPARATOR)[1:]:
-            measurements.append(Measurement(measurement_content))
+            measurements.append(Measurement(measurement_content , self))
         return measurements
+    
+    def get_measurement_set(self) -> MeasurementSet:
+        return MeasurementSet(self.get_measurements())
         
     def matches(self, key_vals: list[tuple[str, any]]):
         for key, val in key_vals:
@@ -116,6 +175,11 @@ class Experiment:
 
     def __str__(self):
         return f'Experiment: {self.get_param(Key.algorithm_name)} on grid {self.get_param(Key.grid_dimensions)} ...'
+
+    def compute_grid_size(self):
+        x = self.get_param(Key.grid_dim_x)
+        y = self.get_param(Key.grid_dim_y)
+        return x * y
 
 class Results:
     def __init__(self, results_content: str):
