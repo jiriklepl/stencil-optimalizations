@@ -200,40 +200,7 @@ class VariantGenerator:
     def generate_to_str(self, variants):
         return '\n'.join(self.generate_to_arr_of_lines(variants))
 
-
 class TaskGen:
-    def __init__(self, SETTINGS):
-        self.SETTINGS = SETTINGS
-        
-    def generate_for_alg(self, alg_keys_and_variants):
-        
-        alg_params = []
-
-        for alg_key, alg_variant in alg_keys_and_variants:
-            alg_variant = alg_variant if alg_variant is not None else ['']
-
-            for variant in alg_variant:
-                alg_params.append(f'ALGORITHM="{alg_key}" {variant}')
-
-        variants = [
-            self.SETTINGS.TEST_CASES,
-            self.SETTINGS.DATA,
-
-            alg_params,
-        ]
-
-        generator = VariantGenerator()
-        variant_lines = generator.generate_to_arr_of_lines(variants)
-
-        return [expand_macros(line) for line in variant_lines]
-    
-    def generate_for_alg_list_to_str(self, alg_list, suffix):
-        lines_with_suffix = [f'{line} {suffix}' for line in self.generate_for_alg(alg_list)]
-
-        return '\n'.join(lines_with_suffix)
-    
-
-class HyperParamsTaskGen:
     def __init__(self):
         self.TEST_CASES = None
         self.DATA = None
@@ -332,6 +299,22 @@ def remove_invalid_lines(lines):
 
     return res_lines, len(lines) - len(res_lines)
 
+def write_to_files(lines, template_name, workers_count):
+    parts = workers_count
+    filenames = f'./hyper-params-measurements/_scripts/{template_name}--part_{"{i}"}.sh'
+    file_prefix = '#!/bin/bash\n\n'
+
+    for i in range(parts):
+        fname = filenames.replace('{i}', str(i + 1))
+        print (f'Writing to {fname}')
+        
+        content = '\n'.join(lines[i::parts])
+        content = interleaf_lines_with_echos(content, i * len(lines) // parts)
+        
+        with open(fname, 'w') as f:
+            f.write(file_prefix)
+            f.write(content)
+
 def generate_hp_cases_for_local_cuda():
     if len(sys.argv) != 3:
         print("Usage: python tasks-gen.py <template name> <workers count>")
@@ -340,7 +323,7 @@ def generate_hp_cases_for_local_cuda():
     template_name = sys.argv[1]
     workers_count = int(sys.argv[2])
 
-    res = HyperParamsTaskGen() \
+    res = TaskGen() \
         .set_test_cases(HyperParamsCases.TEST_CASES_small_set) \
         .set_data(HyperParamsCases.DATA_loaders) \
         .set_hyperparams([
@@ -356,34 +339,33 @@ def generate_hp_cases_for_local_cuda():
     res_lines, skipped = remove_invalid_lines(res.split('\n'))
 
     print(f'Skipped: {skipped} lines due to invalid warp tile dims')
-
-    parts = workers_count
-    filenames = f'./hyper-params-measurements/_scripts/{template_name}--part_{"{i}"}.sh'
-    file_prefix = '#!/bin/bash\n\n'
-
-    for i in range(parts):
-        fname = filenames.replace('{i}', str(i + 1))
-        print (f'Writing to {fname}')
-        
-        content = '\n'.join(res_lines[i::parts])
-        content = interleaf_lines_with_echos(content, i * len(res_lines) // parts)
-        
-        with open(fname, 'w') as f:
-            f.write(file_prefix)
-            f.write(content)
-
+    write_to_files(res_lines, template_name, workers_count)
     print (f'Generated {len(res_lines)} cases')
 
-# final cases generation
-# res = TaskGen(BenchSetUpForCPUs).generate_for_alg_list_to_str(AlgList.CPU_ALGS_with_variants, SCRIPT_EXE)
-# res = TaskGen(BenchSetUpForGPUS).generate_for_alg_list_to_str(AlgList.CUDA_NAIVE_ALGS_with_variants, SCRIPT_EXE)
-# res = interleaf_lines_with_echos(res)
-# print(res)
-# exit()
 
-# hyperparams cases generation - naive cuda
-# res = HyperParamsTaskGen().generate_for_alg_list_to_str(
-#     HyperParamsCases.NAIVE_CUDA_ALGS_with_variants, [HyperParamsCases.BLOCK_SIZES], SCRIPT_EXE)
+def generate_final_cases_CPU():
+    res = TaskGen() \
+        .set_test_cases(BenchSetUpForCPUs.TEST_CASES) \
+        .set_data(BenchSetUpForCPUs.DATA) \
+        .set_algs(AlgList.CPU_ALGS_with_variants) \
+        .generate_for_alg_list_to_str(SCRIPT_EXE)
 
-# hyperparams cases generation - local alg
-generate_hp_cases_for_local_cuda()
+    res = interleaf_lines_with_echos(res)
+
+    print (res)
+
+def generate_final_cases_CUDA_naive_versions():
+    res = TaskGen() \
+        .set_test_cases(BenchSetUpForGPUS.TEST_CASES) \
+        .set_data(BenchSetUpForGPUS.DATA) \
+        .set_algs(AlgList.CUDA_NAIVE_ALGS_with_variants) \
+        .generate_for_alg_list_to_str(SCRIPT_EXE)
+
+    res = interleaf_lines_with_echos(res)
+
+    print (res)
+
+# generate_final_cases_CPU()
+# generate_final_cases_CUDA_naive_versions()
+
+# generate_hp_cases_for_local_cuda()
