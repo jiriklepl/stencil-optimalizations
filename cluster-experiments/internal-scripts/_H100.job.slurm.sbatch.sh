@@ -11,4 +11,4 @@
 echo "Starting job $SLURM_JOB_ID"
 echo "Node: " $SLURMD_NODENAME
 
-./run-jobs.sh $@
+./internal-scripts/run-jobs.sh $@

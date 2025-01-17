@@ -71,6 +71,7 @@ void GoLCudaNaive<grid_cell_t>::run_kernel(size_type iterations) {
         }
 
         game_of_live_kernel<<<grid, block>>>(cuda_data);
+        CUCH(cudaPeekAtLastError());
     }
 }
 

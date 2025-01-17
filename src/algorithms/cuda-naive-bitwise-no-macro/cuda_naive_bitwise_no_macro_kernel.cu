@@ -144,6 +144,7 @@ void GoLCudaNaiveBitwiseNoMacro<grid_cell_t, Bits>::run_kernel(size_type iterati
         }
 
         game_of_live_kernel<<<grid, block>>>(cuda_data);
+        CUCH(cudaPeekAtLastError());
     }
 }
 

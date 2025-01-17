@@ -1,106 +1,106 @@
 import results_abstraction as ra
 
-HP_DIR = './hyper-params-measurements/results'
+HP_DIR = './hyper-params-measurements/results/ampere'
 # HP_DIR = './experiments-outputs'
 
-results = ra.Results.from_directory(HP_DIR)
+class Algs:
 
-class CudaNaiveCases:
-    cuda_naive_char = [(ra.Key.algorithm_name, 'gol-cuda-naive'), (ra.Key.base_grid_encoding, 'char')]
-    cuda_naive_int = [(ra.Key.algorithm_name, 'gol-cuda-naive'), (ra.Key.base_grid_encoding, 'int')]
+    # NAIVE
 
-    cuda_naive_bitwise_32 = [(ra.Key.algorithm_name, 'gol-cuda-naive-bitwise-no-macro-32')]
-    cuda_naive_bitwise_64 = [(ra.Key.algorithm_name, 'gol-cuda-naive-bitwise-no-macro-64')]
-
-    cuda_bitwise_macro_32 = [(ra.Key.algorithm_name, 'gol-cuda-naive-bitwise-cols-32')]
-    cuda_bitwise_macro_64 = [(ra.Key.algorithm_name, 'gol-cuda-naive-bitwise-cols-64')]
-
-    algs = [
-        cuda_naive_char,
-        cuda_naive_int,
-        cuda_naive_bitwise_32,
-        cuda_naive_bitwise_64,
-        cuda_bitwise_macro_32,
-        cuda_bitwise_macro_64,
+    GPU_naive = [
+        [(ra.Key.algorithm_name, 'gol-cuda-naive'), (ra.Key.base_grid_encoding, 'char')],
+        [(ra.Key.algorithm_name, 'gol-cuda-naive'), (ra.Key.base_grid_encoding, 'int')],
+        [(ra.Key.algorithm_name, 'gol-cuda-naive-bitwise-no-macro-32')],
+        [(ra.Key.algorithm_name, 'gol-cuda-naive-bitwise-no-macro-64')],
+        [(ra.Key.algorithm_name, 'gol-cuda-naive-bitwise-cols-32')],
+        [(ra.Key.algorithm_name, 'gol-cuda-naive-bitwise-cols-64')],
     ]
 
-    tested_grids = [
-        (ra.Key.grid_dimensions, '8192x8192'),
-        (ra.Key.grid_dimensions, '16384x16384'),
-        (ra.Key.grid_dimensions, '32768x32768'),
-        (ra.Key.grid_dimensions, '65536x65536'),
+    GPU_naive_TEST_GRIDS = [
+        [(ra.Key.grid_dimensions, '8192x8192')],
+        [(ra.Key.grid_dimensions, '16384x16384')],
+        [(ra.Key.grid_dimensions, '32768x32768')],
+        [(ra.Key.grid_dimensions, '65536x65536')],
     ]
 
-    @staticmethod
-    def get_best_block_sizes():
-        bests = []
+    GPU_naive_hyper_params = [
+        ra.Key.thread_block_size,
+    ]
 
-        for alg in CudaNaiveCases.algs:
-            for grid in CudaNaiveCases.tested_grids:
+    # LOCAL
 
-                best_exp = CudaNaiveCases._get_best_experiment_for(alg, grid)
+    GPU_local = [
+        [(ra.Key.algorithm_name, 'gol-cuda-naive-local-32')],
+        [(ra.Key.algorithm_name, 'gol-cuda-naive-local-64')],
+    ]
 
-                if best_exp is None:
-                    continue
+    GPU_local_TEST_GRIDS = [
+        [(ra.Key.grid_dimensions, '32768x32768'), (ra.Key.data_loader_name, 'lexicon')],
+        [(ra.Key.grid_dimensions, '32768x32768'), (ra.Key.data_loader_name, 'zeros')],
+        [(ra.Key.grid_dimensions, '32768x32768'), (ra.Key.data_loader_name, 'always-changing')],
 
-                thread_block_size = best_exp.get_param(ra.Key.thread_block_size)
-                perf_per_iter = best_exp.get_median_runtime_per_iter()
+        [(ra.Key.grid_dimensions, '65536x65536'), (ra.Key.data_loader_name, 'lexicon')],
+        [(ra.Key.grid_dimensions, '65536x65536'), (ra.Key.data_loader_name, 'zeros')],
+        [(ra.Key.grid_dimensions, '65536x65536'), (ra.Key.data_loader_name, 'always-0changing')],
+    ]
 
-                bests.append((alg, grid, thread_block_size, perf_per_iter))
+    GPU_local_hyper_params = [
+        ra.Key.thread_block_size,
 
-        return bests        
-                
-    @staticmethod
-    def _get_best_experiment_for(alg, grid) -> ra.Experiment:
-        exps = results.get_experiments_with([*alg, grid])
+        ra.Key.warp_dims_x,
+        ra.Key.warp_dims_y,
+        
+        ra.Key.warp_tile_dims_x,
+        ra.Key.warp_tile_dims_y,
+        
+        ra.Key.streaming_direction,
+        
+        ra.Key.state_bits_count,
+    ]    
 
-        if len(exps) == 0:
-            return None
+class BestHP:
+    def __init__(self, results: ra.Results, algs: list[list[tuple[str, str]]], tested_grids: list[list[tuple[str, str]]]):
+        self.results: ra.Results = results
+        self.algs = algs
+        self.tested_grids = tested_grids
 
-        best_exp = None
+        self.print_limit_per_test_case = 400
 
-        for exp in exps:
-            median_perf = exp.get_median_runtime_per_iter()
-            
-            if median_perf is None:
-                continue
-
-            if best_exp is None:
-                best_exp = exp
-                continue
-            
-            if exp.get_median_runtime_per_iter() < median_perf:
-                best_exp = exp
-
-        return best_exp
-    
-    @staticmethod
-    def print_stats_for_all():
-        for alg in CudaNaiveCases.algs:
+    def print_best(self, hyper_params_keys: list[str]):
+        for alg in self.algs:
             print('Algorithm:', alg, '\n')
 
-            for grid in CudaNaiveCases.tested_grids:
-                print('  Grid:', grid[1])
+            for grid in self.tested_grids:
+                print('  Grid:', grid)
 
-                CudaNaiveCases._print_stats_for(alg, grid)
+                bests = self._get_best_experiments_for(alg, grid)
+                self._print_bests(bests, hyper_params_keys)
 
-    @staticmethod
-    def _print_stats_for(alg, grid):
-        exps = results.get_experiments_with([*alg, grid])
+                print()
+
+    def _get_best_experiments_for(self, alg, grid) -> ra.Experiment:
+        exps = self.results.get_experiments_with([*alg, *grid])
         exps = [exp for exp in exps if exp.get_median_runtime_per_iter() is not None]
 
         exps.sort(key=lambda e: e.get_median_runtime_per_iter())
+    
+        return exps
+    
 
-        for exp in exps:
-            print(f'     {exp.get_param(ra.Key.thread_block_size)}: {exp.get_median_runtime_per_iter()}')
+    def _print_bests(self, exps: list[ra.Experiment], hyper_params_keys: list[str]):
+        for exp in exps[:self.print_limit_per_test_case]:
+            print(f'    rt: {exp.get_median_runtime_per_iter()}', end=' ')
 
-        print()
+            for key in hyper_params_keys:
+                print(f'{key}: {exp.get_param(key)}\t', end=' ')
 
-                
+            print()
 
-# bests = CudaNaiveCases.get_best_block_sizes()
 
-# for best in bests:
-#     print(best)
+results = ra.Results.from_directory(HP_DIR)
 
-CudaNaiveCases.print_stats_for_all()
+best_hp_naive_cuda = BestHP(results, Algs.GPU_naive, Algs.GPU_naive_TEST_GRIDS)
+best_hp_local_cuda = BestHP(results, Algs.GPU_local, Algs.GPU_local_TEST_GRIDS)
+
+# best_hp_naive_cuda.print_best(Algs.GPU_naive_hyper_params)
+best_hp_local_cuda.print_best(Algs.GPU_local_hyper_params)

@@ -1,5 +1,6 @@
 import itertools
 import random
+import sys
 
 MID_COORDS_MACRO = '{mid_coordinates}'
 
@@ -90,7 +91,7 @@ class AlgList:
 
 class HyperParamsCases:
     
-    GENERAL_SETTINGS = ' ITERATIONS="1000000" MAX_RUNTIME_SECONDS="10" RANDOM_SEED="42" WARMUP_ROUNDS="1" MEASUREMENT_ROUNDS="3" COLORFUL="false" ANIMATE_OUTPUT="false" BASE_GRID_ENCODING="char" '
+    GENERAL_SETTINGS = ' ITERATIONS="1000000" MAX_RUNTIME_SECONDS="5" RANDOM_SEED="42" WARMUP_ROUNDS="0" MEASUREMENT_ROUNDS="3" COLORFUL="false" ANIMATE_OUTPUT="false" BASE_GRID_ENCODING="char" '
 
     TEST_CASES = [
         f' GRID_DIMENSIONS_X="8192"  GRID_DIMENSIONS_Y="8192"  {GENERAL_SETTINGS} {BenchSetUp.SPEED_UP_AND_VALIDATION_OFF} ',
@@ -121,21 +122,30 @@ class HyperParamsCases:
         ' THREAD_BLOCK_SIZE="1024" ',
     ]
 
+    BLOCK_SIZES_limited = [
+        ' THREAD_BLOCK_SIZE="128" ',
+        ' THREAD_BLOCK_SIZE="256" ',
+        ' THREAD_BLOCK_SIZE="512" ',
+        ' THREAD_BLOCK_SIZE="1024" ',
+    ]
+
+
     LOCAL_ALGS_with_variants = [
         ['gol-cuda-naive-local-32', None],
         ['gol-cuda-naive-local-64', None],
     ]
 
-    DATA = [
+    DATA_loaders = [
         # space filler
-        f' DATA_LOADER_NAME="lexicon" PATTERN_EXPRESSION="spacefiller[{MID_COORDS_MACRO}]"  '
+        f' DATA_LOADER_NAME="lexicon" PATTERN_EXPRESSION="spacefiller[{MID_COORDS_MACRO}]"  ',
 
         # no action
-        ' DATA_LOADER_NAME="zeros" '
+        ' DATA_LOADER_NAME="zeros" ',
 
         # always changing
-        ' DATA_LOADER_NAME="always-changing" '
+        ' DATA_LOADER_NAME="always-changing" ',
     ]
+
 
     WARP_DIMS = [
         ' WARP_DIMS_X="1" WARP_DIMS_Y="32" ',
@@ -153,21 +163,21 @@ class HyperParamsCases:
         ' WARP_TILE_DIMS_X="64" WARP_TILE_DIMS_Y="64" ',
         ' WARP_TILE_DIMS_X="32" WARP_TILE_DIMS_Y="64" ',
         ' WARP_TILE_DIMS_X="64" WARP_TILE_DIMS_Y="32" ',
-        ' WARP_TILE_DIMS_X="128" WARP_TILE_DIMS_Y="128" ',
+        # ' WARP_TILE_DIMS_X="128" WARP_TILE_DIMS_Y="128" ',
         ' WARP_TILE_DIMS_X="128" WARP_TILE_DIMS_Y="64" ',
-        ' WARP_TILE_DIMS_X="64" WARP_TILE_DIMS_Y="128" ',
+        # ' WARP_TILE_DIMS_X="64" WARP_TILE_DIMS_Y="128" ',
         ' WARP_TILE_DIMS_X="128" WARP_TILE_DIMS_Y="32" ',
         ' WARP_TILE_DIMS_X="32" WARP_TILE_DIMS_Y="128" ',
-        ' WARP_TILE_DIMS_X="256" WARP_TILE_DIMS_Y="128" ',
-        ' WARP_TILE_DIMS_X="128" WARP_TILE_DIMS_Y="256" ',
-        ' WARP_TILE_DIMS_X="256" WARP_TILE_DIMS_Y="32" ',
-        ' WARP_TILE_DIMS_X="256" WARP_TILE_DIMS_Y="64" ',
+        # ' WARP_TILE_DIMS_X="256" WARP_TILE_DIMS_Y="128" ',
+        # ' WARP_TILE_DIMS_X="128" WARP_TILE_DIMS_Y="256" ',
+        # ' WARP_TILE_DIMS_X="256" WARP_TILE_DIMS_Y="32" ',
+        # ' WARP_TILE_DIMS_X="256" WARP_TILE_DIMS_Y="64" ',
     ]
 
     STREAMING_DIRECTIONS = [
         ' STREAMING_DIRECTION="in-x" ',
-        ' STREAMING_DIRECTION="in-y" ',
-        ' STREAMING_DIRECTION="naive" ',
+        # ' STREAMING_DIRECTION="in-y" ',
+        # ' STREAMING_DIRECTION="naive" ',
     ]
 
     STATE_BITS_COUNTS = [
@@ -225,8 +235,10 @@ class TaskGen:
 
 class HyperParamsTaskGen:
     def __init__(self):
-        self.TEST_CASES = HyperParamsCases.TEST_CASES
-        self.DATA = BenchSetUp.DATA
+        self.TEST_CASES = None
+        self.DATA = None
+        self.HP_SPACE = []
+        self.ALGS = None
 
     def set_test_cases(self, test_cases):
         self.TEST_CASES = test_cases
@@ -235,35 +247,40 @@ class HyperParamsTaskGen:
     def set_data(self, data):
         self.DATA = data
         return self
+    
+    def set_hyperparams(self, hyperparams):
+        self.HP_SPACE = hyperparams
+        return self
+    
+    def set_algs(self, algs):
+        self.ALGS = algs
+        return self
 
-    def generate_for_alg(self, alg_keys_and_variants, hp_space):
+    def generate_for_alg(self):
         
         alg_params = []
 
-        for alg_key, alg_variant in alg_keys_and_variants:
+        for alg_key, alg_variant in self.ALGS:
             alg_variant = alg_variant if alg_variant is not None else ['']
 
             for variant in alg_variant:
                 alg_params.append(f'ALGORITHM="{alg_key}" {variant}')
 
-
         variants = [
             self.TEST_CASES,
+            self.DATA,
 
             alg_params,
-            *hp_space,
-            
-            self.DATA,
+            *self.HP_SPACE,
         ]
 
-        generator = VariantGenerator()
-        variant_lines = generator.generate_to_arr_of_lines(variants)
+        variant_lines = VariantGenerator().generate_to_arr_of_lines(variants)
         variant_lines = self._shuffle_lines(variant_lines)
 
         return [expand_macros(line) for line in variant_lines]
     
-    def generate_for_alg_list_to_str(self, alg_list, hp_space, suffix):
-        lines_with_suffix = [f'{line} {suffix}' for line in self.generate_for_alg(alg_list, hp_space)]
+    def generate_for_alg_list_to_str(self, suffix):
+        lines_with_suffix = [f'{line} {suffix}' for line in self.generate_for_alg()]
 
         return '\n'.join(lines_with_suffix)
 
@@ -273,20 +290,26 @@ class HyperParamsTaskGen:
             lines[i], lines[j] = lines[j], lines[i]
         return lines
 
-def has_valid_warp_tile_dims(line):
+class Validator:
+
+    @staticmethod
+    def has_valid_warp_tile_dims(line):
+        
+        x_tile = Validator.read_val('WARP_TILE_DIMS_X', line)
+        y_tile = Validator.read_val('WARP_TILE_DIMS_Y', line)
+        x_warp = Validator.read_val('WARP_DIMS_X', line)
+        y_warp = Validator.read_val('WARP_DIMS_Y', line)
+
+        warp_fits_tile_in_x = x_tile % x_warp == 0
+        warp_fits_tile_in_y = y_tile % y_warp == 0
+
+        return warp_fits_tile_in_x and warp_fits_tile_in_y
+
+    @staticmethod
     def read_val(key, line):
         return int(line.split(f'{key}="')[1].split('"')[0])
-    
-    x_tile = read_val('WARP_TILE_DIMS_X', line)
-    y_tile = read_val('WARP_TILE_DIMS_Y', line)
 
-    x_warp = read_val('WARP_DIMS_X', line)
-    y_warp = read_val('WARP_DIMS_Y', line)
 
-    warp_fits_tile_in_x = x_tile % x_warp == 0
-    warp_fits_tile_in_y = y_tile % y_warp == 0
-
-    return warp_fits_tile_in_x and warp_fits_tile_in_y
 
 def interleaf_lines_with_echos(lines: list[str], start: int = 0):
     res = []
@@ -297,56 +320,70 @@ def interleaf_lines_with_echos(lines: list[str], start: int = 0):
 
     return '\n'.join(res)
 
+def remove_invalid_lines(lines):
+    res_lines = []
 
+    for line in lines:
+        valid = True
+        valid = valid and Validator.has_valid_warp_tile_dims(line)
+
+        if valid:
+            res_lines.append(line)
+
+    return res_lines, len(lines) - len(res_lines)
+
+def generate_hp_cases_for_local_cuda():
+    if len(sys.argv) != 3:
+        print("Usage: python tasks-gen.py <template name> <workers count>")
+        sys.exit(1)
+
+    template_name = sys.argv[1]
+    workers_count = int(sys.argv[2])
+
+    res = HyperParamsTaskGen() \
+        .set_test_cases(HyperParamsCases.TEST_CASES_small_set) \
+        .set_data(HyperParamsCases.DATA_loaders) \
+        .set_hyperparams([
+                HyperParamsCases.WARP_DIMS,
+                HyperParamsCases.WARP_TILE_DIMS,
+                HyperParamsCases.STREAMING_DIRECTIONS,
+                HyperParamsCases.STATE_BITS_COUNTS,
+                HyperParamsCases.BLOCK_SIZES_limited
+        ]) \
+        .set_algs(HyperParamsCases.LOCAL_ALGS_with_variants) \
+        .generate_for_alg_list_to_str(SCRIPT_EXE)
+
+    res_lines, skipped = remove_invalid_lines(res.split('\n'))
+
+    print(f'Skipped: {skipped} lines due to invalid warp tile dims')
+
+    parts = workers_count
+    filenames = f'./hyper-params-measurements/_scripts/{template_name}--part_{"{i}"}.sh'
+    file_prefix = '#!/bin/bash\n\n'
+
+    for i in range(parts):
+        fname = filenames.replace('{i}', str(i + 1))
+        print (f'Writing to {fname}')
+        
+        content = '\n'.join(res_lines[i::parts])
+        content = interleaf_lines_with_echos(content, i * len(res_lines) // parts)
+        
+        with open(fname, 'w') as f:
+            f.write(file_prefix)
+            f.write(content)
+
+    print (f'Generated {len(res_lines)} cases')
 
 # final cases generation
 # res = TaskGen(BenchSetUpForCPUs).generate_for_alg_list_to_str(AlgList.CPU_ALGS_with_variants, SCRIPT_EXE)
-res = TaskGen(BenchSetUpForGPUS).generate_for_alg_list_to_str(AlgList.CUDA_NAIVE_ALGS_with_variants, SCRIPT_EXE)
-res = interleaf_lines_with_echos(res)
-print(res)
-exit()
+# res = TaskGen(BenchSetUpForGPUS).generate_for_alg_list_to_str(AlgList.CUDA_NAIVE_ALGS_with_variants, SCRIPT_EXE)
+# res = interleaf_lines_with_echos(res)
+# print(res)
+# exit()
 
 # hyperparams cases generation - naive cuda
 # res = HyperParamsTaskGen().generate_for_alg_list_to_str(
 #     HyperParamsCases.NAIVE_CUDA_ALGS_with_variants, [HyperParamsCases.BLOCK_SIZES], SCRIPT_EXE)
 
 # hyperparams cases generation - local alg
-res = HyperParamsTaskGen() \
-    .set_test_cases(HyperParamsCases.TEST_CASES_small_set) \
-    .set_data(HyperParamsCases.DATA) \
-    .generate_for_alg_list_to_str(
-        HyperParamsCases.LOCAL_ALGS_with_variants, 
-        [
-            HyperParamsCases.WARP_DIMS,
-            HyperParamsCases.WARP_TILE_DIMS,
-            HyperParamsCases.STREAMING_DIRECTIONS,
-            HyperParamsCases.STATE_BITS_COUNTS,
-        ],
-        SCRIPT_EXE)
-
-res_lines = []
-skipped = 0
-
-for line in res.split('\n'):
-    if has_valid_warp_tile_dims(line):
-        res_lines.append(line)
-    else:
-        skipped += 1
-
-print(f'Skipped: {skipped} lines due to invalid warp tile dims')
-
-parts = 4
-filenames = './hyper-params-measurements/_scripts/search-cuda-local--part_{i}.sh'
-file_prefix = '#!/bin/bash\n\nEXECUTABLE=./run-one-exp.sh\n\n'
-
-for i in range(parts):
-    fname = filenames.replace('{i}', str(i + 1))
-    print (f'Writing to {fname}')
-    
-    content = '\n'.join(res_lines[i::parts])
-    content = interleaf_lines_with_echos(content, i * len(res_lines) // parts)
-    
-    with open(fname, 'w') as f:
-        f.write(file_prefix)
-        f.write(content)
-
+generate_hp_cases_for_local_cuda()

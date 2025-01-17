@@ -345,7 +345,7 @@ void GoLCudaNaiveLocalWithState<grid_cell_t, Bits, state_store_type>::run_kernel
         }
 
         game_of_live_kernel<DIRECTION ><<<blocks, block_size, shm_size, stream>>>(cuda_data);
-
+        CUCH(cudaPeekAtLastError());
     }
 
     cudaEventRecord(events[_performed_iterations], stream);
@@ -382,6 +382,7 @@ void GoLCudaNaiveJustTiling<grid_cell_t, Bits>::run_kernel(size_type iterations)
         }
 
         game_of_live_kernel_just_tiling<DIRECTION><<<blocks, block_size>>>(cuda_data);
+        CUCH(cudaPeekAtLastError());
     }
 }
 

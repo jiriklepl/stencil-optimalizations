@@ -9,13 +9,8 @@ echo "WORKER_ID: $WORKER_ID"
 SCRIPT="$SCRIPT_TEMPLATE--part_$WORKER_ID.sh"
 
 echo "SCRIPT: $SCRIPT"
+chmod +x $SCRIPT
+
+
+EXECUTABLE='./internal-scripts/run-one-exp.sh' \
 ./$SCRIPT
-
-# final tests
-# ./final-measurements/_scripts/run-cpu-versions.sh
-
-
-# hyper-params
-# EXE="hyper-params-measurements/_scripts/search-cuda-naive-algs__part_$WORKER_ID.sh"
-# ./$EXE
-

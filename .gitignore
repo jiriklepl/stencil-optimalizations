@@ -1,5 +1,6 @@
 .cache/
 build/
+build-stable/
 upload.sh
 repl.sh
 benchmark.sh
