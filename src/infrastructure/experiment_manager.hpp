@@ -8,6 +8,7 @@
 #include "../algorithms/cpu-naive/gol_cpu_naive.hpp"
 #include "../algorithms/cuda-naive-bitwise/gol_cuda_naive_bitwise.hpp"
 #include "../algorithms/cuda-naive/gol_cuda_naive.hpp"
+#include "../algorithms/cuda-memcpy/cuda_memcpy_bench.hpp"
 #include "../algorithms/cuda-naive-bitwise-no-macro/gol_cuda_naive_bitwise_no_macro.hpp"
 #include "../algorithms/cuda-naive-local/gol_cuda_naive_local.hpp"
 #include "../algorithms/cuda-naive-local/gol_cuda_naive_just_tiling.hpp"
@@ -74,6 +75,8 @@ class ExperimentManager {
         // CUDA
 
         _2d_repo-> template register_algorithm<alg::GoLCudaNaive<grid_cell_t>>("gol-cuda-naive");
+
+        _2d_repo-> template register_algorithm<alg::CudaMemcpy<grid_cell_t>>("cuda-memcpy");
 
         _2d_repo-> template register_algorithm<alg::GoLCudaNaiveBitwise<grid_cell_t, 16>>("gol-cuda-naive-bitwise-cols-16");
         _2d_repo-> template register_algorithm<alg::GoLCudaNaiveBitwise<grid_cell_t, 32>>("gol-cuda-naive-bitwise-cols-32");

@@ -42,13 +42,14 @@ __31="2147483648"
 # ALGORITHM="gol-cpu-bitwise-cols-macro-64"
 # ALGORITHM="gol-cuda-naive-bitwise-no-macro-64"
 # ALGORITHM="an5d-cpu-64"
-ALGORITHM="gol-cuda-naive"
+ALGORITHM="cuda-memcpy"
+# ALGORITHM="gol-cuda-naive"
 # ALGORITHM="gol-cuda-naive-bitwise-cols-64"
 # ALGORITHM="gol-cuda-naive-local-64"
 # ALGORITHM="gol-cuda-naive-just-tiling-64"
 GRID_DIMENSIONS_X=$__16
 GRID_DIMENSIONS_Y=$__16
-ITERATIONS="300"
+ITERATIONS="10000000"
 
 BASE_GRID_ENCODING="char"
 
@@ -65,10 +66,11 @@ PATTERN_EXPRESSION="spacefiller[$((GRID_DIMENSIONS_X/2)),$((GRID_DIMENSIONS_Y/2)
 
 # MEASURE_SPEEDUP="true"
 MEASURE_SPEEDUP="false"
+SPEEDUP_BENCH_ALGORITHM_NAME="cuda-memcpy"
 # SPEEDUP_BENCH_ALGORITHM_NAME="gol-cpu-naive"
 # SPEEDUP_BENCH_ALGORITHM_NAME="gol-cpu-bitwise-cols-naive-64"
 # SPEEDUP_BENCH_ALGORITHM_NAME="gol-cuda-naive-bitwise-cols-64"
-SPEEDUP_BENCH_ALGORITHM_NAME="gol-cuda-naive"
+# SPEEDUP_BENCH_ALGORITHM_NAME="gol-cuda-naive"
 # SPEEDUP_BENCH_ALGORITHM_NAME="gol-cuda-naive-just-tiling-64"
 
 # VALIDATE="true"
@@ -84,9 +86,9 @@ RANDOM_SEED="42"
 
 STATE_BITS_COUNT="64"
 
-# THREAD_BLOCK_SIZE="2048"
 THREAD_BLOCK_SIZE="1024"
 # THREAD_BLOCK_SIZE="512"
+# THREAD_BLOCK_SIZE="256"
 
 WARP_DIMS_X="32"
 WARP_DIMS_Y="1"
@@ -94,8 +96,11 @@ WARP_DIMS_Y="1"
 WARP_TILE_DIMS_X="32"
 WARP_TILE_DIMS_Y="8"
 
-# STREAMING_DIRECTION="in-x"
-STREAMING_DIRECTION="in-y"
+WARP_TILE_DIMS_X="512"
+WARP_TILE_DIMS_Y="512"
+
+STREAMING_DIRECTION="in-x"
+# STREAMING_DIRECTION="in-y"
 MAX_RUNTIME_SECONDS="10"
 
 # srun -p gpu-short -A kdss --cpus-per-task=64 --mem=256GB --gres=gpu:V100 --time=2:00:00 $GOL_EXE_NAME \
