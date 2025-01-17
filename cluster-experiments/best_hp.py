@@ -1,6 +1,6 @@
 import results_abstraction as ra
 
-HP_DIR = './hyper-params-measurements/results/ampere'
+HP_DIR = './hyper-params-measurements/ampere'
 # HP_DIR = './experiments-outputs'
 
 class Algs:
