@@ -121,7 +121,7 @@ class GoLCpuNaive : public infrastructure::Algorithm<2, grid_cell_t> {
         std::cout << "\033[" << grid.template size_in<1>() << "D";
     }
 
-    void print(const DataGrid& grid, size_type iter) {
+    void print(const DataGrid& grid, size_type iter) const {
 
         std::cout << "Iteration: " << iter << std::endl;
 

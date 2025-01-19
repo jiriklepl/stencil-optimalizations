@@ -112,6 +112,10 @@ class Grid {
         return GridTile<DIMS, ElementType>(elements.data(), tile_sizes_per_dimensions.data());
     }
 
+    auto as_tile() const {
+        return as_const_tile();
+    }
+
     auto as_const_tile() const {
         return GridTile<DIMS, const ElementType>(static_cast<const ElementType*>(elements.data()),
                                             const_cast<size_type*>(tile_sizes_per_dimensions.data()));
@@ -130,6 +134,10 @@ class Grid {
     }
 
     std::vector<ElementType>* data_as_vector() {
+        return &elements;
+    }
+
+    const std::vector<ElementType>* data_as_vector() const {
         return &elements;
     }
 

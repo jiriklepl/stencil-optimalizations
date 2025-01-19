@@ -15,7 +15,7 @@ template <typename grid_cell_t, std::size_t Bits>
 class GoLCudaNaiveBitwiseNoMacro : public infrastructure::Algorithm<2, grid_cell_t> {
 
   public:
-    GoLCudaNaiveBitwiseNoMacro() {};
+    GoLCudaNaiveBitwiseNoMacro() = default;
 
     using size_type = std::size_t;
     using col_type = typename BitsConst<Bits>::col_type;
