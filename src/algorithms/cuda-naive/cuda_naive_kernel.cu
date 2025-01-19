@@ -12,6 +12,8 @@ namespace algorithms {
 
 using idx_t = std::int64_t;
 
+namespace {
+
 __device__ __forceinline__ idx_t get_idx(idx_t x, idx_t y, idx_t x_size) {
     return y * x_size + x;
 }
@@ -51,6 +53,8 @@ __global__ void game_of_live_kernel(NaiveGridOnCuda<grid_cell_t> data) {
         data.output[idx] = (live_neighbors == 3) ? 1 : 0;
     }
 }
+
+} // namespace
 
 template <typename grid_cell_t>
 void GoLCudaNaive<grid_cell_t>::run_kernel(size_type iterations) {

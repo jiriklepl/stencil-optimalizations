@@ -21,6 +21,8 @@ using CELL_STATE = bool;
 constexpr CELL_STATE DEAD = false;
 constexpr CELL_STATE ALIVE = true;
 
+namespace {
+
 __device__ __forceinline__ idx_t get_idx(idx_t x, idx_t y, idx_t x_size) {
     return y * x_size + x;
 }
@@ -124,6 +126,8 @@ __global__ void game_of_live_kernel(BitGridData<col_type> data) {
         }
     }
 }
+
+} // namespace
 
 template <typename grid_cell_t, std::size_t Bits>
 void GoLCudaNaiveBitwiseNoMacro<grid_cell_t, Bits>::run_kernel(size_type iterations) {

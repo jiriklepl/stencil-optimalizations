@@ -24,6 +24,8 @@ constexpr std::size_t WARP_SIZE = 32;
 template <typename col_type>
 using WarpInfo = algorithms::cuda_naive_local::WarpInformation<col_type, idx_t>; 
 
+namespace {
+
 __device__ __forceinline__ idx_t get_idx(idx_t x, idx_t y, idx_t x_size) {
     return y * x_size + x;
 }
@@ -317,6 +319,8 @@ __global__ void game_of_live_kernel(BitGridWithChangeInfo<col_type, state_store_
         set_changed_state_for_block(block_store, data.change_state_store.current);
     }
 }
+
+} // namespace
 
 template <typename grid_cell_t, std::size_t Bits, typename state_store_type>
 template <StreamingDir DIRECTION>

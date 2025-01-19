@@ -14,6 +14,8 @@ namespace algorithms {
 
 using idx_t = std::int64_t;
 
+namespace {
+
 __device__ __forceinline__ idx_t get_idx(idx_t x, idx_t y, idx_t x_size) {
     return y * x_size + x;
 }
@@ -49,6 +51,8 @@ __global__ void game_of_live_kernel(BitGridOnCuda<col_type> data) {
     data.output[get_idx(x, y, data.x_size)] =
         CudaBitwiseOps<col_type>::compute_center_col(lt, ct, rt, lc, cc, rc, lb, cb, rb);
 }
+
+} // namespace
 
 template <typename grid_cell_t, std::size_t Bits>
 void GoLCudaNaiveBitwise<grid_cell_t, Bits>::run_kernel(size_type iterations) { // Added template parameter

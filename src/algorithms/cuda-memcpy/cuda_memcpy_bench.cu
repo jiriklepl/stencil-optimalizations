@@ -11,6 +11,8 @@ namespace algorithms {
 
 using idx_t = std::int64_t;
 
+namespace {
+
 template <typename grid_cell_t>
 __global__ void memcpy_kernel(NaiveGridOnCuda<grid_cell_t> data) {
     idx_t x = blockIdx.x * blockDim.x + threadIdx.x;
@@ -22,6 +24,8 @@ __global__ void memcpy_kernel(NaiveGridOnCuda<grid_cell_t> data) {
 
     data.output[idx] = data.input[idx];
 }
+
+} // namespace
 
 template <typename grid_cell_t>
 void CudaMemcpy<grid_cell_t>::run_kernel(size_type iterations) {
