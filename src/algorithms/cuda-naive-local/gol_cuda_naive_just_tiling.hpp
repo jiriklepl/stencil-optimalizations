@@ -20,7 +20,7 @@ template <typename grid_cell_t, std::size_t Bits>
 class GoLCudaNaiveJustTiling : public infrastructure::Algorithm<2, grid_cell_t> {
 
   public:
-    GoLCudaNaiveJustTiling() {};
+    GoLCudaNaiveJustTiling() = default;
 
     using size_type = std::size_t;
     using col_type = typename BitsConst<Bits>::col_type;
@@ -113,22 +113,22 @@ class GoLCudaNaiveJustTiling : public infrastructure::Algorithm<2, grid_cell_t> 
         return cuda_data.warp_dims.x * cuda_data.warp_dims.y;
     }
 
-    std::size_t get_warp_tiles_count() {
+    std::size_t get_warp_tiles_count() const {
         return bit_grid->size() / warp_tile_size();
     }
 
-    std::size_t get_thread_block_count() {
-        auto warps_per_block = thread_block_size / warp_size();
-        auto computed_elems_in_block = warps_per_block * warp_tile_size(); 
+    std::size_t get_thread_block_count() const {
+        const auto warps_per_block = thread_block_size / warp_size();
+        const auto computed_elems_in_block = warps_per_block * warp_tile_size(); 
 
         return bit_grid->size() / computed_elems_in_block;
     }
 
-    std::size_t state_store_word_count() {
+    std::size_t state_store_word_count() const {
         return get_thread_block_count();
     }
 
-    std::size_t tiles_per_block() {
+    std::size_t tiles_per_block() const {
         return thread_block_size / warp_size();
     }
 

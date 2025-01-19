@@ -21,7 +21,7 @@ template <typename grid_cell_t, std::size_t Bits, typename state_store_type>
 class GoLCudaNaiveLocalWithState : public infrastructure::Algorithm<2, grid_cell_t> {
 
   public:
-    GoLCudaNaiveLocalWithState() {};
+    GoLCudaNaiveLocalWithState() = default;
 
     using size_type = std::size_t;
     using col_type = typename BitsConst<Bits>::col_type;

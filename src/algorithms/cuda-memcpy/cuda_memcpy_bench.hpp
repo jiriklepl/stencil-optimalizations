@@ -13,7 +13,7 @@ template <typename grid_cell_t>
 class CudaMemcpy : public infrastructure::Algorithm<2, grid_cell_t> {
 
   public:
-    CudaMemcpy() {};
+    CudaMemcpy() = default;
 
     using size_type = std::size_t;
     using DataGrid = infrastructure::Grid<2, grid_cell_t>;

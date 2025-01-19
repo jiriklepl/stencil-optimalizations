@@ -36,9 +36,9 @@ class StopWatch {
         start_time = std::chrono::high_resolution_clock::now();
     }
 
-    bool time_is_up() {
-        auto now = std::chrono::high_resolution_clock::now();
-        auto elapsed_secs = std::chrono::duration_cast<std::chrono::seconds>(now - start_time).count();
+    bool time_is_up() const {
+        const auto now = std::chrono::high_resolution_clock::now();
+        const auto elapsed_secs = std::chrono::duration_cast<std::chrono::seconds>(now - start_time).count();
 
         return elapsed_secs >= count_down_seconds;
     }
