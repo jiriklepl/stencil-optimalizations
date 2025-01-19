@@ -46,6 +46,8 @@ class ExperimentParams {
 
     std::size_t random_seed = 42;
 
+    std::string tag = "";
+
     std::size_t state_bits_count = 64;
 
     std::size_t thread_block_size;
@@ -84,6 +86,7 @@ class ExperimentParams {
       ss << label_color << "  animate_output: " << value_color << animate_output << std::endl;
       ss << label_color << "  colorful: " << value_color << colorful << std::endl << c::extra_line_in_params();
       ss << label_color << "  random_seed: " << value_color << random_seed << std::endl << c::extra_line_in_params();
+      ss << label_color << "  tag: " << value_color << tag << std::endl << c::extra_line_in_params();
       ss << label_color << "  state_bits_count: " << value_color << state_bits_count << std::endl << c::extra_line_in_params();
       ss << label_color << "  thread_block_size: " << value_color << thread_block_size << std::endl << c::extra_line_in_params();
       ss << label_color << "  warp_dims_x: " << value_color << warp_dims_x << std::endl;
@@ -129,6 +132,7 @@ const std::string WARP_TILE_DIMS_Y             = "warp-tile-dims-y";
 const std::string STREAMING_DIRECTION          = "streaming-direction";
 const std::string STATE_BITS_COUNT             = "state-bits-count";
 const std::string BASE_GRID_ENCODING           = "base-grid-encoding";
+const std::string TAG                          = "tag";
 // clang-format on
 }
 
@@ -215,6 +219,8 @@ class ParamsParser {
 
         (opts::BASE_GRID_ENCODING, "Base grid encoding (char|int)",
           cxxopts::value<std::string>()->default_value("char"))
+
+        (opts::TAG, "Tag", cxxopts::value<std::string>()->default_value(""));
       ;
 
       auto result = optConfig.parse(argc, argv);
@@ -274,6 +280,8 @@ class ParamsParser {
       params.state_bits_count = result[opts::STATE_BITS_COUNT].as<std::size_t>();
 
       params.base_grid_encoding = result[opts::BASE_GRID_ENCODING].as<std::string>();
+
+      params.tag = result[opts::TAG].as<std::string>();
 
       return params;
     }

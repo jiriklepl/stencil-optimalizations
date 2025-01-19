@@ -100,7 +100,7 @@ class TimePerCellPerIter__InputSize:
 
             for grid in self.tested_grids:
                 exp = self.results.get_experiments_with([*alg, *grid])
-                
+
                 if not exp:
                     alg_values.append(None)
                     alg_box_data.append(None)
@@ -167,8 +167,8 @@ TimePerCellPerIter__InputSize(results) \
         ALG_LIST.cuda_naive_int,
         ALG_LIST.cuda_naive_bitwise_no_macro_32,
         ALG_LIST.cuda_naive_bitwise_no_macro_64,
-        ALG_LIST.cuda_naive_bitwise_cols_32,
-        ALG_LIST.cuda_naive_bitwise_cols_64,
+        # ALG_LIST.cuda_naive_bitwise_cols_32,
+        # ALG_LIST.cuda_naive_bitwise_cols_64,
         
         # *ALG_LIST.ALGS
     ]) \

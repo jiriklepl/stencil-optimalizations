@@ -137,13 +137,15 @@ class HyperParamsCases:
 
     DATA_loaders = [
         # space filler
-        f' DATA_LOADER_NAME="lexicon" PATTERN_EXPRESSION="spacefiller[{MID_COORDS_MACRO}]"  ',
+        # f' DATA_LOADER_NAME="lexicon" PATTERN_EXPRESSION="spacefiller[{MID_COORDS_MACRO}]"  ',
+        
+        ' DATA_LOADER_NAME="lexicon" PATTERN_EXPRESSION="gosper-glider-gun[0,0]"  ',
 
         # no action
-        ' DATA_LOADER_NAME="zeros" ',
+        # ' DATA_LOADER_NAME="zeros" ',
 
         # always changing
-        ' DATA_LOADER_NAME="always-changing" ',
+        # ' DATA_LOADER_NAME="always-changing" ',
     ]
 
 
@@ -368,4 +370,4 @@ def generate_final_cases_CUDA_naive_versions():
 # generate_final_cases_CPU()
 # generate_final_cases_CUDA_naive_versions()
 
-# generate_hp_cases_for_local_cuda()
+generate_hp_cases_for_local_cuda()

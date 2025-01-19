@@ -35,13 +35,13 @@ class Algs:
     ]
 
     GPU_local_TEST_GRIDS = [
-        [(ra.Key.grid_dimensions, '32768x32768'), (ra.Key.data_loader_name, 'lexicon')],
+        [(ra.Key.grid_dimensions, '32768x32768'), (ra.Key.data_loader_name, 'lexicon'), (ra.Key.pattern_expression, 'spacefiller[16384,16384]')],
         [(ra.Key.grid_dimensions, '32768x32768'), (ra.Key.data_loader_name, 'zeros')],
         [(ra.Key.grid_dimensions, '32768x32768'), (ra.Key.data_loader_name, 'always-changing')],
 
-        [(ra.Key.grid_dimensions, '65536x65536'), (ra.Key.data_loader_name, 'lexicon')],
+        [(ra.Key.grid_dimensions, '65536x65536'), (ra.Key.data_loader_name, 'lexicon'), (ra.Key.pattern_expression, 'spacefiller[32768,32768]')],
         [(ra.Key.grid_dimensions, '65536x65536'), (ra.Key.data_loader_name, 'zeros')],
-        [(ra.Key.grid_dimensions, '65536x65536'), (ra.Key.data_loader_name, 'always-0changing')],
+        [(ra.Key.grid_dimensions, '65536x65536'), (ra.Key.data_loader_name, 'always-changing')],
     ]
 
     GPU_local_hyper_params = [
@@ -64,7 +64,7 @@ class BestHP:
         self.algs = algs
         self.tested_grids = tested_grids
 
-        self.print_limit_per_test_case = 400
+        self.print_limit_per_test_case = 4
 
     def print_best(self, hyper_params_keys: list[str]):
         for alg in self.algs:

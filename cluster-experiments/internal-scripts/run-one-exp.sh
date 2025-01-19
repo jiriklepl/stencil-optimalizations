@@ -18,7 +18,7 @@ WARP_TILE_DIMS_X=${WARP_TILE_DIMS_X:-32}
 WARP_TILE_DIMS_Y=${WARP_TILE_DIMS_Y:-8}
 STREAMING_DIRECTION=${STREAMING_DIRECTION:-in-x}
 STATE_BITS_COUNT=${STATE_BITS_COUNT:-32}
-
+TAG=${TAG:-""}
 
 $EXECUTABLE \
     --algorithm="$ALGORITHM" \
@@ -45,4 +45,5 @@ $EXECUTABLE \
     --warp-tile-dims-y="$WARP_TILE_DIMS_Y" \
     --streaming-direction="$STREAMING_DIRECTION" \
     --state-bits-count="$STATE_BITS_COUNT" \
-    --base-grid-encoding="$BASE_GRID_ENCODING"
+    --base-grid-encoding="$BASE_GRID_ENCODING" \
+    --tag="$TAG"

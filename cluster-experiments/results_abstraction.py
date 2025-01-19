@@ -31,7 +31,8 @@ class Key:
     warp_tile_dims_x='warp_tile_dims_x'
     warp_tile_dims_y='warp_tile_dims_y'
     streaming_direction='streaming_direction'
-
+    tag='tag'
+    
 class MeasurementKey:
     set_and_format_input_data='set_and_format_input_data'
     initialize_data_structures='initialize_data_structures'
