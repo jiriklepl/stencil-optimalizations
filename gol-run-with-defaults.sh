@@ -40,31 +40,34 @@ __31="2147483648"
 
 # ALGORITHM="gol-cpu-naive"
 # ALGORITHM="gol-cpu-bitwise-cols-naive-64"
-# ALGORITHM="gol-cpu-bitwise-cols-macro-64"
+# ALGORITHM="gol-cpu-bitwise-cols-naive-32"
+ALGORITHM="gol-cpu-bitwise-cols-macro-64"
 # ALGORITHM="gol-cuda-naive-bitwise-no-macro-64"
 # ALGORITHM="an5d-cpu-64"
 # ALGORITHM="cuda-memcpy"
-ALGORITHM="gol-cuda-naive"
+# ALGORITHM="gol-cuda-naive"
 # ALGORITHM="gol-cuda-naive-bitwise-cols-64"
 # ALGORITHM="gol-cuda-naive-local-64"
 # ALGORITHM="gol-cuda-naive-just-tiling-64"
-GRID_DIMENSIONS_X=$__6
-GRID_DIMENSIONS_Y=$__6
-ITERATIONS="1000"
+GRID_DIMENSIONS_X=$__10
+GRID_DIMENSIONS_Y=$__10
+# GRID_DIMENSIONS_X=$((8 * 4))
+# GRID_DIMENSIONS_Y=$((8 * 3))
+ITERATIONS="10"
 
 BASE_GRID_ENCODING="char"
 
 WARMUP_ROUNDS="0"
 MEASUREMENT_ROUNDS="1"
 
-# DATA_LOADER_NAME="random-ones-zeros"
+DATA_LOADER_NAME="random-ones-zeros"
 # DATA_LOADER_NAME="always-changing"
 # DATA_LOADER_NAME="zeros"
-DATA_LOADER_NAME="lexicon"
+# DATA_LOADER_NAME="lexicon"
 # PATTERN_EXPRESSION="blinker[10,10]"
-# PATTERN_EXPRESSION="glider[10,10]"
+PATTERN_EXPRESSION="glider[10,10]"
 # PATTERN_EXPRESSION="spacefiller[$((GRID_DIMENSIONS_X/2)),$((GRID_DIMENSIONS_Y/2))]"
-PATTERN_EXPRESSION="gosper-glider-gun[0,0]"
+# PATTERN_EXPRESSION="gosper-glider-gun[0,0]"
 
 # MEASURE_SPEEDUP="true"
 MEASURE_SPEEDUP="false"
@@ -75,11 +78,12 @@ MEASURE_SPEEDUP="false"
 SPEEDUP_BENCH_ALGORITHM_NAME="gol-cuda-naive"
 # SPEEDUP_BENCH_ALGORITHM_NAME="gol-cuda-naive-just-tiling-64"
 
-# VALIDATE="true"
-VALIDATE="false"
+VALIDATE="true"
+# VALIDATE="false"
+# PRINT_VALIDATION_DIFF="true"
 PRINT_VALIDATION_DIFF="false"
-# VALIDATION_ALGORITHM_NAME="gol-cpu-naive"
-VALIDATION_ALGORITHM_NAME="gol-cuda-naive"
+VALIDATION_ALGORITHM_NAME="gol-cpu-naive"
+# VALIDATION_ALGORITHM_NAME="gol-cuda-naive"
 
 ANIMATE_OUTPUT="false"
 # ANIMATE_OUTPUT="true"
@@ -104,7 +108,7 @@ WARP_TILE_DIMS_Y="512"
 
 STREAMING_DIRECTION="in-x"
 # STREAMING_DIRECTION="in-y"
-MAX_RUNTIME_SECONDS="10000"
+MAX_RUNTIME_SECONDS="10"
 
 TAG="test-run"
 
