@@ -17,12 +17,12 @@ struct ChangeStateStore {
 };
 
 
-template <typename col_type, typename change_state_store_type>
+template <typename word_type, typename change_state_store_type>
 struct BitGridWithChangeInfo {
-    constexpr static std::size_t BITS = sizeof(col_type) * 8;
+    constexpr static std::size_t BITS = sizeof(word_type) * 8;
 
-    col_type* input;
-    col_type* output;
+    word_type* input;
+    word_type* output;
 
     std::size_t x_size;
     std::size_t y_size;
@@ -33,12 +33,12 @@ struct BitGridWithChangeInfo {
     ChangeStateStore<change_state_store_type> change_state_store;
 };
 
-template <typename col_type>
+template <typename word_type>
 struct BitGridWithTiling {
-    constexpr static std::size_t BITS = sizeof(col_type) * 8;
+    constexpr static std::size_t BITS = sizeof(word_type) * 8;
 
-    col_type* input;
-    col_type* output;
+    word_type* input;
+    word_type* output;
 
     std::size_t x_size;
     std::size_t y_size;
@@ -47,7 +47,7 @@ struct BitGridWithTiling {
     Dims warp_tile_dims;
 };
 
-template <typename col_type, typename idx_t>
+template <typename word_type, typename idx_t>
 struct WarpInformation {
     idx_t warp_idx;
     idx_t lane_idx;

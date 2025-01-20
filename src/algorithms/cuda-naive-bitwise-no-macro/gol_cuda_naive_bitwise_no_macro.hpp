@@ -18,15 +18,15 @@ class GoLCudaNaiveBitwiseNoMacro : public infrastructure::Algorithm<2, grid_cell
     GoLCudaNaiveBitwiseNoMacro() = default;
 
     using size_type = std::size_t;
-    using col_type = typename BitsConst<Bits>::col_type;
+    using word_type = typename BitsConst<Bits>::word_type;
     using DataGrid = infrastructure::Grid<2, grid_cell_t>;
-    using BitGrid = BitColsGrid<col_type>;
+    using BitGrid = GeneralBitGrid<word_type>;
     using BitGrid_ptr = std::unique_ptr<BitGrid>;
     
     using idx_t = std::int64_t;
 
-    template <typename col_type>
-    using BitGridCudaData = BitGridOnCudaWitOriginalSizes<col_type, idx_t>;
+    template <typename word_type>
+    using BitGridCudaData = BitGridOnCudaWitOriginalSizes<word_type, idx_t>;
 
     void set_and_format_input_data(const DataGrid& data) override {
         bit_grid = std::make_unique<BitGrid>(data);
@@ -41,10 +41,10 @@ class GoLCudaNaiveBitwiseNoMacro : public infrastructure::Algorithm<2, grid_cell
 
         auto size = bit_grid->size();
 
-        CUCH(cudaMalloc(&cuda_data.input, size * sizeof(col_type)));
-        CUCH(cudaMalloc(&cuda_data.output, size * sizeof(col_type)));
+        CUCH(cudaMalloc(&cuda_data.input, size * sizeof(word_type)));
+        CUCH(cudaMalloc(&cuda_data.output, size * sizeof(word_type)));
 
-        CUCH(cudaMemcpy(cuda_data.input, bit_grid->data(), size * sizeof(col_type), cudaMemcpyHostToDevice));
+        CUCH(cudaMemcpy(cuda_data.input, bit_grid->data(), size * sizeof(word_type), cudaMemcpyHostToDevice));
     }
 
     void run(size_type iterations) override {
@@ -56,7 +56,7 @@ class GoLCudaNaiveBitwiseNoMacro : public infrastructure::Algorithm<2, grid_cell
 
         auto data = bit_grid->data();
 
-        CUCH(cudaMemcpy(data, cuda_data.output, bit_grid->size() * sizeof(col_type), cudaMemcpyDeviceToHost));
+        CUCH(cudaMemcpy(data, cuda_data.output, bit_grid->size() * sizeof(word_type), cudaMemcpyDeviceToHost));
 
         CUCH(cudaFree(cuda_data.input));
         CUCH(cudaFree(cuda_data.output));
@@ -73,7 +73,7 @@ class GoLCudaNaiveBitwiseNoMacro : public infrastructure::Algorithm<2, grid_cell
 
   private:
     BitGrid_ptr bit_grid;
-    BitGridCudaData<col_type> cuda_data;
+    BitGridCudaData<word_type> cuda_data;
 
     void run_kernel(size_type iterations);
 

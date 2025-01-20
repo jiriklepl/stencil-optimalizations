@@ -10,19 +10,19 @@ namespace algorithms {
 #define POPCOUNT_32(x) __builtin_popcount(x)
 #define POPCOUNT_64(x) __builtin_popcountll(x)
 
-template <typename col_type>
+template <typename word_type>
 class MacroBitOperations {};
 
 template <>
 class MacroBitOperations<std::uint16_t> {
   public:
-    using col_type = std::uint16_t;
+    using word_type = std::uint16_t;
 
     // clang-format off
-    static  col_type compute_center_col(
-        col_type lt, col_type ct, col_type rt, 
-        col_type lc, col_type cc, col_type rc,
-        col_type lb, col_type cb, col_type rb) {
+    static  word_type compute_center_word(
+        word_type lt, word_type ct, word_type rt, 
+        word_type lc, word_type cc, word_type rc,
+        word_type lb, word_type cb, word_type rb) {
     
         return __16_BITS__GOL_BITWISE_COL_COMPUTE(lt, ct, rt, lc, cc, rc, lb, cb, rb);
     }
@@ -33,14 +33,14 @@ class MacroBitOperations<std::uint16_t> {
 template <>
 class MacroBitOperations<std::uint32_t> {
   public:
-    using col_type = std::uint32_t;
+    using word_type = std::uint32_t;
 
     // clang-format off
 
-    static  col_type compute_center_col(
-        col_type lt, col_type ct, col_type rt, 
-        col_type lc, col_type cc, col_type rc,
-        col_type lb, col_type cb, col_type rb) {
+    static  word_type compute_center_word(
+        word_type lt, word_type ct, word_type rt, 
+        word_type lc, word_type cc, word_type rc,
+        word_type lb, word_type cb, word_type rb) {
         
         return __32_BITS__GOL_BITWISE_COL_COMPUTE(lt, ct, rt, lc, cc, rc, lb, cb, rb);
     }
@@ -51,13 +51,13 @@ class MacroBitOperations<std::uint32_t> {
 template <>
 class MacroBitOperations<std::uint64_t> {
   public:
-    using col_type = std::uint64_t;
+    using word_type = std::uint64_t;
 
     // clang-format off
-    static  col_type compute_center_col(
-        col_type lt, col_type ct, col_type rt, 
-        col_type lc, col_type cc, col_type rc,
-        col_type lb, col_type cb, col_type rb) {
+    static  word_type compute_center_word(
+        word_type lt, word_type ct, word_type rt, 
+        word_type lc, word_type cc, word_type rc,
+        word_type lb, word_type cb, word_type rb) {
 
         return __64_BITS__GOL_BITWISE_COL_COMPUTE(lt, ct, rt, lc, cc, rc, lb, cb, rb);
     }

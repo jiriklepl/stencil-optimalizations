@@ -49,7 +49,7 @@ __global__ void game_of_live_kernel(BitGridOnCuda<col_type> data) {
     col_type rb = load(x + 1, y + 1, data);
 
     data.output[get_idx(x, y, data.x_size)] =
-        CudaBitwiseOps<col_type>::compute_center_col(lt, ct, rt, lc, cc, rc, lb, cb, rb);
+        CudaBitwiseOps<col_type>::compute_center_word(lt, ct, rt, lc, cc, rc, lb, cb, rb);
 }
 
 } // namespace

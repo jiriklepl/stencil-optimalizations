@@ -23,9 +23,9 @@ class GoLCudaNaiveJustTiling : public infrastructure::Algorithm<2, grid_cell_t> 
     GoLCudaNaiveJustTiling() = default;
 
     using size_type = std::size_t;
-    using col_type = typename BitsConst<Bits>::col_type;
+    using word_type = typename BitsConst<Bits>::word_type;
     using DataGrid = infrastructure::Grid<2, grid_cell_t>;
-    using BitGrid = BitColsGrid<col_type>;
+    using BitGrid = GeneralBitGrid<word_type>;
     using BitGrid_ptr = std::unique_ptr<BitGrid>;
 
     void set_and_format_input_data(const DataGrid& data) override {
@@ -52,10 +52,10 @@ class GoLCudaNaiveJustTiling : public infrastructure::Algorithm<2, grid_cell_t> 
 
         auto size = bit_grid->size();
         
-        CUCH(cudaMalloc(&cuda_data.input, size * sizeof(col_type)));
-        CUCH(cudaMalloc(&cuda_data.output, size * sizeof(col_type)));
+        CUCH(cudaMalloc(&cuda_data.input, size * sizeof(word_type)));
+        CUCH(cudaMalloc(&cuda_data.output, size * sizeof(word_type)));
 
-        CUCH(cudaMemcpy(cuda_data.input, bit_grid->data(), size * sizeof(col_type), cudaMemcpyHostToDevice));
+        CUCH(cudaMemcpy(cuda_data.input, bit_grid->data(), size * sizeof(word_type), cudaMemcpyHostToDevice));
 
     }
 
@@ -80,7 +80,7 @@ class GoLCudaNaiveJustTiling : public infrastructure::Algorithm<2, grid_cell_t> 
 
         auto data = bit_grid->data();
 
-        CUCH(cudaMemcpy(data, cuda_data.output, bit_grid->size() * sizeof(col_type), cudaMemcpyDeviceToHost));
+        CUCH(cudaMemcpy(data, cuda_data.output, bit_grid->size() * sizeof(word_type), cudaMemcpyDeviceToHost));
 
         CUCH(cudaFree(cuda_data.input));
         CUCH(cudaFree(cuda_data.output));
@@ -96,7 +96,7 @@ class GoLCudaNaiveJustTiling : public infrastructure::Algorithm<2, grid_cell_t> 
 
   private:
     BitGrid_ptr bit_grid;
-    BitGridWithTiling<col_type> cuda_data;
+    BitGridWithTiling<word_type> cuda_data;
 
     std::size_t thread_block_size;
     std::size_t _performed_iterations;

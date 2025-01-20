@@ -14,22 +14,22 @@ struct BitsConst {};
 
 // template <>
 // struct BitsConst<8> {
-//     using col_type = std::uint8_t;
+//     using word_type = std::uint8_t;
 // };
 
 template <>
 struct BitsConst<16> {
-    using col_type = std::uint16_t;
+    using word_type = std::uint16_t;
 };
 
 template <>
 struct BitsConst<32> {
-    using col_type = std::uint32_t;
+    using word_type = std::uint32_t;
 };
 
 template <>
 struct BitsConst<64> {
-    using col_type = std::uint64_t;
+    using word_type = std::uint64_t;
 };
 
 } // namespace algorithms

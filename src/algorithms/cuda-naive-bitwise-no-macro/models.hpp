@@ -4,10 +4,10 @@
 #include <cstddef>
 namespace algorithms {
 
-template <typename col_type, typename idx_t>
+template <typename word_type, typename idx_t>
 struct BitGridOnCudaWitOriginalSizes {
-    col_type* input;
-    col_type* output;
+    word_type* input;
+    word_type* output;
     
     idx_t x_size;
     idx_t y_size;

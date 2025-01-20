@@ -21,8 +21,8 @@ using StreamingDir = infrastructure::StreamingDirection;
 
 constexpr std::size_t WARP_SIZE = 32;
 
-template <typename col_type>
-using WarpInfo = algorithms::cuda_naive_local::WarpInformation<col_type, idx_t>; 
+template <typename word_type>
+using WarpInfo = algorithms::cuda_naive_local::WarpInformation<word_type, idx_t>; 
 
 namespace {
 
@@ -30,9 +30,9 @@ __device__ __forceinline__ idx_t get_idx(idx_t x, idx_t y, idx_t x_size) {
     return y * x_size + x;
 }
 
-template <typename col_type, typename CudaData>
-__device__ __forceinline__ WarpInfo<col_type> get_warp_info(const CudaData& data) {
-    WarpInfo<col_type> info;
+template <typename word_type, typename CudaData>
+__device__ __forceinline__ WarpInfo<word_type> get_warp_info(const CudaData& data) {
+    WarpInfo<word_type> info;
 
     auto idx = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -57,16 +57,16 @@ __device__ __forceinline__ WarpInfo<col_type> get_warp_info(const CudaData& data
     return info;
 }
 
-template <typename col_type, typename CudaData>
-__device__ __forceinline__ col_type load(idx_t x, idx_t y, CudaData&& data) {
+template <typename word_type, typename CudaData>
+__device__ __forceinline__ word_type load(idx_t x, idx_t y, CudaData&& data) {
     if (x < 0 || y < 0 || x >= data.x_size || y >= data.y_size)
         return 0;
 
     return data.input[get_idx(x, y, data.x_size)];
 }
 
-template <typename col_type>
-__device__ __forceinline__ idx_t store_idx(idx_t x_tile, idx_t y_tile, const WarpInfo<col_type>& info) {
+template <typename word_type>
+__device__ __forceinline__ idx_t store_idx(idx_t x_tile, idx_t y_tile, const WarpInfo<word_type>& info) {
     auto tile_idx = y_tile * info.x_tiles + x_tile;
     auto warp_tiles_in_block = blockDim.x / WARP_SIZE;
 
@@ -74,18 +74,18 @@ __device__ __forceinline__ idx_t store_idx(idx_t x_tile, idx_t y_tile, const War
     return store_idx;
 }
 
-template <typename col_type>
-__device__ __forceinline__ int store_bit_idx(idx_t x_tile, idx_t y_tile, const WarpInfo<col_type>& info) {
+template <typename word_type>
+__device__ __forceinline__ int store_bit_idx(idx_t x_tile, idx_t y_tile, const WarpInfo<word_type>& info) {
     auto tile_idx = y_tile * info.x_tiles + x_tile;
     auto warp_tiles_in_block = blockDim.x / WARP_SIZE;
 
     return tile_idx % warp_tiles_in_block;
 }
 
-template <typename col_type, typename state_store_type>
+template <typename word_type, typename state_store_type>
 __device__ __forceinline__ bool warp_tile_changed(
     idx_t x_tile, idx_t y_tile, 
-    const WarpInfo<col_type>& info, state_store_type* store) {
+    const WarpInfo<word_type>& info, state_store_type* store) {
 
     auto word = store[store_idx(x_tile, y_tile, info)];
     auto mask = 1 << store_bit_idx(x_tile, y_tile, info);
@@ -93,10 +93,10 @@ __device__ __forceinline__ bool warp_tile_changed(
     return word & mask;
 }
 
-template <typename col_type, typename state_store_type>
+template <typename word_type, typename state_store_type>
 __device__ __forceinline__ bool tile_or_neighbours_changed(
     idx_t x_tile, idx_t y_tile,
-    const WarpInfo<col_type>& info, state_store_type* store) {
+    const WarpInfo<word_type>& info, state_store_type* store) {
 
     idx_t x_start = max(static_cast<idx_t>(0), x_tile - 1);
     idx_t y_start = max(static_cast<idx_t>(0), y_tile - 1);
@@ -130,9 +130,9 @@ __device__ __forceinline__ void set_changed_state_for_block(
     global_store[blockIdx.x] = result;
 }
 
-template <typename col_type, typename state_store_type>
+template <typename word_type, typename state_store_type>
 __device__ __forceinline__ void cpy_to_output(
-    const WarpInfo<col_type>& info, const BitGridWithChangeInfo<col_type, state_store_type>& data) {
+    const WarpInfo<word_type>& info, const BitGridWithChangeInfo<word_type, state_store_type>& data) {
     
     for (idx_t y = info.y_start; y < info.y_start + info.y_rows_in_warp; ++y) {
         for (idx_t x = info.x_start; x < info.x_start + info.x_cols_in_warp; ++x) {
@@ -141,26 +141,26 @@ __device__ __forceinline__ void cpy_to_output(
     }
 }
 
-template <typename col_type, typename CudaData>
+template <typename word_type, typename CudaData>
 __device__ __forceinline__ bool compute_GOL_on_tile__naive_no_streaming(
-    const WarpInfo<col_type>& info, CudaData&& data) {
+    const WarpInfo<word_type>& info, CudaData&& data) {
     
     bool tile_changed = false;
 
     for (idx_t y = info.y_start; y < info.y_start + info.y_rows_in_warp; ++y) {
         for (idx_t x = info.x_start; x < info.x_start + info.x_cols_in_warp; ++x) {
     
-            col_type lt = load<col_type>(x - 1, y - 1, data);
-            col_type ct = load<col_type>(x + 0, y - 1, data);
-            col_type rt = load<col_type>(x + 1, y - 1, data);
-            col_type lc = load<col_type>(x - 1, y + 0, data);
-            col_type cc = load<col_type>(x + 0, y + 0, data);
-            col_type rc = load<col_type>(x + 1, y + 0, data);
-            col_type lb = load<col_type>(x - 1, y + 1, data);
-            col_type cb = load<col_type>(x + 0, y + 1, data);
-            col_type rb = load<col_type>(x + 1, y + 1, data);
+            word_type lt = load<word_type>(x - 1, y - 1, data);
+            word_type ct = load<word_type>(x + 0, y - 1, data);
+            word_type rt = load<word_type>(x + 1, y - 1, data);
+            word_type lc = load<word_type>(x - 1, y + 0, data);
+            word_type cc = load<word_type>(x + 0, y + 0, data);
+            word_type rc = load<word_type>(x + 1, y + 0, data);
+            word_type lb = load<word_type>(x - 1, y + 1, data);
+            word_type cb = load<word_type>(x + 0, y + 1, data);
+            word_type rb = load<word_type>(x + 1, y + 1, data);
     
-            auto new_cc = CudaBitwiseOps<col_type>::compute_center_col(lt, ct, rt, lc, cc, rc, lb, cb, rb); 
+            auto new_cc = CudaBitwiseOps<word_type>::compute_center_word(lt, ct, rt, lc, cc, rc, lb, cb, rb); 
             
             if (new_cc != cc) {
                 tile_changed = true;
@@ -173,26 +173,26 @@ __device__ __forceinline__ bool compute_GOL_on_tile__naive_no_streaming(
     return tile_changed;
 }
 
-template <typename col_type, typename CudaData>
+template <typename word_type, typename CudaData>
 __device__ __forceinline__ bool compute_GOL_on_tile__streaming_in_x(
-    const WarpInfo<col_type>& info, CudaData&& data) {
+    const WarpInfo<word_type>& info, CudaData&& data) {
     
     bool tile_changed = false;
 
     for (idx_t x = info.x_start; x < info.x_start + info.x_cols_in_warp; ++x) {
         idx_t y = info.y_start;
         
-        col_type lt, ct, rt;
-        col_type lc, cc, rc;
-        col_type lb, cb, rb;
+        word_type lt, ct, rt;
+        word_type lc, cc, rc;
+        word_type lb, cb, rb;
         
-        lc = load<col_type>(x - 1, y - 1, data);
-        cc = load<col_type>(x + 0, y - 1, data);
-        rc = load<col_type>(x + 1, y - 1, data);
+        lc = load<word_type>(x - 1, y - 1, data);
+        cc = load<word_type>(x + 0, y - 1, data);
+        rc = load<word_type>(x + 1, y - 1, data);
 
-        lb = load<col_type>(x - 1, y + 0, data);
-        cb = load<col_type>(x + 0, y + 0, data);
-        rb = load<col_type>(x + 1, y + 0, data);
+        lb = load<word_type>(x - 1, y + 0, data);
+        cb = load<word_type>(x + 0, y + 0, data);
+        rb = load<word_type>(x + 1, y + 0, data);
 
         for (; y < info.y_start + info.y_rows_in_warp; ++y) {
 
@@ -204,11 +204,11 @@ __device__ __forceinline__ bool compute_GOL_on_tile__streaming_in_x(
             cc = cb; 
             rc = rb; 
             
-            lb = load<col_type>(x - 1, y + 1, data);
-            cb = load<col_type>(x + 0, y + 1, data);
-            rb = load<col_type>(x + 1, y + 1, data);
+            lb = load<word_type>(x - 1, y + 1, data);
+            cb = load<word_type>(x + 0, y + 1, data);
+            rb = load<word_type>(x + 1, y + 1, data);
     
-            auto new_cc = CudaBitwiseOps<col_type>::compute_center_col(lt, ct, rt, lc, cc, rc, lb, cb, rb); 
+            auto new_cc = CudaBitwiseOps<word_type>::compute_center_word(lt, ct, rt, lc, cc, rc, lb, cb, rb); 
             
             if (new_cc != cc) {
                 tile_changed = true;
@@ -221,26 +221,26 @@ __device__ __forceinline__ bool compute_GOL_on_tile__streaming_in_x(
     return tile_changed;
 }
 
-template <typename col_type, typename CudaData>
+template <typename word_type, typename CudaData>
 __device__ __forceinline__ bool compute_GOL_on_tile__streaming_in_y(
-    const WarpInfo<col_type>& info, CudaData&& data) {
+    const WarpInfo<word_type>& info, CudaData&& data) {
     
     bool tile_changed = false;
 
     for (idx_t y = info.y_start; y < info.y_start + info.y_rows_in_warp; ++y) {
         idx_t x = info.x_start;
 
-        col_type lt, ct, rt;
-        col_type lc, cc, rc;
-        col_type lb, cb, rb;
+        word_type lt, ct, rt;
+        word_type lc, cc, rc;
+        word_type lb, cb, rb;
 
-        ct = load<col_type>(x - 1, y - 1, data);
-        cc = load<col_type>(x - 1, y + 0, data);
-        cb = load<col_type>(x - 1, y + 1, data);
+        ct = load<word_type>(x - 1, y - 1, data);
+        cc = load<word_type>(x - 1, y + 0, data);
+        cb = load<word_type>(x - 1, y + 1, data);
 
-        rt = load<col_type>(x + 0, y - 1, data);
-        rc = load<col_type>(x + 0, y + 0, data);
-        rb = load<col_type>(x + 0, y + 1, data);
+        rt = load<word_type>(x + 0, y - 1, data);
+        rc = load<word_type>(x + 0, y + 0, data);
+        rb = load<word_type>(x + 0, y + 1, data);
 
         for (; x < info.x_start + info.x_cols_in_warp; ++x) {
 
@@ -252,11 +252,11 @@ __device__ __forceinline__ bool compute_GOL_on_tile__streaming_in_y(
             cc = rc;
             cb = rb;
 
-            rt = load<col_type>(x + 1, y - 1, data);
-            rc = load<col_type>(x + 1, y + 0, data);
-            rb = load<col_type>(x + 1, y + 1, data);
+            rt = load<word_type>(x + 1, y - 1, data);
+            rc = load<word_type>(x + 1, y + 0, data);
+            rb = load<word_type>(x + 1, y + 1, data);
             
-            auto new_cc = CudaBitwiseOps<col_type>::compute_center_col(lt, ct, rt, lc, cc, rc, lb, cb, rb); 
+            auto new_cc = CudaBitwiseOps<word_type>::compute_center_word(lt, ct, rt, lc, cc, rc, lb, cb, rb); 
             
             if (new_cc != cc) {
                 tile_changed = true;
@@ -269,31 +269,31 @@ __device__ __forceinline__ bool compute_GOL_on_tile__streaming_in_y(
     return tile_changed;
 }
 
-template <typename col_type, StreamingDir DIRECTION, typename CudaData>
+template <typename word_type, StreamingDir DIRECTION, typename CudaData>
 __device__ __forceinline__ bool compute_GOL_on_tile(
-    const WarpInfo<col_type>& info, CudaData&& data) {
+    const WarpInfo<word_type>& info, CudaData&& data) {
 
     if constexpr (DIRECTION == StreamingDir::in_X) {
-        return compute_GOL_on_tile__streaming_in_x<col_type>(info, data);
+        return compute_GOL_on_tile__streaming_in_x<word_type>(info, data);
     }
     else if constexpr (DIRECTION == StreamingDir::in_Y) {
-        return compute_GOL_on_tile__streaming_in_y<col_type>(info, data);
+        return compute_GOL_on_tile__streaming_in_y<word_type>(info, data);
     }
     else if constexpr (DIRECTION == StreamingDir::NAIVE) {
-        return compute_GOL_on_tile__naive_no_streaming<col_type>(info, data);
+        return compute_GOL_on_tile__naive_no_streaming<word_type>(info, data);
     }
     else {
         printf("Invalid streaming direction %d\n", DIRECTION);
     }
 }
 
-template <StreamingDir DIRECTION, typename col_type, typename state_store_type>
-__global__ void game_of_live_kernel(BitGridWithChangeInfo<col_type, state_store_type> data) {
+template <StreamingDir DIRECTION, typename word_type, typename state_store_type>
+__global__ void game_of_live_kernel(BitGridWithChangeInfo<word_type, state_store_type> data) {
 
     extern __shared__ shm_private_value_t block_store[];
     bool entire_tile_changed;
 
-    auto info = get_warp_info<col_type>(data);
+    auto info = get_warp_info<word_type>(data);
 
     if (!tile_or_neighbours_changed(info.x_tile, info.y_tile, info, data.change_state_store.last)) {
         
@@ -304,7 +304,7 @@ __global__ void game_of_live_kernel(BitGridWithChangeInfo<col_type, state_store_
         entire_tile_changed = false;
     }
     else {
-        auto local_tile_changed = compute_GOL_on_tile<col_type, DIRECTION>(info, data);
+        auto local_tile_changed = compute_GOL_on_tile<word_type, DIRECTION>(info, data);
         entire_tile_changed = __any_sync(0xFF'FF'FF'FF, local_tile_changed);
     }
 
@@ -359,10 +359,10 @@ void GoLCudaNaiveLocalWithState<grid_cell_t, Bits, state_store_type>::run_kernel
 // JUST TILING KERNEL
 // -----------------------------------------------------------------------------------------------
 
-template <StreamingDir DIRECTION, typename col_type>
-__global__ void game_of_live_kernel_just_tiling(BitGridWithTiling<col_type> data) {
-    auto info = get_warp_info<col_type>(data);
-    compute_GOL_on_tile<col_type, DIRECTION>(info, data);
+template <StreamingDir DIRECTION, typename word_type>
+__global__ void game_of_live_kernel_just_tiling(BitGridWithTiling<word_type> data) {
+    auto info = get_warp_info<word_type>(data);
+    compute_GOL_on_tile<word_type, DIRECTION>(info, data);
 }
 
 

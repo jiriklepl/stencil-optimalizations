@@ -23,8 +23,8 @@ class An5dAlg : public infrastructure::Algorithm<2, grid_cell_t> {
   public:
     An5dAlg() {};
 
-    using col_type = typename BitsConst<Bits>::col_type;
-    using BitGrid = algorithms::BitColsGrid<col_type>;
+    using word_type = typename BitsConst<Bits>::word_type;
+    using BitGrid = algorithms::GeneralBitGrid<word_type>;
     
     using DataGrid = infrastructure::Grid<2, grid_cell_t>;
     using size_type = BitGrid::size_type;

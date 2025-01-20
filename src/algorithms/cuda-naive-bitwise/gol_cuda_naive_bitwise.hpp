@@ -18,9 +18,9 @@ class GoLCudaNaiveBitwise : public infrastructure::Algorithm<2, grid_cell_t> {
     GoLCudaNaiveBitwise() = default;
 
     using size_type = std::size_t;
-    using col_type = typename BitsConst<Bits>::col_type;
+    using col_type = typename BitsConst<Bits>::word_type;
     using DataGrid = infrastructure::Grid<2, grid_cell_t>;
-    using BitGrid = BitColsGrid<col_type>;
+    using BitGrid = GeneralBitGrid<col_type>;
     using BitGrid_ptr = std::unique_ptr<BitGrid>;
 
     void set_and_format_input_data(const DataGrid& data) override {

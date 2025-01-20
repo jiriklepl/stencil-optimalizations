@@ -14,8 +14,8 @@ namespace algorithms {
 
 using idx_t = std::int64_t;
 
-template <typename col_type>
-using BitGridData = BitGridOnCudaWitOriginalSizes<col_type, idx_t>;
+template <typename word_type>
+using BitGridData = BitGridOnCudaWitOriginalSizes<word_type, idx_t>;
 
 using CELL_STATE = bool;
 constexpr CELL_STATE DEAD = false;
@@ -27,17 +27,17 @@ __device__ __forceinline__ idx_t get_idx(idx_t x, idx_t y, idx_t x_size) {
     return y * x_size + x;
 }
 
-template <typename col_type>
-__device__ __forceinline__ col_type load_bit_col(idx_t x, idx_t y, col_type* source, BitGridData<col_type> data) {
+template <typename word_type>
+__device__ __forceinline__ word_type load_bit_col(idx_t x, idx_t y, word_type* source, BitGridData<word_type> data) {
     if (x < 0 || y < 0 || x >= data.x_size || y >= data.y_size)
         return 0;
 
     return source[get_idx(x, y, data.x_size)];
 }
 
-template <typename col_type>
-__device__ __forceinline__ CELL_STATE get_cell_state(idx_t x, idx_t y, BitGridData<col_type> data) {
-    constexpr int BITS = sizeof(col_type) * 8;
+template <typename word_type>
+__device__ __forceinline__ CELL_STATE get_cell_state(idx_t x, idx_t y, BitGridData<word_type> data) {
+    constexpr int BITS = sizeof(word_type) * 8;
 
     if (x < 0 || x >= data.x_size_original || y < 0 || y >= data.y_size_original)
         return DEAD;
@@ -48,9 +48,9 @@ __device__ __forceinline__ CELL_STATE get_cell_state(idx_t x, idx_t y, BitGridDa
     return (bit_col >> y_bit) & 1 ? ALIVE : DEAD;
 }
 
-template <typename col_type>
-__device__ __forceinline__ void set_cell_state(idx_t x, idx_t y, CELL_STATE state, BitGridData<col_type> data) {
-    constexpr int BITS = sizeof(col_type) * 8;
+template <typename word_type>
+__device__ __forceinline__ void set_cell_state(idx_t x, idx_t y, CELL_STATE state, BitGridData<word_type> data) {
+    constexpr int BITS = sizeof(word_type) * 8;
 
     if (x < 0 || x >= data.x_size_original || y < 0 || y >= data.y_size_original)
         return;
@@ -58,7 +58,7 @@ __device__ __forceinline__ void set_cell_state(idx_t x, idx_t y, CELL_STATE stat
     auto bit_col = load_bit_col(x, y / BITS, data.output, data);
     auto y_bit = y % BITS;
 
-    col_type one = 1;
+    word_type one = 1;
 
     if (state == ALIVE) {
         bit_col |= (one << y_bit);
@@ -70,9 +70,9 @@ __device__ __forceinline__ void set_cell_state(idx_t x, idx_t y, CELL_STATE stat
     data.output[get_idx(x, y / BITS, data.x_size_original)] = bit_col;
 }
 
-template <typename col_type>
-__global__ void game_of_live_kernel(BitGridData<col_type> data) {
-    constexpr int BITS = sizeof(col_type) * 8;
+template <typename word_type>
+__global__ void game_of_live_kernel(BitGridData<word_type> data) {
+    constexpr int BITS = sizeof(word_type) * 8;
 
     idx_t x = blockIdx.x * blockDim.x + threadIdx.x;
 

@@ -24,9 +24,9 @@ class GoLCudaNaiveLocalWithState : public infrastructure::Algorithm<2, grid_cell
     GoLCudaNaiveLocalWithState() = default;
 
     using size_type = std::size_t;
-    using col_type = typename BitsConst<Bits>::col_type;
+    using word_type = typename BitsConst<Bits>::word_type;
     using DataGrid = infrastructure::Grid<2, grid_cell_t>;
-    using BitGrid = BitColsGrid<col_type>;
+    using BitGrid = GeneralBitGrid<word_type>;
     using BitGrid_ptr = std::unique_ptr<BitGrid>;
 
     constexpr static std::size_t STATE_STORE_BITS = sizeof(state_store_type) * 8;
@@ -64,14 +64,14 @@ class GoLCudaNaiveLocalWithState : public infrastructure::Algorithm<2, grid_cell
 
         auto size = bit_grid->size();
         
-        CUCH(cudaMalloc(&cuda_data.input, size * sizeof(col_type)));
-        CUCH(cudaMalloc(&cuda_data.output, size * sizeof(col_type)));
+        CUCH(cudaMalloc(&cuda_data.input, size * sizeof(word_type)));
+        CUCH(cudaMalloc(&cuda_data.output, size * sizeof(word_type)));
 
         CUCH(cudaMalloc(&cuda_data.change_state_store.before_last, state_store_word_count() * sizeof(state_store_type)));
         CUCH(cudaMalloc(&cuda_data.change_state_store.last, state_store_word_count() * sizeof(state_store_type)));
         CUCH(cudaMalloc(&cuda_data.change_state_store.current, state_store_word_count() * sizeof(state_store_type)));
 
-        CUCH(cudaMemcpy(cuda_data.input, bit_grid->data(), size * sizeof(col_type), cudaMemcpyHostToDevice));
+        CUCH(cudaMemcpy(cuda_data.input, bit_grid->data(), size * sizeof(word_type), cudaMemcpyHostToDevice));
 
         reset_changed_stores();
     }
@@ -97,7 +97,7 @@ class GoLCudaNaiveLocalWithState : public infrastructure::Algorithm<2, grid_cell
 
         auto data = bit_grid->data();
 
-        CUCH(cudaMemcpy(data, cuda_data.output, bit_grid->size() * sizeof(col_type), cudaMemcpyDeviceToHost));
+        CUCH(cudaMemcpy(data, cuda_data.output, bit_grid->size() * sizeof(word_type), cudaMemcpyDeviceToHost));
 
         CUCH(cudaFree(cuda_data.input));
         CUCH(cudaFree(cuda_data.output));
@@ -122,7 +122,7 @@ class GoLCudaNaiveLocalWithState : public infrastructure::Algorithm<2, grid_cell
 
   private:
     BitGrid_ptr bit_grid;
-    BitGridWithChangeInfo<col_type, state_store_type> cuda_data;
+    BitGridWithChangeInfo<word_type, state_store_type> cuda_data;
 
     std::vector<cudaEvent_t> events;
     cudaStream_t stream;

@@ -118,11 +118,11 @@ struct BitTile<std::uint64_t> {
     }
 };
 
-template <typename bit_col_type, typename policy = BitColumns<bit_col_type>>
-// template <typename bit_col_type, typename policy = BitTile<bit_col_type>>
-class BitColsGrid {
+template <typename word_type, template <typename> typename policy_template = BitColumns>
+class GeneralBitGrid {
   public:
     using size_type = std::size_t;
+    using policy = policy_template<word_type>;
 
     template <typename grid_cell_t>
     using Grid = infrastructure::Grid<2, grid_cell_t>;
@@ -131,69 +131,69 @@ class BitColsGrid {
     constexpr static ONE_CELL_STATE DEAD = 0;
     constexpr static ONE_CELL_STATE ALIVE = 1;
 
-    BitColsGrid(size_type original_x_size, size_t original_y_size)
+    GeneralBitGrid(size_type original_x_size, size_t original_y_size)
         : _x_size(original_x_size), _y_size(original_y_size) {
         _x_size = original_x_size / policy::X_BITS;
         _y_size = original_y_size / policy::Y_BITS;
 
-        bit_cols_grid.resize(x_size() * y_size(), 0);
+        words_grid.resize(x_size() * y_size(), 0);
     }
 
     template <typename grid_cell_t>
-    BitColsGrid(const Grid<grid_cell_t>& grid) {
+    GeneralBitGrid(const Grid<grid_cell_t>& grid) {
         assert_dim_has_correct_size(grid);
 
         _x_size = grid.template size_in<0>() / policy::X_BITS;
         _y_size = grid.template size_in<1>() / policy::Y_BITS;
 
-        bit_cols_grid.resize(x_size() * y_size(), 0);
+        words_grid.resize(x_size() * y_size(), 0);
         fill_grid(grid);
     }
 
   public:
     ONE_CELL_STATE get_value_at(std::size_t x, std::size_t y) const {
-        bit_col_type col = get_bit_col_from_original_coords(x, y);
+        word_type word = get_word_from_original_coords(x, y);
         auto bit_mask = policy::get_bit_mask_for(x, y);
 
-        return (col & bit_mask) ? ALIVE : DEAD;
+        return (word & bit_mask) ? ALIVE : DEAD;
     }
 
     void set_value_at(std::size_t x, std::size_t y, ONE_CELL_STATE state) {
-        auto col = get_bit_col_from_original_coords(x, y);
+        auto word = get_word_from_original_coords(x, y);
         
         auto bit_mask = policy::get_bit_mask_for(x, y);
 
         if (state == ALIVE) {
-            col |= bit_mask;
+            word |= bit_mask;
         }
         else {
-            col &= ~bit_mask;
+            word &= ~bit_mask;
         }
         
-        set_bit_col_from_original_coords(x, y, col);
+        set_word_from_original_coords(x, y, word);
     }
 
-    bit_col_type get_bit_col_from_original_coords(std::size_t x, std::size_t y) const {
-        return get_bit_col(x / policy::X_BITS, y / policy::Y_BITS);
+    word_type get_word_from_original_coords(std::size_t x, std::size_t y) const {
+        return get_word(x / policy::X_BITS, y / policy::Y_BITS);
     }
 
-    bit_col_type get_bit_col(std::size_t x, std::size_t y) const {
-        return bit_cols_grid[idx(x, y)];
+    word_type get_word(std::size_t x, std::size_t y) const {
+        return words_grid[idx(x, y)];
     }
 
-    void set_bit_col_from_original_coords(std::size_t x, std::size_t y, bit_col_type bit_col) {
-        set_bit_col(x / policy::X_BITS, y / policy::Y_BITS, bit_col);
+    void set_word_from_original_coords(std::size_t x, std::size_t y, word_type word) {
+        set_word(x / policy::X_BITS, y / policy::Y_BITS, word);
     }
 
-    void set_bit_col(std::size_t x, std::size_t y, bit_col_type bit_col) {
-        bit_cols_grid[idx(x, y)] = bit_col;
+    void set_word(std::size_t x, std::size_t y, word_type word) {
+        words_grid[idx(x, y)] = word;
     }
 
     std::string debug_print_words() {
         std::ostringstream result;
 
-        for (auto&& col : bit_cols_grid) {
-            result << col << " ";
+        for (auto&& word : words_grid) {
+            result << word << " ";
         }
 
         return result.str();
@@ -217,8 +217,6 @@ class BitColsGrid {
         return result.str();
     }
 
-    
-
     size_type x_size() const {
         return _x_size;
     }
@@ -239,12 +237,12 @@ class BitColsGrid {
         return _y_size * policy::Y_BITS;
     }
 
-    bit_col_type* data() {
-        return bit_cols_grid.data();
+    word_type* data() {
+        return words_grid.data();
     }
 
-    std::vector<bit_col_type>* data_vector() {
-        return &bit_cols_grid;
+    std::vector<word_type>* data_vector() {
+        return &words_grid;
     }
 
     template <typename grid_cell_t>
@@ -255,23 +253,16 @@ class BitColsGrid {
         Grid<grid_cell_t> grid(_original_x_size, _original_y_size);
         auto raw_data = grid.data();
 
-        // for (std::size_t y = 0; y < _original_y_size; ++y) {
-        //     for (std::size_t x = 0; x < _original_x_size; ++x) {
-        //         auto val = get_value_at(x, y) ? 1 : 0;
-        //         raw_data[in_grid_idx(x, y)] = static_cast<grid_cell_t>(val);
-        //     }
-        // }
-
         for (size_type y = 0; y < _original_y_size; y += policy::Y_BITS) {
             for (size_type x = 0; x < _original_x_size; x += policy::X_BITS) {
 
-                auto col = get_bit_col_from_original_coords(x, y);
+                auto word = get_word_from_original_coords(x, y);
                 auto mask = policy::first_mask;
 
                 for (size_type y_bit = 0; y_bit < policy::Y_BITS; ++y_bit) {
                     for (size_type x_bit = 0; x_bit < policy::X_BITS; ++x_bit) {
 
-                        auto value = (col & mask) ? 1 : 0;
+                        auto value = (word & mask) ? 1 : 0;
 
                         raw_data[in_grid_idx(x + x_bit,y + y_bit)] = static_cast<grid_cell_t>(value);
                         
@@ -307,33 +298,26 @@ class BitColsGrid {
 
         auto raw_data = grid.data();
 
-        // for (std::size_t y = 0; y < _original_y_size; ++y) {
-        //     for (std::size_t x = 0; x < _original_x_size; ++x) {
-        //         auto val = raw_data[in_grid_idx(x, y)];
-        //         set_value_at(x, y, val);
-        //     }
-        // }
-
         for (size_type y = 0; y < _original_y_size; y += policy::Y_BITS) {
             for (size_type x = 0; x < _original_x_size; x += policy::X_BITS) {
 
-                bit_col_type col = 0;
+                word_type word = 0;
                 auto bit_setter = policy::first_mask;
                 
                 for (size_type y_bit = 0; y_bit < policy::Y_BITS; ++y_bit) {
                     for (size_type x_bit = 0; x_bit < policy::X_BITS; ++x_bit) {
 
-                        bit_col_type value = raw_data[in_grid_idx(x + x_bit,y + y_bit)] ? 1 : 0;
+                        word_type value = raw_data[in_grid_idx(x + x_bit,y + y_bit)] ? 1 : 0;
 
                         if (value) {
-                            col |= bit_setter;
+                            word |= bit_setter;
                         }
                         
                         bit_setter = policy::move_next_mask(bit_setter);
                     }
                 }
 
-                set_bit_col_from_original_coords(x, y, col);
+                set_word_from_original_coords(x, y, word);
             }
         }
     }
@@ -351,7 +335,7 @@ class BitColsGrid {
         return y * x_size() + x;
     }
 
-    std::vector<bit_col_type> bit_cols_grid;
+    std::vector<word_type> words_grid;
     size_type _x_size;
     size_type _y_size;
 };

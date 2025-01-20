@@ -10,11 +10,11 @@
 
 namespace algorithms {
 
-template <typename grid_cell_t, std::size_t Bits, template <typename col_type> class BitOps = BitwiseColsOps>
+template <typename grid_cell_t, std::size_t Bits, template <typename word_type> class BitOps = BitwiseColsOps>
 class GoLCpuBitwiseCols : public infrastructure::Algorithm<2, grid_cell_t> {
   public:
-    using col_type = typename BitsConst<Bits>::col_type;
-    using BitGrid = algorithms::BitColsGrid<col_type>;
+    using word_type = typename BitsConst<Bits>::word_type;
+    using BitGrid = algorithms::GeneralBitGrid<word_type>;
     using DataGrid = infrastructure::Grid<2, grid_cell_t>;
     using size_type = BitGrid::size_type;
 
@@ -49,22 +49,22 @@ class GoLCpuBitwiseCols : public infrastructure::Algorithm<2, grid_cell_t> {
                 for (size_type x = 0; x < x_size; ++x) {
                     // clang-format off
 
-                    col_type lt, ct, rt;
-                    col_type lc, cc, rc;
-                    col_type lb, cb, rb;
+                    word_type lt, ct, rt;
+                    word_type lc, cc, rc;
+                    word_type lb, cb, rb;
 
                     load(source, x, y,
                         lt, ct, rt,
                         lc, cc, rc,
                         lb, cb, rb);
 
-                    col_type new_center = BitOps<col_type>::compute_center_col(
+                    word_type new_center = BitOps<word_type>::compute_center_word(
                         lt, ct, rt,
                         lc, cc, rc,
                         lb, cb, rb
                     );
 
-                    target->set_bit_col(x, y, new_center);
+                    target->set_word(x, y, new_center);
 
                     // clang-format on
                 }
@@ -89,9 +89,9 @@ class GoLCpuBitwiseCols : public infrastructure::Algorithm<2, grid_cell_t> {
   private:
     // clang-format off
     void load(const BitGrid* grid, size_type x, size_type y,
-        col_type& lt, col_type& ct, col_type& rt,
-        col_type& lc, col_type& cc, col_type& rc,
-        col_type& lb, col_type& cb, col_type& rb) {
+        word_type& lt, word_type& ct, word_type& rt,
+        word_type& lc, word_type& cc, word_type& rc,
+        word_type& lb, word_type& cb, word_type& rb) {
 
         load_one(grid, lt, x - 1, y - 1);
         load_one(grid, ct, x,     y - 1);
@@ -107,15 +107,15 @@ class GoLCpuBitwiseCols : public infrastructure::Algorithm<2, grid_cell_t> {
     }
     // clang-format on
 
-    void load_one(const BitGrid* grid, col_type& col, size_type x, size_type y) {
+    void load_one(const BitGrid* grid, word_type& word, size_type x, size_type y) {
         auto x_size = grid->x_size();
         auto y_size = grid->y_size();
 
         if (x < 0 || x >= x_size || y < 0 || y >= y_size) {
-            col = 0;
+            word = 0;
         }
         else {
-            col = grid->get_bit_col(x, y);
+            word = grid->get_word(x, y);
         }
     }
 

@@ -43,8 +43,8 @@ template <typename grid_cell_t>
 class ExperimentManager {
     template <int Dims, typename ElementType>
     using grid_ptr = std::unique_ptr<Grid<Dims, ElementType>>;
-    template <typename col_type>
-    using MacroOps = algorithms::MacroBitOperations<col_type>;
+    template <typename word_type>
+    using MacroOps = algorithms::MacroBitOperations<word_type>;
 
     enum class AlgMode {
         Timed = 0,
