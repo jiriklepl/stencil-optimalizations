@@ -1,8 +1,8 @@
 #ifndef CUDA_NAIVE_LOCAL_CU
 #define CUDA_NAIVE_LOCAL_CU
 
-#include "../_shared/bitwise-cols/bitwise_ops_cuda_bit_ops.cuh"
-#include "../_shared/bitwise-cols/bitwise_ops_macros.hpp"
+#include "../_shared/bitwise/bitwise-ops/cuda-ops-interface.cuh"
+#include "../_shared/bitwise/bitwise-ops/macro-cols.hpp"
 #include "../../infrastructure/timer.hpp"
 #include "./models.hpp"
 #include "gol_cuda_naive_local.hpp"

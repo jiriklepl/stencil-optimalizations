@@ -3,8 +3,8 @@
 
 #include "../../debug_utils/pretty_print.hpp"
 #include "../../infrastructure/algorithm.hpp"
-#include "../_shared/bitwise-cols/bit_col_types.hpp"
-#include "../_shared/bitwise-cols/bit_cols_grid.hpp"
+#include "../_shared/bitwise/bit_word_types.hpp"
+#include "../_shared/bitwise/general_bit_grid.hpp"
 #include <chrono>
 #include <cstddef>
 #include <iostream>

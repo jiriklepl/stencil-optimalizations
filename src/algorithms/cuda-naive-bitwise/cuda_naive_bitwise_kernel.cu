@@ -1,8 +1,8 @@
 #ifndef CUDA_NAIVE_KERNEL_BITWISE_CU
 #define CUDA_NAIVE_KERNEL_BITWISE_CU
 
-#include "../_shared/bitwise-cols/bitwise_ops_cuda_bit_ops.cuh"
-#include "../_shared/bitwise-cols/bitwise_ops_macros.hpp"
+#include "../_shared/bitwise/bitwise-ops/cuda-ops-interface.cuh"
+#include "../_shared/bitwise/bitwise-ops/macro-cols.hpp"
 #include "./models.hpp"
 #include "gol_cuda_naive_bitwise.hpp"
 #include <cuda_runtime.h>

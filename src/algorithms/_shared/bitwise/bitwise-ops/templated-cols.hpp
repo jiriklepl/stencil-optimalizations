@@ -6,7 +6,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "../template_helpers/static_for.hpp"
+#include "../../template_helpers/static_for.hpp"
 
 namespace algorithms {
 
@@ -19,7 +19,7 @@ template <Position POSITION, typename word_type>
 class MasksByPosition {};
 
 template <typename word_type>
-struct BitwiseColsOps {
+struct BitwiseColsTemplatedOps {
     constexpr static std::size_t BITS_IN_COL = sizeof(word_type) * 8;
 
     template <Position POSITION>

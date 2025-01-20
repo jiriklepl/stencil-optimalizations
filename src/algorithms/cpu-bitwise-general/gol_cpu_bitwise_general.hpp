@@ -2,16 +2,16 @@
 #define GOL_CPU_BITWISE_COLS_HPP
 
 #include "../../infrastructure/algorithm.hpp"
-#include "../_shared/bitwise-cols/bit_col_types.hpp"
-#include "../_shared/bitwise-cols/bit_cols_grid.hpp"
-#include "../_shared/bitwise-cols/bitwise_cols_gol_operations.hpp"
+#include "../_shared/bitwise/bit_word_types.hpp"
+#include "../_shared/bitwise/general_bit_grid.hpp"
+#include "../_shared/bitwise/bitwise-ops/templated-cols.hpp"
 #include <cstddef>
 #include <memory>
 
 namespace algorithms {
 
-template <typename grid_cell_t, std::size_t Bits, template <typename word_type> class BitOps = BitwiseColsOps>
-class GoLCpuBitwiseCols : public infrastructure::Algorithm<2, grid_cell_t> {
+template <typename grid_cell_t, std::size_t Bits, template <typename word_type> class BitOps>
+class GoLCpuBitwise : public infrastructure::Algorithm<2, grid_cell_t> {
   public:
     using word_type = typename BitsConst<Bits>::word_type;
     using BitGrid = algorithms::GeneralBitGrid<word_type>;

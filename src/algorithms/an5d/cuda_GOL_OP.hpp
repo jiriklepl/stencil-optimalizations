@@ -1,7 +1,7 @@
 #ifndef CUDA_GOL_OPS_FOR_AN5D_HPP
 #define CUDA_GOL_OPS_FOR_AN5D_HPP
 
-#include "../_shared/bitwise-cols/bitwise_ops_macros.hpp"
+#include "../_shared/bitwise/bitwise-ops/macro-cols.hpp"
 #include <cstdint>
 
 #define POPCOUNT_16(x) __popc(x)
