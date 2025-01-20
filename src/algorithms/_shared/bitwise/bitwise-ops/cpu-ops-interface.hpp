@@ -4,6 +4,7 @@
 #include "./macro-cols.hpp"
 #include "./macro-tiles.hpp"
 #include <cstdint>
+#include <iostream>
 #include "../bit_modes.hpp"
 
 namespace algorithms {
