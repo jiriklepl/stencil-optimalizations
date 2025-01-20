@@ -13,6 +13,7 @@
 #include "../algorithms/cuda-naive-local/gol_cuda_naive_local.hpp"
 #include "../algorithms/cuda-naive-local/gol_cuda_naive_just_tiling.hpp"
 #include "./data_loader.hpp"
+#include "../algorithms/rel-work/eff-sim-ex-of-cell-auto-GPU/register-all-algs.hpp"
 #include "algorithm.hpp"
 #include "algorithm_repository.hpp"
 #include "data_loader.hpp"
@@ -134,6 +135,10 @@ class ExperimentManager {
 
         _2d_repo-> template register_algorithm<alg::An5dAlg<grid_cell_t, 32, alg::ExecModel::CUDA, alg::BitTileMode>>("an5d-cuda-32-tiles");
         _2d_repo-> template register_algorithm<alg::An5dAlg<grid_cell_t, 64, alg::ExecModel::CUDA, alg::BitTileMode>>("an5d-cuda-64-tiles");
+
+        // other related work algorithms
+
+        algorithms::rel_work::Efficient_simulation_execution_of_cellular_automata_on_GPU::register_all_algs(*_2d_repo);
     }
 
     void run(const ExperimentParams& params) {

@@ -38,9 +38,12 @@ __29="536870912"
 __30="1073741824"
 __31="2147483648"
 
-# ALGORITHM="gol-cpu-bitwise-tiles-macro-64"
-ALGORITHM="gol-cuda-naive-bitwise-tiles-64"
+# ALGORITHM="eff-baseline"
+# ALGORITHM="eff-baseline-shm"
+ALGORITHM="eff-sota-packed-64"
 
+# ALGORITHM="gol-cpu-bitwise-tiles-macro-64"
+# ALGORITHM="gol-cuda-naive-bitwise-tiles-64"
 # ALGORITHM="gol-cpu-naive"
 # ALGORITHM="gol-cpu-bitwise-cols-naive-64"
 # ALGORITHM="gol-cuda-naive-bitwise-tiles-32"
@@ -55,28 +58,28 @@ ALGORITHM="gol-cuda-naive-bitwise-tiles-64"
 # ALGORITHM="gol-cuda-naive-bitwise-cols-64"
 # ALGORITHM="gol-cuda-naive-local-64"
 # ALGORITHM="gol-cuda-naive-just-tiling-64"
-GRID_DIMENSIONS_X=$__10
-GRID_DIMENSIONS_Y=$__10
+GRID_DIMENSIONS_X=$__13
+GRID_DIMENSIONS_Y=$__13
 # GRID_DIMENSIONS_X=$((8 * 6))
-# GRID_DIMENSIONS_Y=$((8 * 5))
-ITERATIONS="10"
+# GRID_DIMENSIONS_Y=$((8 * 6))
+ITERATIONS="10000"
 
 BASE_GRID_ENCODING="char"
 
 WARMUP_ROUNDS="0"
 MEASUREMENT_ROUNDS="1"
 
-DATA_LOADER_NAME="random-ones-zeros"
+# DATA_LOADER_NAME="random-ones-zeros"
 # DATA_LOADER_NAME="always-changing"
 # DATA_LOADER_NAME="zeros"
-# DATA_LOADER_NAME="lexicon"
+DATA_LOADER_NAME="lexicon"
 # PATTERN_EXPRESSION="blinker[10,10]"
-PATTERN_EXPRESSION="glider[7,7]"
-# PATTERN_EXPRESSION="spacefiller[$((GRID_DIMENSIONS_X/2)),$((GRID_DIMENSIONS_Y/2))]"
+# PATTERN_EXPRESSION="glider[10,10]"
+PATTERN_EXPRESSION="spacefiller[$((GRID_DIMENSIONS_X/2)),$((GRID_DIMENSIONS_Y/2))]"
 # PATTERN_EXPRESSION="gosper-glider-gun[0,0]"
 
-# MEASURE_SPEEDUP="true"
-MEASURE_SPEEDUP="false"
+MEASURE_SPEEDUP="true"
+# MEASURE_SPEEDUP="false"
 # SPEEDUP_BENCH_ALGORITHM_NAME="cuda-memcpy"
 # SPEEDUP_BENCH_ALGORITHM_NAME="gol-cpu-naive"
 # SPEEDUP_BENCH_ALGORITHM_NAME="gol-cpu-bitwise-cols-naive-64"
@@ -88,8 +91,8 @@ VALIDATE="true"
 # VALIDATE="false"
 # PRINT_VALIDATION_DIFF="true"
 PRINT_VALIDATION_DIFF="false"
-VALIDATION_ALGORITHM_NAME="gol-cpu-naive"
-# VALIDATION_ALGORITHM_NAME="gol-cuda-naive"
+# VALIDATION_ALGORITHM_NAME="gol-cpu-naive"
+VALIDATION_ALGORITHM_NAME="gol-cuda-naive"
 
 ANIMATE_OUTPUT="false"
 # ANIMATE_OUTPUT="true"
@@ -99,8 +102,8 @@ RANDOM_SEED="42"
 
 STATE_BITS_COUNT="64"
 
-THREAD_BLOCK_SIZE="1024"
-# THREAD_BLOCK_SIZE="512"
+# THREAD_BLOCK_SIZE="1024"
+THREAD_BLOCK_SIZE="512"
 # THREAD_BLOCK_SIZE="256"
 
 WARP_DIMS_X="32"

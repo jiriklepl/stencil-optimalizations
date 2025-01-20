@@ -12,3 +12,4 @@ profile-upload.sh
 experiments-outputs/
 _test/
 */__pycache__/
+rel_work/
