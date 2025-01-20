@@ -17,7 +17,7 @@ namespace algorithms::cuda_naive_local {
 
 using StreamingDir = infrastructure::StreamingDirection;
 
-template <typename grid_cell_t, std::size_t Bits, typename state_store_type>
+template <typename grid_cell_t, std::size_t Bits, typename state_store_type, typename bit_grid_mode>
 class GoLCudaNaiveLocalWithState : public infrastructure::Algorithm<2, grid_cell_t> {
 
   public:
@@ -26,7 +26,7 @@ class GoLCudaNaiveLocalWithState : public infrastructure::Algorithm<2, grid_cell
     using size_type = std::size_t;
     using word_type = typename BitsConst<Bits>::word_type;
     using DataGrid = infrastructure::Grid<2, grid_cell_t>;
-    using BitGrid = GeneralBitGrid<word_type>;
+    using BitGrid = GeneralBitGrid<word_type, bit_grid_mode>;
     using BitGrid_ptr = std::unique_ptr<BitGrid>;
 
     constexpr static std::size_t STATE_STORE_BITS = sizeof(state_store_type) * 8;
@@ -242,7 +242,7 @@ class GoLCudaNaiveLocalWithState : public infrastructure::Algorithm<2, grid_cell
 };
 
 
-template <typename grid_cell_t, std::size_t Bits>
+template <typename grid_cell_t, std::size_t Bits, typename bit_grid_mode>
 class GoLCudaNaiveLocal : public infrastructure::Algorithm<2, grid_cell_t> {
   public:
     
@@ -276,8 +276,8 @@ class GoLCudaNaiveLocal : public infrastructure::Algorithm<2, grid_cell_t> {
     }
 
   private:
-    GoLCudaNaiveLocalWithState<grid_cell_t, Bits, std::uint32_t> implementation_32_state;    
-    GoLCudaNaiveLocalWithState<grid_cell_t, Bits, std::uint64_t> implementation_64_state;    
+    GoLCudaNaiveLocalWithState<grid_cell_t, Bits, std::uint32_t, bit_grid_mode> implementation_32_state;    
+    GoLCudaNaiveLocalWithState<grid_cell_t, Bits, std::uint64_t, bit_grid_mode> implementation_64_state;    
 
     infrastructure::Algorithm<2, grid_cell_t>* fetch_implementation() {
         if (this->params.state_bits_count == 32) {

@@ -18,13 +18,13 @@ enum class ExecModel {
     CUDA = 1,
 };
 
-template <typename grid_cell_t, std::size_t Bits, ExecModel Model>
+template <typename grid_cell_t, std::size_t Bits, ExecModel Model, typename bit_grid_mode>
 class An5dAlg : public infrastructure::Algorithm<2, grid_cell_t> {
   public:
     An5dAlg() {};
 
     using word_type = typename BitsConst<Bits>::word_type;
-    using BitGrid = algorithms::GeneralBitGrid<word_type>;
+    using BitGrid = algorithms::GeneralBitGrid<word_type, bit_grid_mode>;
     
     using DataGrid = infrastructure::Grid<2, grid_cell_t>;
     using size_type = BitGrid::size_type;

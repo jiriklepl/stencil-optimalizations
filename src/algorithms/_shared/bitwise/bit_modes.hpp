@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <string>
 
 namespace algorithms {
 
@@ -23,6 +24,10 @@ struct BitColumns {
     constexpr static bit_type first_mask = 1;
     static bit_type move_next_mask(bit_type mask) {
         return mask << 1;
+    }
+
+    static std::string name() {
+        return "Columns " + std::to_string(Y_BITS) + " bits policy";
     }
 };
 
@@ -67,6 +72,10 @@ struct BitTile<std::uint16_t> {
     static bit_type get_bit_mask_for(std::size_t x, std::size_t y) {
         return BitTileCommon::get_bit_mask_for<X_BITS, Y_BITS, bit_type>(x, y);
     }
+    
+    static std::string name() {
+        return "Tiles " + std::to_string(X_BITS) + "x" + std::to_string(Y_BITS) + " bits policy";
+    }
 };
 
 template <>
@@ -84,6 +93,11 @@ struct BitTile<std::uint32_t> {
 
     static bit_type get_bit_mask_for(std::size_t x, std::size_t y) {
         return BitTileCommon::get_bit_mask_for<X_BITS, Y_BITS, bit_type>(x, y);
+    }
+
+    
+    static std::string name() {
+        return "Tiles " + std::to_string(X_BITS) + "x" + std::to_string(Y_BITS) + " bits policy";
     }
 };
 
@@ -103,7 +117,31 @@ struct BitTile<std::uint64_t> {
     static bit_type get_bit_mask_for(std::size_t x, std::size_t y) {
         return BitTileCommon::get_bit_mask_for<X_BITS, Y_BITS, bit_type>(x, y);
     }
+
+    
+    static std::string name() {
+        return "Tiles " + std::to_string(X_BITS) + "x" + std::to_string(Y_BITS) + " bits policy";
+    }
 };
+
+struct BitColumnsMode {
+    template <typename bit_type>
+    using policy = BitColumns<bit_type>;
+
+    static std::string name() {
+        return "ModeColumns";
+    }
+};
+
+struct BitTileMode {
+    template <typename bit_type>
+    using policy = BitTile<bit_type>;
+
+    static std::string name() {
+        return "ModeTiles";
+    }
+};
+
 
 } // namespace algorithms
 

@@ -16,7 +16,7 @@ namespace algorithms::cuda_naive_local {
 
 using StreamingDir = infrastructure::StreamingDirection;
 
-template <typename grid_cell_t, std::size_t Bits>
+template <typename grid_cell_t, std::size_t Bits, typename bit_grid_mode>
 class GoLCudaNaiveJustTiling : public infrastructure::Algorithm<2, grid_cell_t> {
 
   public:
@@ -25,7 +25,7 @@ class GoLCudaNaiveJustTiling : public infrastructure::Algorithm<2, grid_cell_t> 
     using size_type = std::size_t;
     using word_type = typename BitsConst<Bits>::word_type;
     using DataGrid = infrastructure::Grid<2, grid_cell_t>;
-    using BitGrid = GeneralBitGrid<word_type>;
+    using BitGrid = GeneralBitGrid<word_type, bit_grid_mode>;
     using BitGrid_ptr = std::unique_ptr<BitGrid>;
 
     void set_and_format_input_data(const DataGrid& data) override {

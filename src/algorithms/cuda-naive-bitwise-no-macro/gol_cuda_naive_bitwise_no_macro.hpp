@@ -20,7 +20,7 @@ class GoLCudaNaiveBitwiseNoMacro : public infrastructure::Algorithm<2, grid_cell
     using size_type = std::size_t;
     using word_type = typename BitsConst<Bits>::word_type;
     using DataGrid = infrastructure::Grid<2, grid_cell_t>;
-    using BitGrid = GeneralBitGrid<word_type>;
+    using BitGrid = GeneralBitGrid<word_type, BitColumnsMode>;
     using BitGrid_ptr = std::unique_ptr<BitGrid>;
     
     using idx_t = std::int64_t;

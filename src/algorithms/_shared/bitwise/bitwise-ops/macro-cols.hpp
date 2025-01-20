@@ -1,5 +1,5 @@
-#ifndef MACROS_HPP
-#define MACROS_HPP
+#ifndef MACROS_COLS_HPP
+#define MACROS_COLS_HPP
 
 // clang-format off
 

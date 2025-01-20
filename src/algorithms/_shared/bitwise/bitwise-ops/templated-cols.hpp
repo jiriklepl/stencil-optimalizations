@@ -7,7 +7,7 @@
 #include <sstream>
 
 #include "../../template_helpers/static_for.hpp"
-
+#include "../bit_modes.hpp"
 namespace algorithms {
 
 enum class Position {
@@ -24,6 +24,8 @@ struct BitwiseColsTemplatedOps {
 
     template <Position POSITION>
     using masks = MasksByPosition<POSITION, word_type>;
+
+    using bit_grid_mode = BitColumnsMode;
 
     // clang-format off
     static word_type compute_center_word(

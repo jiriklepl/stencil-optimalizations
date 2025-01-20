@@ -12,13 +12,13 @@
 
 namespace algorithms {
 
-template <typename grid_cell_t, std::size_t Bits>
+template <typename grid_cell_t, std::size_t Bits, typename bit_grid_mode>
 class GoLCpuBitwiseNaive : public infrastructure::Algorithm<2, grid_cell_t> {
   public:
     using size_type = std::size_t;
     using word_type = typename BitsConst<Bits>::word_type;
     using DataGrid = infrastructure::Grid<2, grid_cell_t>;
-    using BitGrid = GeneralBitGrid<word_type>;
+    using BitGrid = GeneralBitGrid<word_type, bit_grid_mode>;
 
     void set_and_format_input_data(const DataGrid& data) override {
         _initial_source_bit_grid = std::make_unique<BitGrid>(data);

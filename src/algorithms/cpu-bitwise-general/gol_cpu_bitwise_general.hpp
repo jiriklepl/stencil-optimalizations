@@ -14,7 +14,7 @@ template <typename grid_cell_t, std::size_t Bits, template <typename word_type> 
 class GoLCpuBitwise : public infrastructure::Algorithm<2, grid_cell_t> {
   public:
     using word_type = typename BitsConst<Bits>::word_type;
-    using BitGrid = algorithms::GeneralBitGrid<word_type>;
+    using BitGrid = algorithms::GeneralBitGrid<word_type, typename BitOps<word_type>::bit_grid_mode>;
     using DataGrid = infrastructure::Grid<2, grid_cell_t>;
     using size_type = BitGrid::size_type;
 

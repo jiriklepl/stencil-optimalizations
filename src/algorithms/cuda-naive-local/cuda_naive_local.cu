@@ -3,6 +3,7 @@
 
 #include "../_shared/bitwise/bitwise-ops/cuda-ops-interface.cuh"
 #include "../_shared/bitwise/bitwise-ops/macro-cols.hpp"
+#include "../_shared/bitwise/bit_modes.hpp"
 #include "../../infrastructure/timer.hpp"
 #include "./models.hpp"
 #include "gol_cuda_naive_local.hpp"
@@ -141,7 +142,7 @@ __device__ __forceinline__ void cpy_to_output(
     }
 }
 
-template <typename word_type, typename CudaData>
+template <typename word_type, typename bit_grid_mode, typename CudaData>
 __device__ __forceinline__ bool compute_GOL_on_tile__naive_no_streaming(
     const WarpInfo<word_type>& info, CudaData&& data) {
     
@@ -160,7 +161,7 @@ __device__ __forceinline__ bool compute_GOL_on_tile__naive_no_streaming(
             word_type cb = load<word_type>(x + 0, y + 1, data);
             word_type rb = load<word_type>(x + 1, y + 1, data);
     
-            auto new_cc = CudaBitwiseOps<word_type>::compute_center_word(lt, ct, rt, lc, cc, rc, lb, cb, rb); 
+            auto new_cc = CudaBitwiseOps<word_type, bit_grid_mode>::compute_center_word(lt, ct, rt, lc, cc, rc, lb, cb, rb); 
             
             if (new_cc != cc) {
                 tile_changed = true;
@@ -173,7 +174,7 @@ __device__ __forceinline__ bool compute_GOL_on_tile__naive_no_streaming(
     return tile_changed;
 }
 
-template <typename word_type, typename CudaData>
+template <typename word_type, typename bit_grid_mode, typename CudaData>
 __device__ __forceinline__ bool compute_GOL_on_tile__streaming_in_x(
     const WarpInfo<word_type>& info, CudaData&& data) {
     
@@ -208,7 +209,7 @@ __device__ __forceinline__ bool compute_GOL_on_tile__streaming_in_x(
             cb = load<word_type>(x + 0, y + 1, data);
             rb = load<word_type>(x + 1, y + 1, data);
     
-            auto new_cc = CudaBitwiseOps<word_type>::compute_center_word(lt, ct, rt, lc, cc, rc, lb, cb, rb); 
+            auto new_cc = CudaBitwiseOps<word_type, bit_grid_mode>::compute_center_word(lt, ct, rt, lc, cc, rc, lb, cb, rb); 
             
             if (new_cc != cc) {
                 tile_changed = true;
@@ -221,7 +222,7 @@ __device__ __forceinline__ bool compute_GOL_on_tile__streaming_in_x(
     return tile_changed;
 }
 
-template <typename word_type, typename CudaData>
+template <typename word_type, typename bit_grid_mode, typename CudaData>
 __device__ __forceinline__ bool compute_GOL_on_tile__streaming_in_y(
     const WarpInfo<word_type>& info, CudaData&& data) {
     
@@ -256,7 +257,7 @@ __device__ __forceinline__ bool compute_GOL_on_tile__streaming_in_y(
             rc = load<word_type>(x + 1, y + 0, data);
             rb = load<word_type>(x + 1, y + 1, data);
             
-            auto new_cc = CudaBitwiseOps<word_type>::compute_center_word(lt, ct, rt, lc, cc, rc, lb, cb, rb); 
+            auto new_cc = CudaBitwiseOps<word_type, bit_grid_mode>::compute_center_word(lt, ct, rt, lc, cc, rc, lb, cb, rb); 
             
             if (new_cc != cc) {
                 tile_changed = true;
@@ -269,25 +270,25 @@ __device__ __forceinline__ bool compute_GOL_on_tile__streaming_in_y(
     return tile_changed;
 }
 
-template <typename word_type, StreamingDir DIRECTION, typename CudaData>
+template <typename word_type, typename bit_grid_mode, StreamingDir DIRECTION, typename CudaData>
 __device__ __forceinline__ bool compute_GOL_on_tile(
     const WarpInfo<word_type>& info, CudaData&& data) {
 
     if constexpr (DIRECTION == StreamingDir::in_X) {
-        return compute_GOL_on_tile__streaming_in_x<word_type>(info, data);
+        return compute_GOL_on_tile__streaming_in_x<word_type, bit_grid_mode>(info, data);
     }
     else if constexpr (DIRECTION == StreamingDir::in_Y) {
-        return compute_GOL_on_tile__streaming_in_y<word_type>(info, data);
+        return compute_GOL_on_tile__streaming_in_y<word_type, bit_grid_mode>(info, data);
     }
     else if constexpr (DIRECTION == StreamingDir::NAIVE) {
-        return compute_GOL_on_tile__naive_no_streaming<word_type>(info, data);
+        return compute_GOL_on_tile__naive_no_streaming<word_type, bit_grid_mode>(info, data);
     }
     else {
         printf("Invalid streaming direction %d\n", DIRECTION);
     }
 }
 
-template <StreamingDir DIRECTION, typename word_type, typename state_store_type>
+template <StreamingDir DIRECTION, typename bit_grid_mode, typename word_type, typename state_store_type>
 __global__ void game_of_live_kernel(BitGridWithChangeInfo<word_type, state_store_type> data) {
 
     extern __shared__ shm_private_value_t block_store[];
@@ -304,7 +305,7 @@ __global__ void game_of_live_kernel(BitGridWithChangeInfo<word_type, state_store
         entire_tile_changed = false;
     }
     else {
-        auto local_tile_changed = compute_GOL_on_tile<word_type, DIRECTION>(info, data);
+        auto local_tile_changed = compute_GOL_on_tile<word_type, bit_grid_mode, DIRECTION>(info, data);
         entire_tile_changed = __any_sync(0xFF'FF'FF'FF, local_tile_changed);
     }
 
@@ -322,9 +323,9 @@ __global__ void game_of_live_kernel(BitGridWithChangeInfo<word_type, state_store
 
 } // namespace
 
-template <typename grid_cell_t, std::size_t Bits, typename state_store_type>
+template <typename grid_cell_t, std::size_t Bits, typename state_store_type, typename bit_grid_mode>
 template <StreamingDir DIRECTION>
-void GoLCudaNaiveLocalWithState<grid_cell_t, Bits, state_store_type>::run_kernel(size_type iterations) {
+void GoLCudaNaiveLocalWithState<grid_cell_t, Bits, state_store_type, bit_grid_mode>::run_kernel(size_type iterations) {
 
     auto block_size = thread_block_size;
     auto blocks = get_thread_block_count();
@@ -348,7 +349,7 @@ void GoLCudaNaiveLocalWithState<grid_cell_t, Bits, state_store_type>::run_kernel
             rotate_state_stores();      
         }
 
-        game_of_live_kernel<DIRECTION ><<<blocks, block_size, shm_size, stream>>>(cuda_data);
+        game_of_live_kernel<DIRECTION, BitColumnsMode><<<blocks, block_size, shm_size, stream>>>(cuda_data);
         CUCH(cudaPeekAtLastError());
     }
 
@@ -359,16 +360,16 @@ void GoLCudaNaiveLocalWithState<grid_cell_t, Bits, state_store_type>::run_kernel
 // JUST TILING KERNEL
 // -----------------------------------------------------------------------------------------------
 
-template <StreamingDir DIRECTION, typename word_type>
+template <StreamingDir DIRECTION, typename bit_grid_mode, typename word_type>
 __global__ void game_of_live_kernel_just_tiling(BitGridWithTiling<word_type> data) {
     auto info = get_warp_info<word_type>(data);
-    compute_GOL_on_tile<word_type, DIRECTION>(info, data);
+    compute_GOL_on_tile<word_type, bit_grid_mode, DIRECTION>(info, data);
 }
 
 
-template <typename grid_cell_t, std::size_t Bits>
+template <typename grid_cell_t, std::size_t Bits, typename bit_grid_mode>
 template <StreamingDir DIRECTION>
-void GoLCudaNaiveJustTiling<grid_cell_t, Bits>::run_kernel(size_type iterations) {
+void GoLCudaNaiveJustTiling<grid_cell_t, Bits, bit_grid_mode>::run_kernel(size_type iterations) {
     auto block_size = thread_block_size;
     auto blocks = get_thread_block_count();
 
@@ -385,43 +386,61 @@ void GoLCudaNaiveJustTiling<grid_cell_t, Bits>::run_kernel(size_type iterations)
             std::swap(cuda_data.input, cuda_data.output);
         }
 
-        game_of_live_kernel_just_tiling<DIRECTION><<<blocks, block_size>>>(cuda_data);
+        game_of_live_kernel_just_tiling<DIRECTION, bit_grid_mode><<<blocks, block_size>>>(cuda_data);
         CUCH(cudaPeekAtLastError());
     }
 }
 
 } // namespace algorithms
 
-template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::CHAR, 16, std::uint16_t>;
-template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::CHAR, 16, std::uint32_t>;
-template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::CHAR, 16, std::uint64_t>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::CHAR, 16, std::uint16_t, algorithms::BitColumnsMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::CHAR, 16, std::uint32_t, algorithms::BitColumnsMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::CHAR, 16, std::uint64_t, algorithms::BitColumnsMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::CHAR, 32, std::uint16_t, algorithms::BitColumnsMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::CHAR, 32, std::uint32_t, algorithms::BitColumnsMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::CHAR, 32, std::uint64_t, algorithms::BitColumnsMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::CHAR, 64, std::uint16_t, algorithms::BitColumnsMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::CHAR, 64, std::uint32_t, algorithms::BitColumnsMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::CHAR, 64, std::uint64_t, algorithms::BitColumnsMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::INT, 16, std::uint16_t, algorithms::BitColumnsMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::INT, 16, std::uint32_t, algorithms::BitColumnsMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::INT, 16, std::uint64_t, algorithms::BitColumnsMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::INT, 32, std::uint16_t, algorithms::BitColumnsMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::INT, 32, std::uint32_t, algorithms::BitColumnsMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::INT, 32, std::uint64_t, algorithms::BitColumnsMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::INT, 64, std::uint16_t, algorithms::BitColumnsMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::INT, 64, std::uint32_t, algorithms::BitColumnsMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::INT, 64, std::uint64_t, algorithms::BitColumnsMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::CHAR, 16, std::uint16_t, algorithms::BitTileMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::CHAR, 16, std::uint32_t, algorithms::BitTileMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::CHAR, 16, std::uint64_t, algorithms::BitTileMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::CHAR, 32, std::uint16_t, algorithms::BitTileMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::CHAR, 32, std::uint32_t, algorithms::BitTileMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::CHAR, 32, std::uint64_t, algorithms::BitTileMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::CHAR, 64, std::uint16_t, algorithms::BitTileMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::CHAR, 64, std::uint32_t, algorithms::BitTileMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::CHAR, 64, std::uint64_t, algorithms::BitTileMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::INT, 16, std::uint16_t, algorithms::BitTileMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::INT, 16, std::uint32_t, algorithms::BitTileMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::INT, 16, std::uint64_t, algorithms::BitTileMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::INT, 32, std::uint16_t, algorithms::BitTileMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::INT, 32, std::uint32_t, algorithms::BitTileMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::INT, 32, std::uint64_t, algorithms::BitTileMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::INT, 64, std::uint16_t, algorithms::BitTileMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::INT, 64, std::uint32_t, algorithms::BitTileMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::INT, 64, std::uint64_t, algorithms::BitTileMode>;
 
-template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::CHAR, 32, std::uint16_t>;
-template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::CHAR, 32, std::uint32_t>;
-template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::CHAR, 32, std::uint64_t>;
-
-template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::CHAR, 64, std::uint16_t>;
-template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::CHAR, 64, std::uint32_t>;
-template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::CHAR, 64, std::uint64_t>;
-
-template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<common::CHAR, 16>;
-template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<common::CHAR, 32>;
-template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<common::CHAR, 64>;
-
-template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::INT, 16, std::uint16_t>;
-template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::INT, 16, std::uint32_t>;
-template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::INT, 16, std::uint64_t>;
-
-template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::INT, 32, std::uint16_t>;
-template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::INT, 32, std::uint32_t>;
-template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::INT, 32, std::uint64_t>;
-
-template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::INT, 64, std::uint16_t>;
-template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::INT, 64, std::uint32_t>;
-template class algorithms::cuda_naive_local::GoLCudaNaiveLocalWithState<common::INT, 64, std::uint64_t>;
-
-template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<common::INT, 16>;
-template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<common::INT, 32>;
-template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<common::INT, 64>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<common::CHAR, 16, algorithms::BitColumnsMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<common::CHAR, 32, algorithms::BitColumnsMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<common::CHAR, 64, algorithms::BitColumnsMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<common::INT, 16, algorithms::BitColumnsMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<common::INT, 32, algorithms::BitColumnsMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<common::INT, 64, algorithms::BitColumnsMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<common::CHAR, 16, algorithms::BitTileMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<common::CHAR, 32, algorithms::BitTileMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<common::CHAR, 64, algorithms::BitTileMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<common::INT, 16, algorithms::BitTileMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<common::INT, 32, algorithms::BitTileMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<common::INT, 64, algorithms::BitTileMode>;
 
 #endif // CUDA_NAIVE_LOCAL_CU

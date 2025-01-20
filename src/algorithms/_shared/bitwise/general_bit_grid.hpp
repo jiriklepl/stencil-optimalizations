@@ -21,11 +21,12 @@ using namespace debug_utils;
 namespace algorithms {
 
 
-template <typename word_type, template <typename> typename policy_template = BitColumns>
+template <typename word_type, typename bit_grid_mode>
 class GeneralBitGrid {
   public:
     using size_type = std::size_t;
-    using policy = policy_template<word_type>;
+
+    using policy = typename bit_grid_mode::template policy<word_type>;
 
     template <typename grid_cell_t>
     using Grid = infrastructure::Grid<2, grid_cell_t>;
@@ -102,7 +103,7 @@ class GeneralBitGrid {
         return result.str();
     }
 
-    std::string debug_print(std::size_t line_limit = std::numeric_limits<std::size_t>::max()) {
+    std::string debug_print(std::size_t line_limit = std::numeric_limits<std::size_t>::max()) const{
         std::ostringstream result;
 
         for (std::size_t y = 0; y < original_y_size(); ++y) {
@@ -225,7 +226,7 @@ class GeneralBitGrid {
         }
     }
 
-    std::string color_0_1(char ch) {
+    std::string color_0_1(char ch) const {
         if (ch == '0') {
             return "\033[30m" + std::string(1, ch) + "\033[0m";
         }
