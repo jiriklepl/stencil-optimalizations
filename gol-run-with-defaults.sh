@@ -40,6 +40,7 @@ __31="2147483648"
 
 # ALGORITHM="eff-baseline"
 # ALGORITHM="eff-baseline-shm"
+# ALGORITHM="eff-baseline-texture"
 ALGORITHM="eff-sota-packed-64"
 
 # ALGORITHM="gol-cpu-bitwise-tiles-macro-64"
@@ -64,7 +65,8 @@ GRID_DIMENSIONS_Y=$__13
 # GRID_DIMENSIONS_Y=$((8 * 6))
 ITERATIONS="10000"
 
-BASE_GRID_ENCODING="char"
+# BASE_GRID_ENCODING="char"
+BASE_GRID_ENCODING="int"
 
 WARMUP_ROUNDS="0"
 MEASUREMENT_ROUNDS="1"
@@ -128,6 +130,7 @@ srun -p gpu-short -A kdss --cpus-per-task=64 --mem=256GB --gres=gpu:H100 --time=
     --grid-dimensions-y="$GRID_DIMENSIONS_Y" \
     --iterations="$ITERATIONS" \
     --max-runtime-seconds="$MAX_RUNTIME_SECONDS" \
+    --base-grid-encoding="$BASE_GRID_ENCODING" \
     --warmup-rounds="$WARMUP_ROUNDS" \
     --measurement-rounds="$MEASUREMENT_ROUNDS" \
     --data-loader="$DATA_LOADER_NAME" \
