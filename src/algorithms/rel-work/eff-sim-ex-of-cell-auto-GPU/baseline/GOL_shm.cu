@@ -8,6 +8,8 @@
 
 namespace algorithms::rel_work::eff_sim_ex_of_cell_auto_GPU {
 
+namespace {
+
 template <int BLOCK_x, int BLOCK_y>
 __global__ void GOL_shm(int dim, int *grid, int *newGrid)
 {
@@ -53,8 +55,9 @@ __global__ void GOL_shm(int dim, int *grid, int *newGrid)
                     newGrid[id] = cell;
            }
        }
- 
 }
+
+} // namespace
 
 template <typename grid_cell_t, BaselineVariant variant>
 template <int BLOCK_SIZE_x, int BLOCK_SIZE_y>

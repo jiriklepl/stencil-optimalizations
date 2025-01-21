@@ -19,6 +19,8 @@
 
 namespace algorithms::rel_work::eff_sim_ex_of_cell_auto_GPU {
 
+namespace {
+
 template <typename policy, typename CELL_TYPE>
 __device__ void setSubCellD (CELL_TYPE *cell, char pos, unsigned char subcell)
 {
@@ -144,6 +146,7 @@ __global__ void kernel_init_lookup_table (int *GPU_lookup_table) {
     }
 }
 
+} // namespace
 
 template <typename grid_cell_t, typename policy>
 void GOL_Packed_sota<grid_cell_t, policy>::run_kernel(size_type iterations) {
