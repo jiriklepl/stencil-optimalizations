@@ -349,7 +349,7 @@ void GoLCudaNaiveLocalWithState<grid_cell_t, Bits, state_store_type, bit_grid_mo
             rotate_state_stores();      
         }
 
-        game_of_live_kernel<DIRECTION, BitColumnsMode><<<blocks, block_size, shm_size, stream>>>(cuda_data);
+        game_of_live_kernel<DIRECTION, bit_grid_mode><<<blocks, block_size, shm_size, stream>>>(cuda_data);
         CUCH(cudaPeekAtLastError());
     }
 

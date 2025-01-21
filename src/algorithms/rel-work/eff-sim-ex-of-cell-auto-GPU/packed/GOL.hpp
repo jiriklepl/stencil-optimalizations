@@ -61,7 +61,6 @@ class GOL_Packed_sota : public infrastructure::Algorithm<2, grid_cell_t> {
         CUCH(cudaMalloc(&GPU_lookup_table, sizeof(int)*2*(policy::CELL_NEIGHBOURS+1)));
 
         CUCH(cudaMemcpy(grid, input_output_data_grid.data(), bytes, cudaMemcpyHostToDevice));
-        CUCH(cudaMemcpy(new_grid, input_output_data_grid.data(), bytes, cudaMemcpyHostToDevice));
 
         init_lookup_table();
     }
