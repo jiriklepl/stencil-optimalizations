@@ -70,9 +70,9 @@ __global__ void GOL_packed (std::size_t GRID_SIZE, CELL_TYPE *grid, CELL_TYPE *n
         // First (0) subcell:
         up_cell = grid[id-(ROW_SIZE+2)];
         down_cell = grid[id+(ROW_SIZE+2)];
-        left_cell = grid[id-1];
-        upleft_cell = grid[id-(ROW_SIZE+3)];
-        downleft_cell = grid[id+(ROW_SIZE+1)];
+        left_cell = grid[id+1];
+        upleft_cell = grid[id-(ROW_SIZE+1)];
+        downleft_cell = grid[id+(ROW_SIZE+3)];
 
         numNeighbors = getSubCellD<policy> (up_cell, 0) + getSubCellD<policy> (down_cell, 0); // upper lower
         numNeighbors += getSubCellD<policy> (left_cell, ELEMENTS_PER_CELL-1) + getSubCellD<policy> (cell, 1); // left right
@@ -92,9 +92,9 @@ __global__ void GOL_packed (std::size_t GRID_SIZE, CELL_TYPE *grid, CELL_TYPE *n
         }
 
         // Last (CELL_NEIGHBOURS-1) subcell:
-        right_cell = grid[id+1];
-        upright_cell = grid[id-(ROW_SIZE+1)];
-        downright_cell = grid[id+(ROW_SIZE+3)];
+        right_cell = grid[id-1];
+        upright_cell = grid[id-(ROW_SIZE+3)];
+        downright_cell = grid[id+(ROW_SIZE+1)];
 
         numNeighbors = getSubCellD<policy> (up_cell, ELEMENTS_PER_CELL-1) + getSubCellD<policy> (down_cell, ELEMENTS_PER_CELL-1); // upper lower
         numNeighbors += getSubCellD<policy> (cell, ELEMENTS_PER_CELL-2) + getSubCellD<policy> (right_cell, 0); // left right

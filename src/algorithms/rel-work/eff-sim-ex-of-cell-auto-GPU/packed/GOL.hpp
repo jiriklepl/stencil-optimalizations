@@ -121,40 +121,6 @@ class GOL_Packed_sota : public infrastructure::Algorithm<2, grid_cell_t> {
 
     void run_kernel(size_type iterations);
     void init_lookup_table();
-
-    // void init_values(const DataGrid<grid_cell_t>& data) {
-
-    //     auto h_grid_char_ptr = input_output_data_grid.data();
-    //     CELL_TYPE* h_grid = (CELL_TYPE*)h_grid_char_ptr;
-
-
-    //     std::size_t i,j,k;
-    //     CELL_TYPE aux;
-
-    //     for(i = 1; i<=GRID_SIZE; i++) {
-    //         for(j = 1; j<=ROW_SIZE; j++) {
-    //             aux = h_grid[i*(ROW_SIZE+2)+j];
-    //             for (k=0; k<ELEMENTS_PER_CELL; k++) {
-    //                 setSubCellH (&aux, k, 1);
-    //             }
-    //             h_grid[i*(ROW_SIZE+2)+j] = aux;
-    //         }
-    //     }
-    // }
-
-    // void setSubCellH (CELL_TYPE *cell, char pos, unsigned char subcell)
-    // {
-    //     CELL_TYPE mask = 0xFF;
-    //     CELL_TYPE maskNewCell = subcell;
-        
-    //     // Erase pos content in cell:
-    //     mask = mask << (ELEMENTS_PER_CELL - 1 - pos)*8;
-    //     mask = ~mask;
-    //     *cell = *cell & mask;
-        
-    //     // Add subcell content to cell in pos:
-    //     *cell = *cell | (maskNewCell << (ELEMENTS_PER_CELL - 1 - pos)*8);
-    // }
 };
 
 }
