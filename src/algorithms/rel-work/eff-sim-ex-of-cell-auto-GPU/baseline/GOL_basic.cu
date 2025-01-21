@@ -8,6 +8,8 @@
 
 namespace algorithms::rel_work::eff_sim_ex_of_cell_auto_GPU {
 
+namespace {
+
 __global__ void GOL_basic(int dim, int *grid, int *newGrid)
 {
     // We want id ∈ [1,dim]
@@ -40,6 +42,7 @@ __global__ void GOL_basic(int dim, int *grid, int *newGrid)
     }
 }
 
+} // namespace
 
 template <typename grid_cell_t, BaselineVariant variant>
 void GOL_Baseline<grid_cell_t, variant>::run_kernel_basic(size_type iterations) {
