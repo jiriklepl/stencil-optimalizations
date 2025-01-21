@@ -12,9 +12,12 @@ class GridTransformer {
   
   public:
 
-    template <typename cell_t_to, typename cell_t_from>
+    template <typename cell_t_to, typename cell_t_from, std::size_t halo_size = 1>
     static DataGrid<cell_t_to> transform_grid_with_halo(const DataGrid<cell_t_from>& data) {
-        DataGrid<cell_t_to> result(data.template size_in<0>() + 2, data.template size_in<1>() + 2);
+        DataGrid<cell_t_to> result(
+            data.template size_in<0>() + 2 * halo_size,
+            data.template size_in<1>() + 2
+        );
 
         auto size = result.size();
         auto raw_data = result.data();
@@ -25,20 +28,23 @@ class GridTransformer {
 
         for (size_t y = 0; y < data.template size_in<1>(); ++y) {
             for (size_t x = 0; x < data.template size_in<0>(); ++x) {
-                result[x + 1][y + 1] = static_cast<cell_t_to>(data[x][y]);
+                result[x + halo_size][y + 1] = static_cast<cell_t_to>(data[x][y]);
             }
         }
 
         return result;
     }
 
-    template <typename cell_t_to, typename cell_t_from>
+    template <typename cell_t_to, typename cell_t_from, std::size_t halo_size = 1>
     static DataGrid<cell_t_to> transform_grid_remove_halo(const DataGrid<cell_t_from>& data) {
-        DataGrid<cell_t_to> result(data.template size_in<0>() - 2, data.template size_in<1>() - 2);
+        DataGrid<cell_t_to> result(
+            data.template size_in<0>() - 2 * halo_size,
+            data.template size_in<1>() - 2
+        );
 
         for (size_t y = 0; y < result.template size_in<1>(); ++y) {
             for (size_t x = 0; x < result.template size_in<0>(); ++x) {
-                result[x][y] = static_cast<cell_t_to>(data[x + 1][y + 1]);
+                result[x][y] = static_cast<cell_t_to>(data[x + halo_size][y + 1]);
             }
         }
 

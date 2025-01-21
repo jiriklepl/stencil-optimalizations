@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <cuda_runtime.h>
+#include <stdexcept>
 
 namespace algorithms {
 
@@ -17,6 +18,10 @@ num_t log_2(num_t x) {
 
 template <typename num_t>
 dim3 get_2d_block(num_t block_size) {
+    if (block_size == 0) {
+        throw std::invalid_argument("Block size must be greater than 0");
+    }
+
     auto l = log_2(block_size);
 
     std::size_t one = 1;

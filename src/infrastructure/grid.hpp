@@ -174,10 +174,49 @@ class Grid {
         return true;
     }
 
+    std::string debug_print() const {
+        std::stringstream ss;
+
+        if constexpr (DIMS == 2) {
+            for (size_type y = 0; y < size_in(1); y++) {
+                if (y != 0 && y % 8 == 0) {
+                    std::cout << std::endl;
+                }
+
+                for (size_type x = 0; x < size_in(0); x++) {
+                    if (x != 0 && x % 8 == 0) {
+                        ss << " ";
+                    }
+
+                    auto val = elements[y * size_in(0) + x];
+                    ss << color_0_1(val) << " ";
+
+                }
+                ss << std::endl;
+            }
+        }
+        else {
+            for (size_type i = 0; i < elements.size(); i++) {
+                ss << elements[i] << " ";
+            }
+        }
+
+        return ss.str();
+    }
+
   private:
     std::vector<ElementType> elements;
     std::vector<size_type> dimension_sizes;
     std::vector<size_type> tile_sizes_per_dimensions;
+
+    std::string color_0_1(ElementType el) const {
+        if (el == 0) {
+            return "\033[30m" + std::to_string(el) + "\033[0m";
+        }
+        else {
+            return "\033[31m" + std::to_string(el) + "\033[0m";
+        }
+    }
 };
 
 } // namespace infrastructure

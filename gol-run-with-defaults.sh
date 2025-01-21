@@ -41,6 +41,7 @@ __31="2147483648"
 # ALGORITHM="eff-baseline"
 # ALGORITHM="eff-baseline-shm"
 # ALGORITHM="eff-baseline-texture"
+# ALGORITHM="eff-sota-packed-32"
 ALGORITHM="eff-sota-packed-64"
 
 # ALGORITHM="gol-cpu-bitwise-tiles-macro-64"
@@ -59,11 +60,11 @@ ALGORITHM="eff-sota-packed-64"
 # ALGORITHM="gol-cuda-naive-bitwise-cols-64"
 # ALGORITHM="gol-cuda-naive-local-64"
 # ALGORITHM="gol-cuda-naive-just-tiling-64"
-GRID_DIMENSIONS_X=$__13
-GRID_DIMENSIONS_Y=$__13
+GRID_DIMENSIONS_X=$__7
+GRID_DIMENSIONS_Y=$__7
 # GRID_DIMENSIONS_X=$((8 * 6))
 # GRID_DIMENSIONS_Y=$((8 * 6))
-ITERATIONS="10000"
+ITERATIONS="1"
 
 # BASE_GRID_ENCODING="char"
 BASE_GRID_ENCODING="int"
@@ -83,16 +84,16 @@ PATTERN_EXPRESSION="spacefiller[$((GRID_DIMENSIONS_X/2)),$((GRID_DIMENSIONS_Y/2)
 MEASURE_SPEEDUP="true"
 # MEASURE_SPEEDUP="false"
 # SPEEDUP_BENCH_ALGORITHM_NAME="cuda-memcpy"
-# SPEEDUP_BENCH_ALGORITHM_NAME="gol-cpu-naive"
+SPEEDUP_BENCH_ALGORITHM_NAME="gol-cpu-naive"
 # SPEEDUP_BENCH_ALGORITHM_NAME="gol-cpu-bitwise-cols-naive-64"
 # SPEEDUP_BENCH_ALGORITHM_NAME="gol-cuda-naive-bitwise-cols-64"
-SPEEDUP_BENCH_ALGORITHM_NAME="gol-cuda-naive"
+# SPEEDUP_BENCH_ALGORITHM_NAME="gol-cuda-naive"
 # SPEEDUP_BENCH_ALGORITHM_NAME="gol-cuda-naive-just-tiling-64"
 
 VALIDATE="true"
 # VALIDATE="false"
-# PRINT_VALIDATION_DIFF="true"
-PRINT_VALIDATION_DIFF="false"
+PRINT_VALIDATION_DIFF="true"
+# PRINT_VALIDATION_DIFF="false"
 # VALIDATION_ALGORITHM_NAME="gol-cpu-naive"
 VALIDATION_ALGORITHM_NAME="gol-cuda-naive"
 
@@ -104,8 +105,8 @@ RANDOM_SEED="42"
 
 STATE_BITS_COUNT="64"
 
-# THREAD_BLOCK_SIZE="1024"
-THREAD_BLOCK_SIZE="512"
+THREAD_BLOCK_SIZE="1024"
+# THREAD_BLOCK_SIZE="512"
 # THREAD_BLOCK_SIZE="256"
 
 WARP_DIMS_X="32"

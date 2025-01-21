@@ -60,10 +60,10 @@ __global__ void GOL_packed (std::size_t GRID_SIZE, CELL_TYPE *grid, CELL_TYPE *n
     CELL_TYPE up_cell, down_cell, right_cell, left_cell;                // Up,down,right,left cells
     CELL_TYPE upleft_cell, downleft_cell, upright_cell, downright_cell; // Diagonal cells
     unsigned char subcell;
- 
+
     int k, numNeighbors;
     int (*lookup_table)[CELL_NEIGHBOURS+1] = (int (*)[CELL_NEIGHBOURS+1]) GPU_lookup_table;
- 
+
     if (iy>0 && iy <= GRID_SIZE && ix> 0 && ix <= ROW_SIZE) {
          cell = grid[id];
 
@@ -121,10 +121,9 @@ __global__ void GOL_packed (std::size_t GRID_SIZE, CELL_TYPE *grid, CELL_TYPE *n
     }
 }
 
-
-
 __global__ void kernel_init_lookup_table (int *GPU_lookup_table) {
     int (*lookup_table)[CELL_NEIGHBOURS+1] = (int (*)[CELL_NEIGHBOURS+1]) GPU_lookup_table;
+
 
     if ( threadIdx.y < 2 && threadIdx.x < (CELL_NEIGHBOURS+1) ) {
         // Init lookup_table for GOL
@@ -175,7 +174,7 @@ void GOL_Packed_sota<grid_cell_t, policy>::run_kernel(size_type iterations) {
 
 template <typename grid_cell_t, typename policy>
 void GOL_Packed_sota<grid_cell_t, policy>::init_lookup_table() {
-    dim3 blockSize(BLOCK_SIZE, BLOCK_SIZE,1);
+    dim3 blockSize(32, 32, 1);
 
     kernel_init_lookup_table<<<1,blockSize>>>(GPU_lookup_table);
 }

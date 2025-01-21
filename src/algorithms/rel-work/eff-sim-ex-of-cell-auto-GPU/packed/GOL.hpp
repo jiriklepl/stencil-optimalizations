@@ -18,6 +18,8 @@ struct _64_bit_policy {
     }
 
     using CELL_TYPE = uint64_t;
+
+    static constexpr std::size_t sizeof_CELL_TYPE = sizeof(CELL_TYPE);
 };
 
 struct _32_bit_policy {
@@ -29,6 +31,8 @@ struct _32_bit_policy {
     }
 
     using CELL_TYPE = uint32_t;
+
+    static constexpr std::size_t sizeof_CELL_TYPE = sizeof(CELL_TYPE);
 };
 
 template <typename grid_cell_t, typename policy>
@@ -45,7 +49,7 @@ class GOL_Packed_sota : public infrastructure::Algorithm<2, grid_cell_t> {
     
 
     void set_and_format_input_data(const DataGrid<grid_cell_t>& data) override {
-        input_output_data_grid = GridTransformer::transform_grid_with_halo<int>(data);
+        input_output_data_grid = GridTransformer::transform_grid_with_halo<char, grid_cell_t, policy::sizeof_CELL_TYPE>(data);
     }
 
     void initialize_data_structures() override {
@@ -57,6 +61,7 @@ class GOL_Packed_sota : public infrastructure::Algorithm<2, grid_cell_t> {
         CUCH(cudaMalloc(&GPU_lookup_table, sizeof(int)*2*(policy::CELL_NEIGHBOURS+1)));
 
         CUCH(cudaMemcpy(grid, input_output_data_grid.data(), bytes, cudaMemcpyHostToDevice));
+        CUCH(cudaMemcpy(new_grid, input_output_data_grid.data(), bytes, cudaMemcpyHostToDevice));
 
         init_lookup_table();
     }
@@ -77,7 +82,7 @@ class GOL_Packed_sota : public infrastructure::Algorithm<2, grid_cell_t> {
     }
 
     DataGrid<grid_cell_t> fetch_result() override {
-        return GridTransformer::transform_grid_remove_halo<grid_cell_t>(input_output_data_grid);
+        return GridTransformer::transform_grid_remove_halo<grid_cell_t, char, policy::sizeof_CELL_TYPE>(input_output_data_grid);
     }
 
     std::size_t actually_performed_iterations() const override {
@@ -85,6 +90,8 @@ class GOL_Packed_sota : public infrastructure::Algorithm<2, grid_cell_t> {
     }
 
     void set_params(const infrastructure::ExperimentParams& params) override {
+        this->params = params;
+
         if (params.grid_dimensions[0] != params.grid_dimensions[1]) {
             throw std::runtime_error("Only square grids are supported");
         }
@@ -95,7 +102,6 @@ class GOL_Packed_sota : public infrastructure::Algorithm<2, grid_cell_t> {
             throw std::runtime_error("Only square thread blocks are supported");
         }
 
-        this->params = params;
         BLOCK_SIZE = block.x;
         GRID_SIZE = params.grid_dimensions[0];
         ROW_SIZE = policy::ROW_SIZE(GRID_SIZE);
@@ -111,10 +117,44 @@ class GOL_Packed_sota : public infrastructure::Algorithm<2, grid_cell_t> {
 
     size_type _performed_iterations;
 
-    DataGrid<int> input_output_data_grid;
+    DataGrid<char> input_output_data_grid;
 
     void run_kernel(size_type iterations);
     void init_lookup_table();
+
+    // void init_values(const DataGrid<grid_cell_t>& data) {
+
+    //     auto h_grid_char_ptr = input_output_data_grid.data();
+    //     CELL_TYPE* h_grid = (CELL_TYPE*)h_grid_char_ptr;
+
+
+    //     std::size_t i,j,k;
+    //     CELL_TYPE aux;
+
+    //     for(i = 1; i<=GRID_SIZE; i++) {
+    //         for(j = 1; j<=ROW_SIZE; j++) {
+    //             aux = h_grid[i*(ROW_SIZE+2)+j];
+    //             for (k=0; k<ELEMENTS_PER_CELL; k++) {
+    //                 setSubCellH (&aux, k, 1);
+    //             }
+    //             h_grid[i*(ROW_SIZE+2)+j] = aux;
+    //         }
+    //     }
+    // }
+
+    // void setSubCellH (CELL_TYPE *cell, char pos, unsigned char subcell)
+    // {
+    //     CELL_TYPE mask = 0xFF;
+    //     CELL_TYPE maskNewCell = subcell;
+        
+    //     // Erase pos content in cell:
+    //     mask = mask << (ELEMENTS_PER_CELL - 1 - pos)*8;
+    //     mask = ~mask;
+    //     *cell = *cell & mask;
+        
+    //     // Add subcell content to cell in pos:
+    //     *cell = *cell | (maskNewCell << (ELEMENTS_PER_CELL - 1 - pos)*8);
+    // }
 };
 
 }

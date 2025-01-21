@@ -12,11 +12,12 @@ class Timer {
   public:
     template <typename Func>
     static double measure_ms(Func&& func) {
-        auto start = std::chrono::high_resolution_clock::now();
 
-        func();
         CUCH(cudaDeviceSynchronize());
-
+        auto start = std::chrono::high_resolution_clock::now();
+        func();
+        
+        CUCH(cudaDeviceSynchronize());
         auto end = std::chrono::high_resolution_clock::now();
 
         double nano_sec = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
