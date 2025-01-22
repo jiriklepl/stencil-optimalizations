@@ -121,6 +121,25 @@ class GeneralBitGrid {
         return result.str();
     }
 
+    std::string binary_print(std::size_t line_limit = std::numeric_limits<std::size_t>::max()) const{
+        std::ostringstream result;
+
+        for (std::size_t y = 0; y < y_size(); ++y) {
+            for (std::size_t x = 0; x < x_size(); ++x) {
+                auto word = get_word(x, y);
+                result << std::bitset<sizeof(word_type) * 8>(word) << " ";
+                
+            }
+            result << "\n";
+
+            if (y + 1 >= line_limit) {
+                return result.str();
+            }
+        }
+
+        return result.str();
+    }
+
     size_type x_size() const {
         return _x_size;
     }

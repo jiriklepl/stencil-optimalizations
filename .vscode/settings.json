@@ -12,6 +12,7 @@
         "popcountll",
         "spacefiller",
         "STENCILBENCH",
+        "wrows",
         "zeroer"
     ]
 }

@@ -54,6 +54,9 @@ class ExperimentManager {
     template <typename word_type>
     using ColsTemplatedOps = algorithms::BitwiseColsTemplatedOps<word_type>;
 
+    template <typename word_type>
+    using WastefulRowsOps = algorithms::WastefulRowsOps<word_type>;
+
     enum class AlgMode {
         Timed = 0,
         NotTimed = 1,
@@ -76,6 +79,10 @@ class ExperimentManager {
         _2d_repo-> template register_algorithm<alg::GoLCpuBitwiseNaive<grid_cell_t, 32, alg::BitTileMode>>("gol-cpu-bitwise-tiles-naive-32");
         _2d_repo-> template register_algorithm<alg::GoLCpuBitwiseNaive<grid_cell_t, 64, alg::BitTileMode>>("gol-cpu-bitwise-tiles-naive-64");
 
+        _2d_repo-> template register_algorithm<alg::GoLCpuBitwiseNaive<grid_cell_t, 16, alg::BitWastefulRowsMode>>("gol-cpu-bitwise-wrows-naive-16");
+        _2d_repo-> template register_algorithm<alg::GoLCpuBitwiseNaive<grid_cell_t, 32, alg::BitWastefulRowsMode>>("gol-cpu-bitwise-wrows-naive-32");
+        _2d_repo-> template register_algorithm<alg::GoLCpuBitwiseNaive<grid_cell_t, 64, alg::BitWastefulRowsMode>>("gol-cpu-bitwise-wrows-naive-64");
+
         _2d_repo-> template register_algorithm<alg::GoLCpuBitwise<grid_cell_t, 16, ColsTemplatedOps>>("gol-cpu-bitwise-cols-16");
         _2d_repo-> template register_algorithm<alg::GoLCpuBitwise<grid_cell_t, 32, ColsTemplatedOps>>("gol-cpu-bitwise-cols-32");
         _2d_repo-> template register_algorithm<alg::GoLCpuBitwise<grid_cell_t, 64, ColsTemplatedOps>>("gol-cpu-bitwise-cols-64");
@@ -87,6 +94,10 @@ class ExperimentManager {
         _2d_repo-> template register_algorithm<alg::GoLCpuBitwise<grid_cell_t, 16, TilesMacroOps>>("gol-cpu-bitwise-tiles-macro-16");
         _2d_repo-> template register_algorithm<alg::GoLCpuBitwise<grid_cell_t, 32, TilesMacroOps>>("gol-cpu-bitwise-tiles-macro-32");
         _2d_repo-> template register_algorithm<alg::GoLCpuBitwise<grid_cell_t, 64, TilesMacroOps>>("gol-cpu-bitwise-tiles-macro-64");
+
+        _2d_repo-> template register_algorithm<alg::GoLCpuBitwise<grid_cell_t, 16, WastefulRowsOps>>("gol-cpu-bitwise-wrows-simd-16");
+        _2d_repo-> template register_algorithm<alg::GoLCpuBitwise<grid_cell_t, 32, WastefulRowsOps>>("gol-cpu-bitwise-wrows-simd-32");
+        _2d_repo-> template register_algorithm<alg::GoLCpuBitwise<grid_cell_t, 64, WastefulRowsOps>>("gol-cpu-bitwise-wrows-simd-64");
 
         // CUDA
 
@@ -101,6 +112,10 @@ class ExperimentManager {
         _2d_repo-> template register_algorithm<alg::GoLCudaNaiveBitwise<grid_cell_t, 16, alg::BitTileMode>>("gol-cuda-naive-bitwise-tiles-16");
         _2d_repo-> template register_algorithm<alg::GoLCudaNaiveBitwise<grid_cell_t, 32, alg::BitTileMode>>("gol-cuda-naive-bitwise-tiles-32");
         _2d_repo-> template register_algorithm<alg::GoLCudaNaiveBitwise<grid_cell_t, 64, alg::BitTileMode>>("gol-cuda-naive-bitwise-tiles-64");
+
+        _2d_repo-> template register_algorithm<alg::GoLCudaNaiveBitwise<grid_cell_t, 16, alg::BitTileMode>>("gol-cuda-naive-bitwise-wrows-16");
+        _2d_repo-> template register_algorithm<alg::GoLCudaNaiveBitwise<grid_cell_t, 32, alg::BitTileMode>>("gol-cuda-naive-bitwise-wrows-32");
+        _2d_repo-> template register_algorithm<alg::GoLCudaNaiveBitwise<grid_cell_t, 64, alg::BitTileMode>>("gol-cuda-naive-bitwise-wrows-64");
 
         _2d_repo-> template register_algorithm<alg::GoLCudaNaiveBitwiseNoMacro<grid_cell_t, 16>>("gol-cuda-naive-bitwise-no-macro-16");
         _2d_repo-> template register_algorithm<alg::GoLCudaNaiveBitwiseNoMacro<grid_cell_t, 32>>("gol-cuda-naive-bitwise-no-macro-32");
