@@ -6,8 +6,6 @@
 #include "../../../../infrastructure/timer.hpp"
 #include "../../../_shared/common_grid_types.hpp"
 
-#define CELL_NEIGHBOURS 8
-
 #define MIN_NOF_NEIGH_FROM_ALIVE_TO_ALIVE 2
 #define MAX_NOF_NEIGH_FROM_ALIVE_TO_ALIVE 3
 #define MIN_NOF_NEIGH_FROM_DEAD_TO_ALIVE 3
@@ -47,22 +45,23 @@ __device__ unsigned char getSubCellD (CELL_TYPE cell, char pos)
 }
 
 template <typename policy, typename CELL_TYPE>
-__global__ void GOL_packed (std::size_t GRID_SIZE, CELL_TYPE *grid, CELL_TYPE *newGrid, int *GPU_lookup_table)
+__global__ void GOL_packed (int GRID_SIZE, CELL_TYPE *grid, CELL_TYPE *newGrid, int *GPU_lookup_table)
 {
-    constexpr std::size_t ELEMENTS_PER_CELL = policy::ELEMENTS_PER_CELL;
-    std::size_t ROW_SIZE = GRID_SIZE / ELEMENTS_PER_CELL;
+    constexpr int ELEMENTS_PER_CELL = policy::ELEMENTS_PER_CELL;
+    constexpr int CELL_NEIGHBOURS = policy::CELL_NEIGHBOURS;
+    const int ROW_SIZE = GRID_SIZE / ELEMENTS_PER_CELL;
 
     // We want id ∈ [1,SIZE]
-    int iy = blockDim.y * blockIdx.y + threadIdx.y + 1;
-    int ix = blockDim.x * blockIdx.x + threadIdx.x + 1;
-    int id = iy * (ROW_SIZE+2) + ix;
+    const int iy = blockDim.y * blockIdx.y + threadIdx.y + 1;
+    const int ix = blockDim.x * blockIdx.x + threadIdx.x + 1;
+    const int id = iy * (ROW_SIZE+2) + ix;
     CELL_TYPE cell, new_cell=0; 
     CELL_TYPE up_cell, down_cell, right_cell, left_cell;                // Up,down,right,left cells
     CELL_TYPE upleft_cell, downleft_cell, upright_cell, downright_cell; // Diagonal cells
     unsigned char subcell;
 
-    int k, numNeighbors;
-    int (*lookup_table)[CELL_NEIGHBOURS+1] = (int (*)[CELL_NEIGHBOURS+1]) GPU_lookup_table;
+    int numNeighbors;
+    const int (*const lookup_table)[CELL_NEIGHBOURS+1] = (const int (*)[CELL_NEIGHBOURS+1]) GPU_lookup_table;
 
     if (iy>0 && iy <= GRID_SIZE && ix> 0 && ix <= ROW_SIZE) {
          cell = grid[id];
@@ -82,7 +81,7 @@ __global__ void GOL_packed (std::size_t GRID_SIZE, CELL_TYPE *grid, CELL_TYPE *n
         setSubCellD<policy> (&new_cell, 0, lookup_table[subcell][numNeighbors]);
 
         // Middle subcells:
-        for (k=1; k<CELL_NEIGHBOURS-1; k++) {
+        for (int k=1; k<ELEMENTS_PER_CELL-1; k++) {
             numNeighbors = getSubCellD<policy> (up_cell, k) + getSubCellD<policy> (down_cell, k); // upper lower
             numNeighbors += getSubCellD<policy> (cell, k-1) + getSubCellD<policy> (cell, k+1); // left right
             numNeighbors += getSubCellD<policy> (up_cell, k-1) + getSubCellD<policy> (down_cell, k-1); // diagonals left
@@ -91,7 +90,7 @@ __global__ void GOL_packed (std::size_t GRID_SIZE, CELL_TYPE *grid, CELL_TYPE *n
             setSubCellD<policy> (&new_cell, k, lookup_table[subcell][numNeighbors]);
         }
 
-        // Last (CELL_NEIGHBOURS-1) subcell:
+        // Last (ELEMENTS_PER_CELL-1) subcell:
         right_cell = grid[id-1];
         upright_cell = grid[id-(ROW_SIZE+3)];
         downright_cell = grid[id+(ROW_SIZE+1)];
@@ -122,8 +121,9 @@ __global__ void GOL_packed (std::size_t GRID_SIZE, CELL_TYPE *grid, CELL_TYPE *n
 }
 
 __global__ void kernel_init_lookup_table (int *GPU_lookup_table) {
-    int (*lookup_table)[CELL_NEIGHBOURS+1] = (int (*)[CELL_NEIGHBOURS+1]) GPU_lookup_table;
+    constexpr std::size_t CELL_NEIGHBOURS = 8;
 
+    int (*lookup_table)[CELL_NEIGHBOURS+1] = (int (*)[CELL_NEIGHBOURS+1]) GPU_lookup_table;
 
     if ( threadIdx.y < 2 && threadIdx.x < (CELL_NEIGHBOURS+1) ) {
         // Init lookup_table for GOL
