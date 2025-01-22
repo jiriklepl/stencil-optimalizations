@@ -46,10 +46,10 @@ __31="2147483648"
 
 # ALGORITHM="gol-cpu-bitwise-wrows-naive-64"
 # ALGORITHM="gol-cpu-bitwise-wrows-simd-64"
-# ALGORITHM="gol-cuda-naive-bitwise-wrows-64"
+ALGORITHM="gol-cuda-naive-bitwise-wrows-64"
 
 # ALGORITHM="gol-cpu-bitwise-tiles-macro-64"
-ALGORITHM="gol-cuda-naive-bitwise-tiles-64"
+# ALGORITHM="gol-cuda-naive-bitwise-tiles-64"
 # ALGORITHM="gol-cpu-naive"
 # ALGORITHM="gol-cpu-bitwise-cols-naive-64"
 # ALGORITHM="gol-cuda-naive-bitwise-tiles-32"
@@ -67,8 +67,8 @@ ALGORITHM="gol-cuda-naive-bitwise-tiles-64"
 # ALGORITHM="gol-cuda-naive-just-tiling-cols-64"
 # ALGORITHM="gol-cuda-naive-just-tiling-64--bit-tiles"
 # ALGORITHM="gol-cuda-naive-just-tiling-cols-64"
-GRID_DIMENSIONS_X=$__13
-GRID_DIMENSIONS_Y=$__13
+GRID_DIMENSIONS_X=$__14
+GRID_DIMENSIONS_Y=$__14
 # GRID_DIMENSIONS_X=$((8 * 6))
 # GRID_DIMENSIONS_Y=$((8 * 6))
 ITERATIONS="1024"
@@ -79,13 +79,13 @@ BASE_GRID_ENCODING="char"
 WARMUP_ROUNDS="0"
 MEASUREMENT_ROUNDS="1"
 
-DATA_LOADER_NAME="random-ones-zeros"
+# DATA_LOADER_NAME="random-ones-zeros"
 # DATA_LOADER_NAME="always-changing"
 # DATA_LOADER_NAME="zeros"
-# DATA_LOADER_NAME="lexicon"
+DATA_LOADER_NAME="lexicon"
 # PATTERN_EXPRESSION="blinker[10,10]"
 # PATTERN_EXPRESSION="glider[3,3] glider[10,10] glider[20,20]"
-# PATTERN_EXPRESSION="spacefiller[$((GRID_DIMENSIONS_X/2)),$((GRID_DIMENSIONS_Y/2))]"
+PATTERN_EXPRESSION="spacefiller[$((GRID_DIMENSIONS_X/2)),$((GRID_DIMENSIONS_Y/2))]"
 # PATTERN_EXPRESSION="gosper-glider-gun[0,0]"
 
 MEASURE_SPEEDUP="true"
@@ -103,7 +103,7 @@ VALIDATE="true"
 # VALIDATE="false"
 # PRINT_VALIDATION_DIFF="true"
 PRINT_VALIDATION_DIFF="false"
-# VALIDATION_ALGORITHM_NAME="gol-cpu-naive"
+VALIDATION_ALGORITHM_NAME="gol-cpu-naive"
 VALIDATION_ALGORITHM_NAME="gol-cuda-naive"
 
 ANIMATE_OUTPUT="false"
