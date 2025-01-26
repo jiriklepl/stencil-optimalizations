@@ -7,6 +7,8 @@
 #include "../_shared/cuda-helpers/cuch.hpp"
 #include "../_shared/cuda-helpers/block_to_2dim.hpp"
 #include "./models.hpp"
+#include "./tiling-policies.cuh"
+#include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
@@ -29,37 +31,15 @@ class GoLCudaNaiveJustTiling : public infrastructure::Algorithm<2, grid_cell_t> 
     using BitGrid = GeneralBitGrid<word_type, bit_grid_mode>;
     using BitGrid_ptr = std::unique_ptr<BitGrid>;
 
+    template <template <typename> class base_policy>
+    using policy = extended_policy<size_type, base_policy>;
+
     void set_and_format_input_data(const DataGrid& data) override {
         bit_grid = std::make_unique<BitGrid>(data);
 
         thread_block_size = this->params.thread_block_size;
-        std::cout << "Thread block size: " << thread_block_size << std::endl;
-        
-        cuda_data.warp_dims = {
-            .x = this->params.warp_dims_x,
-            .y = this->params.warp_dims_y
-        };
-        
-        cuda_data.warp_tile_dims = {
-            .x = this->params.warp_tile_dims_x,
-            .y = this->params.warp_tile_dims_y
-        };
-
-        std::cout << "Warp size: " << warp_size() << std::endl;
-        auto warp_count = thread_block_size / warp_size();
-        std::cout << "Warp count: " << warp_count << std::endl;
-        auto squarish_block_size = get_2d_block(warp_count);
-
-        std::cout << "grid size: " << bit_grid->x_size() << " " << bit_grid->y_size() << std::endl;
-        std::cout << "Squarish block size: " << squarish_block_size.x << " " << squarish_block_size.y << std::endl;
-
-        cuda_data.block_dims = {
-            .x = squarish_block_size.x,
-            .y = squarish_block_size.y
-        };
 
         assert(warp_size() == 32);
-        assert(cuda_data.block_dims.x * cuda_data.block_dims.y * warp_size() == thread_block_size);
     }
 
     void initialize_data_structures() override {
@@ -78,13 +58,13 @@ class GoLCudaNaiveJustTiling : public infrastructure::Algorithm<2, grid_cell_t> 
     void run(size_type iterations) override {
         switch (this->params.streaming_direction) {
             case StreamingDir::in_X:
-                run_kernel<StreamingDir::in_X>(iterations);
+                run_kernel_in_direction<StreamingDir::in_X>(iterations);
                 break;
             case StreamingDir::in_Y:
-                run_kernel<StreamingDir::in_Y>(iterations);
+                run_kernel_in_direction<StreamingDir::in_Y>(iterations);
                 break;
             case StreamingDir::NAIVE:
-                run_kernel<StreamingDir::NAIVE>(iterations);
+                run_kernel_in_direction<StreamingDir::NAIVE>(iterations);
                 break;
             default:
                 throw std::runtime_error("Invalid streaming direction");
@@ -117,16 +97,15 @@ class GoLCudaNaiveJustTiling : public infrastructure::Algorithm<2, grid_cell_t> 
     std::size_t thread_block_size;
     std::size_t _performed_iterations;
 
-
-    template <StreamingDir Direction>
+    template <StreamingDir Direction, typename tiling_policy>
     void run_kernel(size_type iterations);
 
     std::size_t warp_tile_size() const {
-        return cuda_data.warp_tile_dims.x * cuda_data.warp_tile_dims.y;
+        return this->params.warp_tile_dims_x * this->params.warp_tile_dims_y;
     }
 
     std::size_t warp_size() const {
-        return cuda_data.warp_dims.x * cuda_data.warp_dims.y;
+        return this->params.warp_dims_x * this->params.warp_dims_y;
     }
 
     std::size_t get_warp_tiles_count() const {
@@ -146,6 +125,19 @@ class GoLCudaNaiveJustTiling : public infrastructure::Algorithm<2, grid_cell_t> 
 
     std::size_t tiles_per_block() const {
         return thread_block_size / warp_size();
+    }
+
+    template <StreamingDir Direction>
+    void run_kernel_in_direction(size_type iterations) {
+        if (policy<thb256__warp32x1__warp_tile32x1>::is_for(this->params)) {
+            run_kernel<Direction, policy<thb256__warp32x1__warp_tile32x1>>(iterations);
+        } 
+        else if (policy<thb256__warp32x1__warp_tile32x4>::is_for(this->params)) {
+            run_kernel<Direction, policy<thb256__warp32x1__warp_tile32x4>>(iterations);
+        }
+        else {
+            throw std::runtime_error("Invalid policy");
+        }
     }
 
 };

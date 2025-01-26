@@ -11,6 +11,7 @@
 #include <cuda_runtime.h>
 #include "../_shared/common_grid_types.hpp"
 #include "../_shared/common_grid_types.hpp"
+#include "./tiling-policies.cuh"
 
 namespace algorithms::cuda_naive_local {
 
@@ -28,73 +29,7 @@ using WarpInfo = algorithms::cuda_naive_local::WarpInformation<word_type, idx_t>
 namespace {
 
 __device__ __forceinline__ idx_t get_idx(idx_t x, idx_t y, idx_t x_size) {
-    auto res = y * x_size + x;
-    if (res >= 1024 * 1024) {
-        auto idx = blockIdx.x * blockDim.x + threadIdx.x;
-        // printf("x: %llu, y: %llu, x_size: %llu, idx: %d\n", x, y, x_size, idx);
-    }
-    return res;
-}
-
-template <typename word_type, typename CudaData>
-__device__ __forceinline__ WarpInfo<word_type> get_warp_info(const CudaData& data) {
-    WarpInfo<word_type> info;
-
-    auto idx = blockIdx.x * blockDim.x + threadIdx.x;
-
-    info.warp_idx = idx / WARP_SIZE;
-    info.lane_idx = idx % WARP_SIZE;
-    
-    info.x_block_abs_size = data.warp_tile_dims.x * data.block_dims.x;
-    info.y_block_abs_size = data.warp_tile_dims.y * data.block_dims.y;
-
-    info.x_block_count = data.x_size / info.x_block_abs_size;
-
-    info.x_block = blockIdx.x % info.x_block_count;
-    info.y_block = blockIdx.x / info.x_block_count;
-
-    idx_t first_abs_x_in_block = info.x_block * info.x_block_abs_size;
-    idx_t first_abs_y_in_block = info.y_block * info.y_block_abs_size;
-
-    idx_t warp_idx_within_block = threadIdx.x / WARP_SIZE;
-
-    info.x_warp = warp_idx_within_block % data.block_dims.x;
-    info.y_warp = warp_idx_within_block / data.block_dims.x;
-
-    idx_t first_abs_x_in_warp = first_abs_x_in_block + info.x_warp * data.warp_tile_dims.x;
-    idx_t first_abs_y_in_warp = first_abs_y_in_block + info.y_warp * data.warp_tile_dims.y;
-
-    idx_t x_within_warp = info.lane_idx % data.warp_dims.x;
-    idx_t y_within_warp = info.lane_idx / data.warp_dims.x;
-
-
-    info.x_computed_word_count = data.warp_tile_dims.x / data.warp_dims.x;
-    info.y_computed_word_count = data.warp_tile_dims.y / data.warp_dims.y;
-
-    info.x_abs_start = first_abs_x_in_warp + x_within_warp * info.x_computed_word_count;
-    info.y_abs_start = first_abs_y_in_warp + y_within_warp * info.y_computed_word_count;
-
-    if (idx == 1) {
-        printf("x_block_abs_size: %llu\n", info.x_block_abs_size);
-        printf("y_block_abs_size: %llu\n", info.y_block_abs_size);
-        printf("x_block_count: %llu\n", info.x_block_count);
-        printf("x_block: %llu\n", info.x_block);
-        printf("y_block: %llu\n", info.y_block);
-        printf("first_abs_x_in_block: %llu\n", first_abs_x_in_block);
-        printf("first_abs_y_in_block: %llu\n", first_abs_y_in_block);
-        printf("x_warp: %llu\n", info.x_warp);
-        printf("y_warp: %llu\n", info.y_warp);
-        printf("x_within_warp: %llu\n", x_within_warp);
-        printf("y_within_warp: %llu\n", y_within_warp);
-        printf("first_abs_x_in_warp: %llu\n", first_abs_x_in_warp);
-        printf("first_abs_y_in_warp: %llu\n", first_abs_y_in_warp);
-        printf("x_abs_start: %llu\n", info.x_abs_start);
-        printf("y_abs_start: %llu\n", info.y_abs_start);
-        printf("x_computed_word_count: %llu\n", info.x_computed_word_count);
-        printf("y_computed_word_count: %llu\n", info.y_computed_word_count);
-    }
-
-    return info;
+    return y * x_size + x;
 }
 
 template <typename word_type, typename CudaData>
@@ -181,14 +116,19 @@ __device__ __forceinline__ word_type load(idx_t x, idx_t y, CudaData&& data) {
 //     }
 // }
 
-template <typename word_type, typename bit_grid_mode, typename CudaData>
+template <typename word_type, typename bit_grid_mode, typename tiling_policy, typename CudaData>
 __device__ __forceinline__ bool compute_GOL_on_tile__naive_no_streaming(
     const WarpInfo<word_type>& info, CudaData&& data) {
     
     bool tile_changed = false;
 
-    for (idx_t y = info.y_abs_start; y < info.y_abs_start + info.y_computed_word_count; ++y) {
-        for (idx_t x = info.x_abs_start; x < info.x_abs_start + info.x_computed_word_count; ++x) {
+    auto x_fst = info.x_abs_start;
+    auto x_lst = info.x_abs_start + tiling_policy::X_COMPUTED_WORD_COUNT;
+    auto y_fst = info.y_abs_start;
+    auto y_lst = info.y_abs_start + tiling_policy::Y_COMPUTED_WORD_COUNT;
+
+    for (idx_t y = y_fst; y < y_lst; ++y) {
+        for (idx_t x = x_fst; x < x_lst; ++x) {
     
             word_type lt = load<word_type>(x - 1, y - 1, data);
             word_type ct = load<word_type>(x + 0, y - 1, data);
@@ -206,23 +146,26 @@ __device__ __forceinline__ bool compute_GOL_on_tile__naive_no_streaming(
                 tile_changed = true;
             }
 
-            auto idx = blockIdx.x * blockDim.x + threadIdx.x;
             data.output[get_idx(x, y, data.x_size)] = new_cc;
-            // printf("computed idx: %llu %d\n", get_idx(x, y, data.x_size), idx);
         }
     }
 
     return tile_changed;
 }
 
-template <typename word_type, typename bit_grid_mode, typename CudaData>
+template <typename word_type, typename bit_grid_mode, typename tiling_policy, typename CudaData>
 __device__ __forceinline__ bool compute_GOL_on_tile__streaming_in_x(
     const WarpInfo<word_type>& info, CudaData&& data) {
     
     bool tile_changed = false;
 
-    for (idx_t x = info.x_abs_start; x < info.x_abs_start + info.x_computed_word_count; ++x) {
-        idx_t y = info.y_abs_start;
+    auto x_fst = info.x_abs_start;
+    auto x_lst = info.x_abs_start + tiling_policy::X_COMPUTED_WORD_COUNT;
+    auto y_fst = info.y_abs_start;
+    auto y_lst = info.y_abs_start + tiling_policy::Y_COMPUTED_WORD_COUNT;
+
+    for (idx_t x = x_fst; x < x_lst; ++x) {
+        idx_t y = y_fst;
         
         word_type lt, ct, rt;
         word_type lc, cc, rc;
@@ -236,7 +179,7 @@ __device__ __forceinline__ bool compute_GOL_on_tile__streaming_in_x(
         cb = load<word_type>(x + 0, y + 0, data);
         rb = load<word_type>(x + 1, y + 0, data);
 
-        for (; y < info.y_abs_start + info.y_computed_word_count; ++y) {
+        for (; y < y_lst; ++y) {
 
             lt = lc; 
             ct = cc; 
@@ -263,14 +206,19 @@ __device__ __forceinline__ bool compute_GOL_on_tile__streaming_in_x(
     return tile_changed;
 }
 
-template <typename word_type, typename bit_grid_mode, typename CudaData>
+template <typename word_type, typename bit_grid_mode, typename tiling_policy, typename CudaData>
 __device__ __forceinline__ bool compute_GOL_on_tile__streaming_in_y(
     const WarpInfo<word_type>& info, CudaData&& data) {
     
     bool tile_changed = false;
 
-    for (idx_t y = info.y_abs_start; y < info.y_abs_start + info.y_computed_word_count; ++y) {
-        idx_t x = info.x_abs_start;
+    auto x_fst = info.x_abs_start;
+    auto x_lst = info.x_abs_start + tiling_policy::X_COMPUTED_WORD_COUNT;
+    auto y_fst = info.y_abs_start;
+    auto y_lst = info.y_abs_start + tiling_policy::Y_COMPUTED_WORD_COUNT;
+
+    for (idx_t y = y_fst; y < y_lst; ++y) {
+        idx_t x = x_fst;
 
         word_type lt, ct, rt;
         word_type lc, cc, rc;
@@ -284,7 +232,7 @@ __device__ __forceinline__ bool compute_GOL_on_tile__streaming_in_y(
         rc = load<word_type>(x + 0, y + 0, data);
         rb = load<word_type>(x + 0, y + 1, data);
 
-        for (; x < info.x_abs_start + info.x_computed_word_count; ++x) {
+        for (; x < x_lst; ++x) {
 
             lt = ct;
             lc = cc;
@@ -311,18 +259,18 @@ __device__ __forceinline__ bool compute_GOL_on_tile__streaming_in_y(
     return tile_changed;
 }
 
-template <typename word_type, typename bit_grid_mode, StreamingDir DIRECTION, typename CudaData>
+template <typename word_type, typename bit_grid_mode, StreamingDir DIRECTION, typename tiling_policy, typename CudaData>
 __device__ __forceinline__ bool compute_GOL_on_tile(
     const WarpInfo<word_type>& info, CudaData&& data) {
 
     if constexpr (DIRECTION == StreamingDir::in_X) {
-        return compute_GOL_on_tile__streaming_in_x<word_type, bit_grid_mode>(info, data);
+        return compute_GOL_on_tile__streaming_in_x<word_type, bit_grid_mode, tiling_policy>(info, data);
     }
     else if constexpr (DIRECTION == StreamingDir::in_Y) {
-        return compute_GOL_on_tile__streaming_in_y<word_type, bit_grid_mode>(info, data);
+        return compute_GOL_on_tile__streaming_in_y<word_type, bit_grid_mode, tiling_policy>(info, data);
     }
     else if constexpr (DIRECTION == StreamingDir::NAIVE) {
-        return compute_GOL_on_tile__naive_no_streaming<word_type, bit_grid_mode>(info, data);
+        return compute_GOL_on_tile__naive_no_streaming<word_type, bit_grid_mode, tiling_policy>(info, data);
     }
     else {
         printf("Invalid streaming direction %d\n", DIRECTION);
@@ -401,21 +349,18 @@ void GoLCudaNaiveLocalWithState<grid_cell_t, Bits, state_store_type, bit_grid_mo
 // JUST TILING KERNEL
 // -----------------------------------------------------------------------------------------------
 
-template <StreamingDir DIRECTION, typename bit_grid_mode, typename word_type>
+template <StreamingDir DIRECTION, typename bit_grid_mode, typename tiling_policy, typename word_type>
 __global__ void game_of_live_kernel_just_tiling(BitGridWithTiling<word_type> data) {
-    auto info = get_warp_info<word_type>(data);
-    compute_GOL_on_tile<word_type, bit_grid_mode, DIRECTION>(info, data);
+    auto info = tiling_policy::template get_warp_info<word_type, idx_t>(data.x_size);
+    compute_GOL_on_tile<word_type, bit_grid_mode, DIRECTION, tiling_policy>(info, data);
 }
 
 
 template <typename grid_cell_t, std::size_t Bits, typename bit_grid_mode>
-template <StreamingDir DIRECTION>
+template <StreamingDir DIRECTION, typename tiling_policy>
 void GoLCudaNaiveJustTiling<grid_cell_t, Bits, bit_grid_mode>::run_kernel(size_type iterations) {
     auto block_size = thread_block_size;
     auto blocks = get_thread_block_count();
-
-    std::cout << "blocks: " << blocks << std::endl;
-    std::cout << "block_size: " << block_size << std::endl;
 
     infrastructure::StopWatch stop_watch(this->params.max_runtime_seconds);
     _performed_iterations = this->params.iterations;
@@ -430,7 +375,7 @@ void GoLCudaNaiveJustTiling<grid_cell_t, Bits, bit_grid_mode>::run_kernel(size_t
             std::swap(cuda_data.input, cuda_data.output);
         }
 
-        game_of_live_kernel_just_tiling<DIRECTION, bit_grid_mode><<<blocks, block_size>>>(cuda_data);
+        game_of_live_kernel_just_tiling<DIRECTION, bit_grid_mode, tiling_policy><<<blocks, block_size>>>(cuda_data);
         CUCH(cudaPeekAtLastError());
     }
 }

@@ -43,10 +43,6 @@ struct BitGridWithTiling {
 
     std::size_t x_size;
     std::size_t y_size;
-
-    Dims warp_dims;
-    Dims warp_tile_dims;
-    Dims block_dims;
 };
 
 template <typename word_type, typename idx_t>
@@ -54,22 +50,8 @@ struct WarpInformation {
     idx_t warp_idx;
     idx_t lane_idx;
 
-    idx_t x_block_abs_size;
-    idx_t y_block_abs_size;
-
-    idx_t x_block_count;
-
-    idx_t x_block;
-    idx_t y_block;
-
-    idx_t x_warp;
-    idx_t y_warp;
-
     idx_t x_abs_start;
     idx_t y_abs_start;
-
-    idx_t x_computed_word_count;
-    idx_t y_computed_word_count;
 };
 
 template <typename state_store_type, typename idx_t>
