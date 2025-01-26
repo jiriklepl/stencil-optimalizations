@@ -54,6 +54,9 @@ struct WastefulRowsImplantation {
         return result;
     }
 
+    // this is slower
+    // word_type cell_res = (idx == 3 || idx == 9 || idx == 10) ? 1 : 0;
+
     constexpr static word_type bit_table = static_cast<word_type>(0b0000'0110'0000'1000);
 
     static __host__ __device__ __forceinline__  word_type compute_center_word(

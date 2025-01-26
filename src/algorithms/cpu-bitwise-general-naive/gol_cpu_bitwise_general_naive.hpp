@@ -45,8 +45,8 @@ class GoLCpuBitwiseNaive : public infrastructure::Algorithm<2, grid_cell_t> {
                 break;
             }
 
-            for (size_type x = 0; x < x_size; ++x) {
-                for (size_type y = 0; y < y_size; ++y) {
+            for (size_type y = 0; y < y_size; ++y) {
+                for (size_type x = 0; x < x_size; ++x) {
 
                     auto alive_neighbours = count_alive_neighbours(*source, x, y);
                     auto cell_state = source->get_value_at(x, y);

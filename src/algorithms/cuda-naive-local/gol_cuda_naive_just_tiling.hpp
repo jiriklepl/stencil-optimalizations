@@ -5,6 +5,7 @@
 #include "../_shared/bitwise/bit_word_types.hpp"
 #include "../_shared/bitwise/general_bit_grid.hpp"
 #include "../_shared/cuda-helpers/cuch.hpp"
+#include "../_shared/cuda-helpers/block_to_2dim.hpp"
 #include "./models.hpp"
 #include <cassert>
 #include <cstddef>
@@ -32,6 +33,7 @@ class GoLCudaNaiveJustTiling : public infrastructure::Algorithm<2, grid_cell_t> 
         bit_grid = std::make_unique<BitGrid>(data);
 
         thread_block_size = this->params.thread_block_size;
+        std::cout << "Thread block size: " << thread_block_size << std::endl;
         
         cuda_data.warp_dims = {
             .x = this->params.warp_dims_x,
@@ -43,7 +45,21 @@ class GoLCudaNaiveJustTiling : public infrastructure::Algorithm<2, grid_cell_t> 
             .y = this->params.warp_tile_dims_y
         };
 
+        std::cout << "Warp size: " << warp_size() << std::endl;
+        auto warp_count = thread_block_size / warp_size();
+        std::cout << "Warp count: " << warp_count << std::endl;
+        auto squarish_block_size = get_2d_block(warp_count);
+
+        std::cout << "grid size: " << bit_grid->x_size() << " " << bit_grid->y_size() << std::endl;
+        std::cout << "Squarish block size: " << squarish_block_size.x << " " << squarish_block_size.y << std::endl;
+
+        cuda_data.block_dims = {
+            .x = squarish_block_size.x,
+            .y = squarish_block_size.y
+        };
+
         assert(warp_size() == 32);
+        assert(cuda_data.block_dims.x * cuda_data.block_dims.y * warp_size() == thread_block_size);
     }
 
     void initialize_data_structures() override {

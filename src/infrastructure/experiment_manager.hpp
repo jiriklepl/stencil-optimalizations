@@ -137,6 +137,10 @@ class ExperimentManager {
         _2d_repo-> template register_algorithm<cuda_naive_local::GoLCudaNaiveJustTiling<grid_cell_t, 32, alg::BitTileMode>>("gol-cuda-naive-just-tiling-32--bit-tiles");
         _2d_repo-> template register_algorithm<cuda_naive_local::GoLCudaNaiveJustTiling<grid_cell_t, 64, alg::BitTileMode>>("gol-cuda-naive-just-tiling-64--bit-tiles");
 
+        _2d_repo-> template register_algorithm<cuda_naive_local::GoLCudaNaiveJustTiling<grid_cell_t, 16, alg::BitWastefulRowsMode>>("gol-cuda-naive-just-tiling-16--wrows");
+        _2d_repo-> template register_algorithm<cuda_naive_local::GoLCudaNaiveJustTiling<grid_cell_t, 32, alg::BitWastefulRowsMode>>("gol-cuda-naive-just-tiling-32--wrows");
+        _2d_repo-> template register_algorithm<cuda_naive_local::GoLCudaNaiveJustTiling<grid_cell_t, 64, alg::BitWastefulRowsMode>>("gol-cuda-naive-just-tiling-64--wrows");
+
         // AN5D
 
         _2d_repo-> template register_algorithm<alg::An5dAlg<grid_cell_t, 32, alg::ExecModel::CPU, alg::BitColumnsMode>>("an5d-cpu-32-cols");
@@ -294,11 +298,16 @@ class ExperimentManager {
 
         TimedAlgorithm<Dims, ElementType> timed_alg(&alg);
 
+        std::cout << "seting params" << std::endl;
         timed_alg.set_params(params);
 
+        std::cout << "seting and formating input data" << std::endl;
         timed_alg.set_and_format_input_data(init_data);
+        std::cout << "initialize data structures" << std::endl;
         timed_alg.initialize_data_structures();
+        std::cout << "running" << std::endl;
         timed_alg.run(params.iterations);
+        std::cout << "finalizing data structures" << std::endl;
         timed_alg.finalize_data_structures();
 
 

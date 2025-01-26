@@ -28,7 +28,12 @@ using WarpInfo = algorithms::cuda_naive_local::WarpInformation<word_type, idx_t>
 namespace {
 
 __device__ __forceinline__ idx_t get_idx(idx_t x, idx_t y, idx_t x_size) {
-    return y * x_size + x;
+    auto res = y * x_size + x;
+    if (res >= 1024 * 1024) {
+        auto idx = blockIdx.x * blockDim.x + threadIdx.x;
+        // printf("x: %llu, y: %llu, x_size: %llu, idx: %d\n", x, y, x_size, idx);
+    }
+    return res;
 }
 
 template <typename word_type, typename CudaData>
@@ -40,20 +45,54 @@ __device__ __forceinline__ WarpInfo<word_type> get_warp_info(const CudaData& dat
     info.warp_idx = idx / WARP_SIZE;
     info.lane_idx = idx % WARP_SIZE;
     
-    info.x_tiles = data.x_size / data.warp_tile_dims.x;
-    info.y_tiles = data.y_size / data.warp_tile_dims.y;
+    info.x_block_abs_size = data.warp_tile_dims.x * data.block_dims.x;
+    info.y_block_abs_size = data.warp_tile_dims.y * data.block_dims.y;
 
-    info.x_tile = info.warp_idx % info.x_tiles;
-    info.y_tile = info.warp_idx / info.x_tiles;
-    
-    info.x_in_warp = info.lane_idx % data.warp_dims.x;
-    info.y_in_warp = info.lane_idx / data.warp_dims.x;
-    
-    info.x_cols_in_warp = data.warp_tile_dims.x / data.warp_dims.x;
-    info.y_rows_in_warp = data.warp_tile_dims.y / data.warp_dims.y;
+    info.x_block_count = data.x_size / info.x_block_abs_size;
 
-    info.x_start = (info.x_tile * data.warp_tile_dims.x) + (info.x_in_warp * info.x_cols_in_warp);
-    info.y_start = (info.y_tile * data.warp_tile_dims.y) + (info.y_in_warp * info.y_rows_in_warp);
+    info.x_block = blockIdx.x % info.x_block_count;
+    info.y_block = blockIdx.x / info.x_block_count;
+
+    idx_t first_abs_x_in_block = info.x_block * info.x_block_abs_size;
+    idx_t first_abs_y_in_block = info.y_block * info.y_block_abs_size;
+
+    idx_t warp_idx_within_block = threadIdx.x / WARP_SIZE;
+
+    info.x_warp = warp_idx_within_block % data.block_dims.x;
+    info.y_warp = warp_idx_within_block / data.block_dims.x;
+
+    idx_t first_abs_x_in_warp = first_abs_x_in_block + info.x_warp * data.warp_tile_dims.x;
+    idx_t first_abs_y_in_warp = first_abs_y_in_block + info.y_warp * data.warp_tile_dims.y;
+
+    idx_t x_within_warp = info.lane_idx % data.warp_dims.x;
+    idx_t y_within_warp = info.lane_idx / data.warp_dims.x;
+
+
+    info.x_computed_word_count = data.warp_tile_dims.x / data.warp_dims.x;
+    info.y_computed_word_count = data.warp_tile_dims.y / data.warp_dims.y;
+
+    info.x_abs_start = first_abs_x_in_warp + x_within_warp * info.x_computed_word_count;
+    info.y_abs_start = first_abs_y_in_warp + y_within_warp * info.y_computed_word_count;
+
+    if (idx == 1) {
+        printf("x_block_abs_size: %llu\n", info.x_block_abs_size);
+        printf("y_block_abs_size: %llu\n", info.y_block_abs_size);
+        printf("x_block_count: %llu\n", info.x_block_count);
+        printf("x_block: %llu\n", info.x_block);
+        printf("y_block: %llu\n", info.y_block);
+        printf("first_abs_x_in_block: %llu\n", first_abs_x_in_block);
+        printf("first_abs_y_in_block: %llu\n", first_abs_y_in_block);
+        printf("x_warp: %llu\n", info.x_warp);
+        printf("y_warp: %llu\n", info.y_warp);
+        printf("x_within_warp: %llu\n", x_within_warp);
+        printf("y_within_warp: %llu\n", y_within_warp);
+        printf("first_abs_x_in_warp: %llu\n", first_abs_x_in_warp);
+        printf("first_abs_y_in_warp: %llu\n", first_abs_y_in_warp);
+        printf("x_abs_start: %llu\n", info.x_abs_start);
+        printf("y_abs_start: %llu\n", info.y_abs_start);
+        printf("x_computed_word_count: %llu\n", info.x_computed_word_count);
+        printf("y_computed_word_count: %llu\n", info.y_computed_word_count);
+    }
 
     return info;
 }
@@ -66,81 +105,81 @@ __device__ __forceinline__ word_type load(idx_t x, idx_t y, CudaData&& data) {
     return data.input[get_idx(x, y, data.x_size)];
 }
 
-template <typename word_type>
-__device__ __forceinline__ idx_t store_idx(idx_t x_tile, idx_t y_tile, const WarpInfo<word_type>& info) {
-    auto tile_idx = y_tile * info.x_tiles + x_tile;
-    auto warp_tiles_in_block = blockDim.x / WARP_SIZE;
+// template <typename word_type>
+// __device__ __forceinline__ idx_t store_idx(idx_t x_tile, idx_t y_tile, const WarpInfo<word_type>& info) {
+//     auto tile_idx = y_tile * info.x_tiles + x_tile;
+//     auto warp_tiles_in_block = blockDim.x / WARP_SIZE;
 
-    auto store_idx = tile_idx / warp_tiles_in_block;
-    return store_idx;
-}
+//     auto store_idx = tile_idx / warp_tiles_in_block;
+//     return store_idx;
+// }
 
-template <typename word_type>
-__device__ __forceinline__ int store_bit_idx(idx_t x_tile, idx_t y_tile, const WarpInfo<word_type>& info) {
-    auto tile_idx = y_tile * info.x_tiles + x_tile;
-    auto warp_tiles_in_block = blockDim.x / WARP_SIZE;
+// template <typename word_type>
+// __device__ __forceinline__ int store_bit_idx(idx_t x_tile, idx_t y_tile, const WarpInfo<word_type>& info) {
+//     auto tile_idx = y_tile * info.x_tiles + x_tile;
+//     auto warp_tiles_in_block = blockDim.x / WARP_SIZE;
 
-    return tile_idx % warp_tiles_in_block;
-}
+//     return tile_idx % warp_tiles_in_block;
+// }
 
-template <typename word_type, typename state_store_type>
-__device__ __forceinline__ bool warp_tile_changed(
-    idx_t x_tile, idx_t y_tile, 
-    const WarpInfo<word_type>& info, state_store_type* store) {
+// template <typename word_type, typename state_store_type>
+// __device__ __forceinline__ bool warp_tile_changed(
+//     idx_t x_tile, idx_t y_tile, 
+//     const WarpInfo<word_type>& info, state_store_type* store) {
 
-    auto word = store[store_idx(x_tile, y_tile, info)];
-    auto mask = 1 << store_bit_idx(x_tile, y_tile, info);
+//     auto word = store[store_idx(x_tile, y_tile, info)];
+//     auto mask = 1 << store_bit_idx(x_tile, y_tile, info);
 
-    return word & mask;
-}
+//     return word & mask;
+// }
 
-template <typename word_type, typename state_store_type>
-__device__ __forceinline__ bool tile_or_neighbours_changed(
-    idx_t x_tile, idx_t y_tile,
-    const WarpInfo<word_type>& info, state_store_type* store) {
+// template <typename word_type, typename state_store_type>
+// __device__ __forceinline__ bool tile_or_neighbours_changed(
+//     idx_t x_tile, idx_t y_tile,
+//     const WarpInfo<word_type>& info, state_store_type* store) {
 
-    idx_t x_start = max(static_cast<idx_t>(0), x_tile - 1);
-    idx_t y_start = max(static_cast<idx_t>(0), y_tile - 1);
-    idx_t x_end = min(info.x_tiles, x_tile + 1);
-    idx_t y_end = min(info.y_tiles, y_tile + 1);
+//     idx_t x_start = max(static_cast<idx_t>(0), x_tile - 1);
+//     idx_t y_start = max(static_cast<idx_t>(0), y_tile - 1);
+//     idx_t x_end = min(info.x_tiles, x_tile + 1);
+//     idx_t y_end = min(info.y_tiles, y_tile + 1);
     
-    for(idx_t y = y_start; y <= y_end + 1; ++y) {
-        for(idx_t x = x_start; x <= x_end; ++x) {
-            if (warp_tile_changed(x, y, info, store)) {
-                return true;
-            }
-        }
-    }
+//     for(idx_t y = y_start; y <= y_end + 1; ++y) {
+//         for(idx_t x = x_start; x <= x_end; ++x) {
+//             if (warp_tile_changed(x, y, info, store)) {
+//                 return true;
+//             }
+//         }
+//     }
 
-    return false;
-}
+//     return false;
+// }
 
-template <typename state_store_type>
-__device__ __forceinline__ void set_changed_state_for_block(
-    shm_private_value_t* block_store,
-    state_store_type* global_store) {
+// template <typename state_store_type>
+// __device__ __forceinline__ void set_changed_state_for_block(
+//     shm_private_value_t* block_store,
+//     state_store_type* global_store) {
         
-    auto tiles = blockDim.x / WARP_SIZE;
-    state_store_type result = 0;
+//     auto tiles = blockDim.x / WARP_SIZE;
+//     state_store_type result = 0;
 
-    for (int i = 0; i < tiles; ++i) {
-        state_store_type val = block_store[i] ? 1 : 0;
-        result |= val << i;
-    }
+//     for (int i = 0; i < tiles; ++i) {
+//         state_store_type val = block_store[i] ? 1 : 0;
+//         result |= val << i;
+//     }
 
-    global_store[blockIdx.x] = result;
-}
+//     global_store[blockIdx.x] = result;
+// }
 
-template <typename word_type, typename state_store_type>
-__device__ __forceinline__ void cpy_to_output(
-    const WarpInfo<word_type>& info, const BitGridWithChangeInfo<word_type, state_store_type>& data) {
+// template <typename word_type, typename state_store_type>
+// __device__ __forceinline__ void cpy_to_output(
+//     const WarpInfo<word_type>& info, const BitGridWithChangeInfo<word_type, state_store_type>& data) {
     
-    for (idx_t y = info.y_start; y < info.y_start + info.y_rows_in_warp; ++y) {
-        for (idx_t x = info.x_start; x < info.x_start + info.x_cols_in_warp; ++x) {
-            data.output[get_idx(x, y, data.x_size)] = data.input[get_idx(x, y, data.x_size)];
-        }
-    }
-}
+//     for (idx_t x = info.x_abs_start; x < info.x_abs_start + info.x_computed_word_count; ++x) {
+//         for (idx_t y = info.y_abs_start; y < info.y_abs_start + info.y_computed_word_count; ++y) {
+//             data.output[get_idx(x, y, data.x_size)] = data.input[get_idx(x, y, data.x_size)];
+//         }
+//     }
+// }
 
 template <typename word_type, typename bit_grid_mode, typename CudaData>
 __device__ __forceinline__ bool compute_GOL_on_tile__naive_no_streaming(
@@ -148,8 +187,8 @@ __device__ __forceinline__ bool compute_GOL_on_tile__naive_no_streaming(
     
     bool tile_changed = false;
 
-    for (idx_t y = info.y_start; y < info.y_start + info.y_rows_in_warp; ++y) {
-        for (idx_t x = info.x_start; x < info.x_start + info.x_cols_in_warp; ++x) {
+    for (idx_t y = info.y_abs_start; y < info.y_abs_start + info.y_computed_word_count; ++y) {
+        for (idx_t x = info.x_abs_start; x < info.x_abs_start + info.x_computed_word_count; ++x) {
     
             word_type lt = load<word_type>(x - 1, y - 1, data);
             word_type ct = load<word_type>(x + 0, y - 1, data);
@@ -167,7 +206,9 @@ __device__ __forceinline__ bool compute_GOL_on_tile__naive_no_streaming(
                 tile_changed = true;
             }
 
+            auto idx = blockIdx.x * blockDim.x + threadIdx.x;
             data.output[get_idx(x, y, data.x_size)] = new_cc;
+            // printf("computed idx: %llu %d\n", get_idx(x, y, data.x_size), idx);
         }
     }
 
@@ -180,8 +221,8 @@ __device__ __forceinline__ bool compute_GOL_on_tile__streaming_in_x(
     
     bool tile_changed = false;
 
-    for (idx_t x = info.x_start; x < info.x_start + info.x_cols_in_warp; ++x) {
-        idx_t y = info.y_start;
+    for (idx_t x = info.x_abs_start; x < info.x_abs_start + info.x_computed_word_count; ++x) {
+        idx_t y = info.y_abs_start;
         
         word_type lt, ct, rt;
         word_type lc, cc, rc;
@@ -195,7 +236,7 @@ __device__ __forceinline__ bool compute_GOL_on_tile__streaming_in_x(
         cb = load<word_type>(x + 0, y + 0, data);
         rb = load<word_type>(x + 1, y + 0, data);
 
-        for (; y < info.y_start + info.y_rows_in_warp; ++y) {
+        for (; y < info.y_abs_start + info.y_computed_word_count; ++y) {
 
             lt = lc; 
             ct = cc; 
@@ -228,8 +269,8 @@ __device__ __forceinline__ bool compute_GOL_on_tile__streaming_in_y(
     
     bool tile_changed = false;
 
-    for (idx_t y = info.y_start; y < info.y_start + info.y_rows_in_warp; ++y) {
-        idx_t x = info.x_start;
+    for (idx_t y = info.y_abs_start; y < info.y_abs_start + info.y_computed_word_count; ++y) {
+        idx_t x = info.x_abs_start;
 
         word_type lt, ct, rt;
         word_type lc, cc, rc;
@@ -243,7 +284,7 @@ __device__ __forceinline__ bool compute_GOL_on_tile__streaming_in_y(
         rc = load<word_type>(x + 0, y + 0, data);
         rb = load<word_type>(x + 0, y + 1, data);
 
-        for (; x < info.x_start + info.x_cols_in_warp; ++x) {
+        for (; x < info.x_abs_start + info.x_computed_word_count; ++x) {
 
             lt = ct;
             lc = cc;
@@ -292,33 +333,33 @@ template <StreamingDir DIRECTION, typename bit_grid_mode, typename word_type, ty
 __global__ void game_of_live_kernel(BitGridWithChangeInfo<word_type, state_store_type> data) {
 
     extern __shared__ shm_private_value_t block_store[];
-    bool entire_tile_changed;
+    // bool entire_tile_changed;
 
-    auto info = get_warp_info<word_type>(data);
+    // auto info = get_warp_info<word_type>(data);
 
-    if (!tile_or_neighbours_changed(info.x_tile, info.y_tile, info, data.change_state_store.last)) {
+    // if (!tile_or_neighbours_changed(info.x_tile, info.y_tile, info, data.change_state_store.last)) {
         
-        if (warp_tile_changed(info.x_tile, info.y_tile, info, data.change_state_store.before_last)) {
-            cpy_to_output(info, data);
-        }
+    //     if (warp_tile_changed(info.x_tile, info.y_tile, info, data.change_state_store.before_last)) {
+    //         cpy_to_output(info, data);
+    //     }
         
-        entire_tile_changed = false;
-    }
-    else {
-        auto local_tile_changed = compute_GOL_on_tile<word_type, bit_grid_mode, DIRECTION>(info, data);
-        entire_tile_changed = __any_sync(0xFF'FF'FF'FF, local_tile_changed);
-    }
+    //     entire_tile_changed = false;
+    // }
+    // else {
+    //     auto local_tile_changed = compute_GOL_on_tile<word_type, bit_grid_mode, DIRECTION>(info, data);
+    //     entire_tile_changed = __any_sync(0xFF'FF'FF'FF, local_tile_changed);
+    // }
 
-    if (info.lane_idx == 0) {
-        auto tiles_per_block = blockDim.x / WARP_SIZE;
-        block_store[info.warp_idx % tiles_per_block] = entire_tile_changed ? 1 : 0;
-    }
+    // if (info.lane_idx == 0) {
+    //     auto tiles_per_block = blockDim.x / WARP_SIZE;
+    //     block_store[info.warp_idx % tiles_per_block] = entire_tile_changed ? 1 : 0;
+    // }
 
-    __syncthreads();
+    // __syncthreads();
 
-    if (threadIdx.x == 0) {
-        set_changed_state_for_block(block_store, data.change_state_store.current);
-    }
+    // if (threadIdx.x == 0) {
+    //     set_changed_state_for_block(block_store, data.change_state_store.current);
+    // }
 }
 
 } // namespace
@@ -372,6 +413,9 @@ template <StreamingDir DIRECTION>
 void GoLCudaNaiveJustTiling<grid_cell_t, Bits, bit_grid_mode>::run_kernel(size_type iterations) {
     auto block_size = thread_block_size;
     auto blocks = get_thread_block_count();
+
+    std::cout << "blocks: " << blocks << std::endl;
+    std::cout << "block_size: " << block_size << std::endl;
 
     infrastructure::StopWatch stop_watch(this->params.max_runtime_seconds);
     _performed_iterations = this->params.iterations;
@@ -442,5 +486,11 @@ template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<common::CHAR
 template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<common::INT, 16, algorithms::BitTileMode>;
 template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<common::INT, 32, algorithms::BitTileMode>;
 template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<common::INT, 64, algorithms::BitTileMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<common::CHAR, 16, algorithms::BitWastefulRowsMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<common::CHAR, 32, algorithms::BitWastefulRowsMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<common::CHAR, 64, algorithms::BitWastefulRowsMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<common::INT, 16, algorithms::BitWastefulRowsMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<common::INT, 32, algorithms::BitWastefulRowsMode>;
+template class algorithms::cuda_naive_local::GoLCudaNaiveJustTiling<common::INT, 64, algorithms::BitWastefulRowsMode>;
 
 #endif // CUDA_NAIVE_LOCAL_CU

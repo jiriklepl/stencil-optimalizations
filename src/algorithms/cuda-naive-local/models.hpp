@@ -29,6 +29,7 @@ struct BitGridWithChangeInfo {
 
     Dims warp_dims;
     Dims warp_tile_dims;
+    Dims block_dims;
 
     ChangeStateStore<change_state_store_type> change_state_store;
 };
@@ -45,6 +46,7 @@ struct BitGridWithTiling {
 
     Dims warp_dims;
     Dims warp_tile_dims;
+    Dims block_dims;
 };
 
 template <typename word_type, typename idx_t>
@@ -52,20 +54,29 @@ struct WarpInformation {
     idx_t warp_idx;
     idx_t lane_idx;
 
-    idx_t x_tile;
-    idx_t y_tile;
+    idx_t x_block_abs_size;
+    idx_t y_block_abs_size;
 
-    idx_t x_tiles;
-    idx_t y_tiles;
+    idx_t x_block_count;
 
-    idx_t x_in_warp;
-    idx_t y_in_warp;
+    idx_t x_block;
+    idx_t y_block;
 
-    idx_t x_cols_in_warp;
-    idx_t y_rows_in_warp;
+    idx_t x_warp;
+    idx_t y_warp;
 
-    idx_t x_start;
-    idx_t y_start;
+    idx_t x_abs_start;
+    idx_t y_abs_start;
+
+    idx_t x_computed_word_count;
+    idx_t y_computed_word_count;
+};
+
+template <typename state_store_type, typename idx_t>
+struct StateStoreInfo {
+    state_store_type* cached_state;
+    static constexpr std::size_t CACHE_SIZE_X = 3;
+    static constexpr std::size_t CACHE_SIZE_Y = 3;
 };
 
 } // namespace algorithms
