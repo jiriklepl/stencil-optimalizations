@@ -4,18 +4,12 @@
 #include <cstddef>
 namespace algorithms::cuda_naive_local {
 
-struct Dims {
-    std::size_t x;
-    std::size_t y;
-};
-
 template <typename change_state_store_type>
 struct ChangeStateStore {
     change_state_store_type* before_last;
     change_state_store_type* last;
     change_state_store_type* current;
 };
-
 
 template <typename word_type, typename change_state_store_type>
 struct BitGridWithChangeInfo {
@@ -26,10 +20,6 @@ struct BitGridWithChangeInfo {
 
     std::size_t x_size;
     std::size_t y_size;
-
-    Dims warp_dims;
-    Dims warp_tile_dims;
-    Dims block_dims;
 
     ChangeStateStore<change_state_store_type> change_state_store;
 };
@@ -45,20 +35,29 @@ struct BitGridWithTiling {
     std::size_t y_size;
 };
 
-template <typename word_type, typename idx_t>
+template <typename idx_t>
 struct WarpInformation {
-    idx_t warp_idx;
-    idx_t lane_idx;
+    idx_t x_block;
+    idx_t y_block;
+
+
+    idx_t x_warp;
+    idx_t y_warp;
+
+    idx_t x_block_count;
+    idx_t y_block_count;
 
     idx_t x_abs_start;
     idx_t y_abs_start;
 };
 
-template <typename state_store_type, typename idx_t>
+template <typename state_store_type>
 struct StateStoreInfo {
     state_store_type* cached_state;
     static constexpr std::size_t CACHE_SIZE_X = 3;
     static constexpr std::size_t CACHE_SIZE_Y = 3;
+
+    static constexpr std::size_t CACHE_SIZE = CACHE_SIZE_X * CACHE_SIZE_Y; 
 };
 
 } // namespace algorithms

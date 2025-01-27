@@ -6,6 +6,9 @@
 #include "../_shared/bitwise/general_bit_grid.hpp"
 #include "../_shared/cuda-helpers/cuch.hpp"
 #include "./models.hpp"
+#include "x-generated_policies.hpp"
+#include "./tiling-policies.cuh"
+#include <bitset>
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
@@ -16,6 +19,18 @@
 namespace algorithms::cuda_naive_local {
 
 using StreamingDir = infrastructure::StreamingDirection;
+
+template <typename const_t>
+struct test_policy {
+    constexpr static const_t THREAD_BLOCK_SIZE = 512;
+
+    constexpr static const_t WARP_DIM_X = 8;
+    constexpr static const_t WARP_DIM_Y = 4;
+
+    constexpr static const_t WARP_TILE_DIM_X = 16;
+    constexpr static const_t WARP_TILE_DIM_Y = 32;
+};
+
 
 template <typename grid_cell_t, std::size_t Bits, typename state_store_type, typename bit_grid_mode>
 class GoLCudaNaiveLocalWithState : public infrastructure::Algorithm<2, grid_cell_t> {
@@ -31,21 +46,14 @@ class GoLCudaNaiveLocalWithState : public infrastructure::Algorithm<2, grid_cell
 
     constexpr static std::size_t STATE_STORE_BITS = sizeof(state_store_type) * 8;
 
+    template <template <typename> class base_policy>
+    using policy = extended_policy<size_type, base_policy>;
+
     void set_and_format_input_data(const DataGrid& data) override {
         bit_grid = std::make_unique<BitGrid>(data);
 
         thread_block_size = this->params.thread_block_size;
         
-        cuda_data.warp_dims = {
-            .x = this->params.warp_dims_x,
-            .y = this->params.warp_dims_y
-        };
-        
-        cuda_data.warp_tile_dims = {
-            .x = this->params.warp_tile_dims_x,
-            .y = this->params.warp_tile_dims_y
-        };
-
         assert(warp_size() == 32);
         assert(tiles_per_block() <= STATE_STORE_BITS);
     }
@@ -79,17 +87,19 @@ class GoLCudaNaiveLocalWithState : public infrastructure::Algorithm<2, grid_cell
     void run(size_type iterations) override {
         switch (this->params.streaming_direction) {
             case StreamingDir::in_X:
-                run_kernel<StreamingDir::in_X>(iterations);
+                run_kernel_in_direction<StreamingDir::in_X>(iterations);
                 break;
             case StreamingDir::in_Y:
-                run_kernel<StreamingDir::in_Y>(iterations);
+                run_kernel_in_direction<StreamingDir::in_Y>(iterations);
                 break;
             case StreamingDir::NAIVE:
-                run_kernel<StreamingDir::NAIVE>(iterations);
+                run_kernel_in_direction<StreamingDir::NAIVE>(iterations);
                 break;
             default:
                 throw std::runtime_error("Invalid streaming direction");
         }
+
+        check_state_stores();
     }
 
     void finalize_data_structures() override {
@@ -132,15 +142,15 @@ class GoLCudaNaiveLocalWithState : public infrastructure::Algorithm<2, grid_cell
     std::size_t _performed_iterations;
 
     
-    template <StreamingDir Direction>
+    template <StreamingDir Direction, typename tiling_policy>
     void run_kernel(size_type iterations);
 
     std::size_t warp_tile_size() const {
-        return cuda_data.warp_tile_dims.x * cuda_data.warp_tile_dims.y;
+        return this->params.warp_tile_dims_x * this->params.warp_tile_dims_y;
     }
 
     std::size_t warp_size() const {
-        return cuda_data.warp_dims.x * cuda_data.warp_dims.y;
+        return this->params.warp_dims_x * this->params.warp_dims_y;
     }
 
     std::size_t get_warp_tiles_count() {
@@ -192,51 +202,196 @@ class GoLCudaNaiveLocalWithState : public infrastructure::Algorithm<2, grid_cell
             changed_tiles_in_current += __builtin_popcountll(current[i]);
         }
 
+        std::cout << "Changed tiles in last: " << changed_tiles_in_last << std::endl;
+        std::cout << "Changed tiles in current: " << changed_tiles_in_current << std::endl;
+
         print_state_store(current.data());
 
         std::cout << std::endl;
     }
 
     void print_state_store(state_store_type* store) {
-        auto x_tiles = bit_grid->x_size() / cuda_data.warp_tile_dims.x;
-        auto y_tiles = bit_grid->y_size() / cuda_data.warp_tile_dims.y;
+        auto x_tiles = bit_grid->x_size() / this->params.warp_tile_dims_x;
+        auto y_tiles = bit_grid->y_size() / this->params.warp_tile_dims_y;
 
         constexpr std::size_t MAX_WIDTH = 32 * 4;
         auto shrink_factor = x_tiles / MAX_WIDTH;
 
-        auto used_bits_in_word = tiles_per_block();
+        if (shrink_factor == 0) {
+            shrink_factor = 1;
+        }
 
-        for (std::size_t y = 0; y < y_tiles; y += shrink_factor) {
-            for (std::size_t x = 0; x < x_tiles; x += shrink_factor) {
-                bool changed = false;
+        std::cout << "x tiles: " << x_tiles << std::endl;
+        std::cout << "y tiles: " << y_tiles << std::endl;
+        std::cout << "shrink factor: " << shrink_factor << std::endl;
 
-                for (std::size_t i_y = y; i_y < y + shrink_factor; i_y++) {
-                    for (std::size_t i_x = x; i_x < x + shrink_factor; i_x++) {
-                        auto idx = i_y * x_tiles + i_x;
+        auto block_dims = runtime_block_dims<size_type>::get(this->params);
 
-                        auto word_idx = idx / used_bits_in_word;
-                        auto bit_idx = idx % used_bits_in_word;
+        auto x_block_count = x_tiles / block_dims.x;
+        auto y_block_count = y_tiles / block_dims.y;
 
-                        auto word = store[word_idx];
-                        auto bit = (word >> bit_idx) & 1;
+        std::vector<char> output(x_tiles * y_tiles, 0);
 
-                        if (bit) {
-                            changed = true;
-                            break;
-                        }
+
+        for (std::size_t y_block = 0; y_block < y_block_count; y_block++) {
+            for (std::size_t x_block = 0; x_block < x_block_count; x_block++) {
+
+                state_store_type block_state = store[y_block * x_block_count + x_block];
+                std::cout << std::bitset<16>(block_state) << " ";
+
+                auto x_base_out = x_block * block_dims.x;
+                auto y_base_out = y_block * block_dims.y;
+
+                for (std::size_t y = 0; y < block_dims.y; y++) {
+                    for (std::size_t x = 0; x < block_dims.x; x++) {
+                        auto bit_idx = y * block_dims.x + x;
+                        auto output_idx = (y_base_out + y) * x_tiles + (x_base_out + x);
+
+                        auto tile_changed = (block_state >> bit_idx) & 1;
+
+                        output[output_idx] = tile_changed ? 'X' : '.';
                     }
                 }
 
-                if (changed) {
-                    std::cout << "X";
-                } else {
-                    std::cout << ".";
-                }
             }
             std::cout << std::endl;
         }
 
         std::cout << std::endl;
+
+        for (std::size_t y = 0; y < y_tiles; y += shrink_factor) {
+            for (std::size_t x = 0; x < x_tiles; x += shrink_factor) {
+                std::cout << output[y * x_tiles + x];
+            }
+            std::cout << std::endl;
+        }
+
+
+        // auto used_bits_in_word = tiles_per_block();
+
+        // for (std::size_t y = 0; y < y_tiles; y += shrink_factor) {
+        //     for (std::size_t x = 0; x < x_tiles; x += shrink_factor) {
+        //         bool changed = false;
+
+        //         for (std::size_t i_y = y; i_y < y + shrink_factor; i_y++) {
+        //             for (std::size_t i_x = x; i_x < x + shrink_factor; i_x++) {
+        //                 auto idx = i_y * x_tiles + i_x;
+
+        //                 auto word_idx = idx / used_bits_in_word;
+        //                 auto bit_idx = idx % used_bits_in_word;
+
+        //                 auto word = store[word_idx];
+        //                 auto bit = (word >> bit_idx) & 1;
+
+        //                 if (bit) {
+        //                     changed = true;
+        //                     break;
+        //                 }
+        //             }
+        //         }
+
+        //         if (changed) {
+        //             std::cout << "X";
+        //         } else {
+        //             std::cout << ".";
+        //         }
+        //     }
+        //     std::cout << std::endl;
+        // }
+
+        // std::cout << std::endl;
+    }
+
+    // TILING POLICIES
+
+    template <StreamingDir Direction>
+    void run_kernel_in_direction(size_type iterations) {
+         run_kernel<Direction, policy<test_policy>>(iterations);
+
+        // if (policy<thb1024__warp32x1__warp_tile32x1>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb1024__warp32x1__warp_tile32x1>>(iterations);
+        // }
+        // else if (policy<thb1024__warp32x1__warp_tile32x8>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb1024__warp32x1__warp_tile32x8>>(iterations);
+        // }
+        // else if (policy<thb1024__warp32x1__warp_tile32x16>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb1024__warp32x1__warp_tile32x16>>(iterations);
+        // }
+        // else if (policy<thb1024__warp32x1__warp_tile32x32>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb1024__warp32x1__warp_tile32x32>>(iterations);
+        // }
+        // else if (policy<thb1024__warp32x1__warp_tile32x64>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb1024__warp32x1__warp_tile32x64>>(iterations);
+        // }
+        // else if (policy<thb1024__warp16x2__warp_tile32x8>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb1024__warp16x2__warp_tile32x8>>(iterations);
+        // }
+        // else if (policy<thb1024__warp16x2__warp_tile32x16>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb1024__warp16x2__warp_tile32x16>>(iterations);
+        // }
+        // else if (policy<thb1024__warp16x2__warp_tile32x32>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb1024__warp16x2__warp_tile32x32>>(iterations);
+        // }
+        // else if (policy<thb1024__warp16x2__warp_tile32x64>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb1024__warp16x2__warp_tile32x64>>(iterations);
+        // }
+        // else if (policy<thb512__warp32x1__warp_tile32x1>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb512__warp32x1__warp_tile32x1>>(iterations);
+        // }
+        // else if (policy<thb512__warp32x1__warp_tile32x8>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb512__warp32x1__warp_tile32x8>>(iterations);
+        // }
+        // else if (policy<thb512__warp32x1__warp_tile32x16>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb512__warp32x1__warp_tile32x16>>(iterations);
+        // }
+            // else if (policy<thb512__warp32x1__warp_tile32x32>::is_for(this->params)) {
+            //     run_kernel<Direction, policy<thb512__warp32x1__warp_tile32x32>>(iterations);
+            // }
+            // else if (policy<thb512__warp32x1__warp_tile32x64>::is_for(this->params)) {
+            //     run_kernel<Direction, policy<thb512__warp32x1__warp_tile32x64>>(iterations);
+            // }
+        // else if (policy<thb512__warp16x2__warp_tile32x8>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb512__warp16x2__warp_tile32x8>>(iterations);
+        // }
+        // else if (policy<thb512__warp16x2__warp_tile32x16>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb512__warp16x2__warp_tile32x16>>(iterations);
+        // }
+        // else if (policy<thb512__warp16x2__warp_tile32x32>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb512__warp16x2__warp_tile32x32>>(iterations);
+        // }
+        // else if (policy<thb512__warp16x2__warp_tile32x64>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb512__warp16x2__warp_tile32x64>>(iterations);
+        // }
+            // else if (policy<thb256__warp32x1__warp_tile32x1>::is_for(this->params)) {
+            //     run_kernel<Direction, policy<thb256__warp32x1__warp_tile32x1>>(iterations);
+            // }
+            // else if (policy<thb256__warp32x1__warp_tile32x8>::is_for(this->params)) {
+            //     run_kernel<Direction, policy<thb256__warp32x1__warp_tile32x8>>(iterations);
+            // }
+            // else if (policy<thb256__warp32x1__warp_tile32x16>::is_for(this->params)) {
+            //     run_kernel<Direction, policy<thb256__warp32x1__warp_tile32x16>>(iterations);
+            // }
+            // else if (policy<thb256__warp32x1__warp_tile32x32>::is_for(this->params)) {
+            //     run_kernel<Direction, policy<thb256__warp32x1__warp_tile32x32>>(iterations);
+            // }
+        // else if (policy<thb256__warp32x1__warp_tile32x64>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb256__warp32x1__warp_tile32x64>>(iterations);
+        // }
+        // else if (policy<thb256__warp16x2__warp_tile32x8>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb256__warp16x2__warp_tile32x8>>(iterations);
+        // }
+        // else if (policy<thb256__warp16x2__warp_tile32x16>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb256__warp16x2__warp_tile32x16>>(iterations);
+        // }
+        // else if (policy<thb256__warp16x2__warp_tile32x32>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb256__warp16x2__warp_tile32x32>>(iterations);
+        // }
+        // else if (policy<thb256__warp16x2__warp_tile32x64>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb256__warp16x2__warp_tile32x64>>(iterations);
+        // }
+        // else {
+        //     throw std::runtime_error("Invalid policy");
+        // }
     }
     
 };
