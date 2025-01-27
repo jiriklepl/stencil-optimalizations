@@ -12,97 +12,11 @@
 #include "../_shared/common_grid_types.hpp"
 #include "../_shared/common_grid_types.hpp"
 #include "./tiling-policies.cuh"
+#include "./gol-tile-computation.cuh"
 
 namespace algorithms::cuda_naive_local {
 
-using idx_t = std::int64_t;
-// using idx_t = std::int32_t;
-using shm_private_value_t = std::uint32_t;
-using StreamingDir = infrastructure::StreamingDirection;
-
-
-constexpr std::size_t WARP_SIZE = 32;
-
-using WarpInfo = algorithms::cuda_naive_local::WarpInformation<idx_t>; 
-
 namespace {
-
-__device__ __forceinline__ idx_t get_idx(idx_t x, idx_t y, idx_t x_size) {
-    return y * x_size + x;
-}
-
-template <typename word_type, typename CudaData>
-__device__ __forceinline__ word_type load(idx_t x, idx_t y, CudaData&& data) {
-    if (x < 0 || y < 0 || x >= data.x_size || y >= data.y_size)
-        return 0;
-
-    return data.input[get_idx(x, y, data.x_size)];
-}
-
-// template <typename word_type>
-// __device__ __forceinline__ idx_t store_idx(idx_t x_tile, idx_t y_tile, const WarpInfo<word_type>& info) {
-//     auto tile_idx = y_tile * info.x_tiles + x_tile;
-//     auto warp_tiles_in_block = blockDim.x / WARP_SIZE;
-
-//     auto store_idx = tile_idx / warp_tiles_in_block;
-//     return store_idx;
-// }
-
-// template <typename word_type>
-// __device__ __forceinline__ int store_bit_idx(idx_t x_tile, idx_t y_tile, const WarpInfo<word_type>& info) {
-//     auto tile_idx = y_tile * info.x_tiles + x_tile;
-//     auto warp_tiles_in_block = blockDim.x / WARP_SIZE;
-
-//     return tile_idx % warp_tiles_in_block;
-// }
-
-// template <typename word_type, typename state_store_type>
-// __device__ __forceinline__ bool warp_tile_changed(
-//     idx_t x_tile, idx_t y_tile, 
-//     const WarpInfo<word_type>& info, state_store_type* store) {
-
-//     auto word = store[store_idx(x_tile, y_tile, info)];
-//     auto mask = 1 << store_bit_idx(x_tile, y_tile, info);
-
-//     return word & mask;
-// }
-
-// template <typename word_type, typename state_store_type>
-// __device__ __forceinline__ bool tile_or_neighbours_changed(
-//     idx_t x_tile, idx_t y_tile,
-//     const WarpInfo<word_type>& info, state_store_type* store) {
-
-//     idx_t x_start = max(static_cast<idx_t>(0), x_tile - 1);
-//     idx_t y_start = max(static_cast<idx_t>(0), y_tile - 1);
-//     idx_t x_end = min(info.x_tiles, x_tile + 1);
-//     idx_t y_end = min(info.y_tiles, y_tile + 1);
-    
-//     for(idx_t y = y_start; y <= y_end + 1; ++y) {
-//         for(idx_t x = x_start; x <= x_end; ++x) {
-//             if (warp_tile_changed(x, y, info, store)) {
-//                 return true;
-//             }
-//         }
-//     }
-
-//     return false;
-// }
-
-// template <typename state_store_type>
-// __device__ __forceinline__ void set_changed_state_for_block(
-//     shm_private_value_t* block_store,
-//     state_store_type* global_store) {
-        
-//     auto tiles = blockDim.x / WARP_SIZE;
-//     state_store_type result = 0;
-
-//     for (int i = 0; i < tiles; ++i) {
-//         state_store_type val = block_store[i] ? 1 : 0;
-//         result |= val << i;
-//     }
-
-//     global_store[blockIdx.x] = result;
-// }
 
 template <typename tiling_policy, typename word_type, typename state_store_type>
 __device__ __forceinline__ void cpy_to_output(
@@ -117,167 +31,6 @@ __device__ __forceinline__ void cpy_to_output(
         for (idx_t y = y_fst; y < y_lst; ++y) {
             data.output[get_idx(x, y, data.x_size)] = data.input[get_idx(x, y, data.x_size)];
         }
-    }
-}
-
-template <typename word_type, typename bit_grid_mode, typename tiling_policy, typename CudaData>
-__device__ __forceinline__ bool compute_GOL_on_tile__naive_no_streaming(
-    const WarpInfo& info, CudaData&& data) {
-    
-    bool tile_changed = false;
-
-    auto x_fst = info.x_abs_start;
-    auto x_lst = info.x_abs_start + tiling_policy::X_COMPUTED_WORD_COUNT;
-    auto y_fst = info.y_abs_start;
-    auto y_lst = info.y_abs_start + tiling_policy::Y_COMPUTED_WORD_COUNT;
-
-    for (idx_t y = y_fst; y < y_lst; ++y) {
-        for (idx_t x = x_fst; x < x_lst; ++x) {
-    
-            word_type lt = load<word_type>(x - 1, y - 1, data);
-            word_type ct = load<word_type>(x + 0, y - 1, data);
-            word_type rt = load<word_type>(x + 1, y - 1, data);
-            word_type lc = load<word_type>(x - 1, y + 0, data);
-            word_type cc = load<word_type>(x + 0, y + 0, data);
-            word_type rc = load<word_type>(x + 1, y + 0, data);
-            word_type lb = load<word_type>(x - 1, y + 1, data);
-            word_type cb = load<word_type>(x + 0, y + 1, data);
-            word_type rb = load<word_type>(x + 1, y + 1, data);
-    
-            auto new_cc = CudaBitwiseOps<word_type, bit_grid_mode>::compute_center_word(lt, ct, rt, lc, cc, rc, lb, cb, rb); 
-            
-            if (new_cc != cc) {
-                tile_changed = true;
-            }
-
-            data.output[get_idx(x, y, data.x_size)] = new_cc;
-        }
-    }
-
-    return tile_changed;
-}
-
-template <typename word_type, typename bit_grid_mode, typename tiling_policy, typename CudaData>
-__device__ __forceinline__ bool compute_GOL_on_tile__streaming_in_x(
-    const WarpInfo& info, CudaData&& data) {
-    
-    bool tile_changed = false;
-
-    auto x_fst = info.x_abs_start;
-    auto x_lst = info.x_abs_start + tiling_policy::X_COMPUTED_WORD_COUNT;
-    auto y_fst = info.y_abs_start;
-    auto y_lst = info.y_abs_start + tiling_policy::Y_COMPUTED_WORD_COUNT;
-
-    for (idx_t x = x_fst; x < x_lst; ++x) {
-        idx_t y = y_fst;
-        
-        word_type lt, ct, rt;
-        word_type lc, cc, rc;
-        word_type lb, cb, rb;
-        
-        lc = load<word_type>(x - 1, y - 1, data);
-        cc = load<word_type>(x + 0, y - 1, data);
-        rc = load<word_type>(x + 1, y - 1, data);
-
-        lb = load<word_type>(x - 1, y + 0, data);
-        cb = load<word_type>(x + 0, y + 0, data);
-        rb = load<word_type>(x + 1, y + 0, data);
-
-        for (; y < y_lst; ++y) {
-
-            lt = lc; 
-            ct = cc; 
-            rt = rc; 
-
-            lc = lb; 
-            cc = cb; 
-            rc = rb; 
-            
-            lb = load<word_type>(x - 1, y + 1, data);
-            cb = load<word_type>(x + 0, y + 1, data);
-            rb = load<word_type>(x + 1, y + 1, data);
-    
-            auto new_cc = CudaBitwiseOps<word_type, bit_grid_mode>::compute_center_word(lt, ct, rt, lc, cc, rc, lb, cb, rb); 
-            
-            if (new_cc != cc) {
-                tile_changed = true;
-            }
-
-            data.output[get_idx(x, y, data.x_size)] = new_cc;
-        }
-    }
-
-    return tile_changed;
-}
-
-template <typename word_type, typename bit_grid_mode, typename tiling_policy, typename CudaData>
-__device__ __forceinline__ bool compute_GOL_on_tile__streaming_in_y(
-    const WarpInfo& info, CudaData&& data) {
-    
-    bool tile_changed = false;
-
-    auto x_fst = info.x_abs_start;
-    auto x_lst = info.x_abs_start + tiling_policy::X_COMPUTED_WORD_COUNT;
-    auto y_fst = info.y_abs_start;
-    auto y_lst = info.y_abs_start + tiling_policy::Y_COMPUTED_WORD_COUNT;
-
-    for (idx_t y = y_fst; y < y_lst; ++y) {
-        idx_t x = x_fst;
-
-        word_type lt, ct, rt;
-        word_type lc, cc, rc;
-        word_type lb, cb, rb;
-
-        ct = load<word_type>(x - 1, y - 1, data);
-        cc = load<word_type>(x - 1, y + 0, data);
-        cb = load<word_type>(x - 1, y + 1, data);
-
-        rt = load<word_type>(x + 0, y - 1, data);
-        rc = load<word_type>(x + 0, y + 0, data);
-        rb = load<word_type>(x + 0, y + 1, data);
-
-        for (; x < x_lst; ++x) {
-
-            lt = ct;
-            lc = cc;
-            lb = cb;
-
-            ct = rt;
-            cc = rc;
-            cb = rb;
-
-            rt = load<word_type>(x + 1, y - 1, data);
-            rc = load<word_type>(x + 1, y + 0, data);
-            rb = load<word_type>(x + 1, y + 1, data);
-            
-            auto new_cc = CudaBitwiseOps<word_type, bit_grid_mode>::compute_center_word(lt, ct, rt, lc, cc, rc, lb, cb, rb); 
-            
-            if (new_cc != cc) {
-                tile_changed = true;
-            }
-
-            data.output[get_idx(x, y, data.x_size)] = new_cc;
-        }
-    }
-
-    return tile_changed;
-}
-
-template <typename word_type, typename bit_grid_mode, StreamingDir DIRECTION, typename tiling_policy, typename CudaData>
-__device__ __forceinline__ bool compute_GOL_on_tile(
-    const WarpInfo& info, CudaData&& data) {
-
-    if constexpr (DIRECTION == StreamingDir::in_X) {
-        return compute_GOL_on_tile__streaming_in_x<word_type, bit_grid_mode, tiling_policy>(info, data);
-    }
-    else if constexpr (DIRECTION == StreamingDir::in_Y) {
-        return compute_GOL_on_tile__streaming_in_y<word_type, bit_grid_mode, tiling_policy>(info, data);
-    }
-    else if constexpr (DIRECTION == StreamingDir::NAIVE) {
-        return compute_GOL_on_tile__naive_no_streaming<word_type, bit_grid_mode, tiling_policy>(info, data);
-    }
-    else {
-        printf("Invalid streaming direction %d\n", DIRECTION);
     }
 }
 
@@ -345,7 +98,6 @@ __device__ __forceinline__ void load_state_store(
     auto x_block_to_load = idx % StateStoreInfo<state_store_type>::CACHE_SIZE_X + info.x_block - 1;
     auto y_block_to_load = idx / StateStoreInfo<state_store_type>::CACHE_SIZE_X + info.y_block - 1;
 
-    // TODO this might fail
     if (x_block_to_load >= info.x_block_count || y_block_to_load >= info.y_block_count) {
         shared_store[idx] = 0;
         return;
@@ -356,18 +108,19 @@ __device__ __forceinline__ void load_state_store(
     shared_store[idx] = store[store_idx];
 }
 
-// template <typename tiling_policy, typename state_store_type, typename CudaData>
-// __device__ __forceinline__ void preload_caches(
-//     const WarpInfo& info, const CudaData&& data,
-//     state_store_type* cache_last, state_store_type* cache_before_last) {
-    
-//     if (threadIdx.x < StateStoreInfo<state_store_type>::CACHE_SIZE) {
-//         load_state_store<tiling_policy>(info, data.change_state_store.before_last, cache_before_last);
-//     }
-//     else if (threadIdx.x < StateStoreInfo<state_store_type>::CACHE_SIZE * 2) {
-//         load_state_store<tiling_policy>(info, data.change_state_store.last, cache_last);
-//     }
-// }
+template <typename tiling_policy, typename word_type, typename state_store_type>
+__device__ __forceinline__ void prefetch_state_stores(
+    const WarpInfo& info,
+    BitGridWithChangeInfo<word_type, state_store_type> data,
+    state_store_type* cache_last, state_store_type* cache_before_last) {
+     
+    if (threadIdx.x < StateStoreInfo<state_store_type>::CACHE_SIZE) {
+        load_state_store<tiling_policy>(info, data.change_state_store.before_last, cache_before_last);
+    }
+    else if (threadIdx.x < StateStoreInfo<state_store_type>::CACHE_SIZE * 2) {
+        load_state_store<tiling_policy>(info, data.change_state_store.last, cache_last);
+    }
+}
 
 template <StreamingDir DIRECTION, typename bit_grid_mode, typename tiling_policy, typename word_type, typename state_store_type>
 __global__ void game_of_live_kernel(BitGridWithChangeInfo<word_type, state_store_type> data) {
@@ -377,28 +130,13 @@ __global__ void game_of_live_kernel(BitGridWithChangeInfo<word_type, state_store
     __shared__ state_store_type change_state_before_last[StateStoreInfo<state_store_type>::CACHE_SIZE];
     
     WarpInfo info = tiling_policy::template get_warp_info<idx_t>(data.x_size, data.y_size);
-    // preload_caches<tiling_policy>(info, data, change_state_last, change_state_before_last);
-    
-    if (threadIdx.x < StateStoreInfo<state_store_type>::CACHE_SIZE) {
-        load_state_store<tiling_policy>(info, data.change_state_store.before_last, change_state_before_last);
-    }
-    else if (threadIdx.x < StateStoreInfo<state_store_type>::CACHE_SIZE * 2) {
-        load_state_store<tiling_policy>(info, data.change_state_store.last, change_state_last);
-    }
+    prefetch_state_stores<tiling_policy>(info, data, change_state_last, change_state_before_last);
 
     __syncthreads();
-
-    if (blockIdx.x == 0 && threadIdx.x == 0) {
-        printf("cache content: \n%lu %lu %lu \n%lu %lu %lu \n%lu %lu %lu \n", 
-            change_state_last[0], change_state_last[1], change_state_last[2], 
-            change_state_last[3], change_state_last[4], change_state_last[5],
-            change_state_last[6], change_state_last[7], change_state_last[8]);
-    }
 
     bool entire_tile_changed;
 
     if (!tile_or_neighbours_changed<tiling_policy>(info.x_warp, info.y_warp, info, change_state_last)) {
-    // if (false) {
         
         if (warp_tile_changed<tiling_policy>(info.x_warp, info.y_warp, info, change_state_before_last)) {
             cpy_to_output<tiling_policy>(info, data);

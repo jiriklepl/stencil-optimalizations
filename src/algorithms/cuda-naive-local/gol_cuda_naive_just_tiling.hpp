@@ -168,12 +168,12 @@ class GoLCudaNaiveJustTiling : public infrastructure::Algorithm<2, grid_cell_t> 
         // else if (policy<thb512__warp32x1__warp_tile32x16>::is_for(this->params)) {
         //     run_kernel<Direction, policy<thb512__warp32x1__warp_tile32x16>>(iterations);
         // }
-            // else if (policy<thb512__warp32x1__warp_tile32x32>::is_for(this->params)) {
-            //     run_kernel<Direction, policy<thb512__warp32x1__warp_tile32x32>>(iterations);
-            // }
-            // else if (policy<thb512__warp32x1__warp_tile32x64>::is_for(this->params)) {
-            //     run_kernel<Direction, policy<thb512__warp32x1__warp_tile32x64>>(iterations);
-            // }
+        // else if (policy<thb512__warp32x1__warp_tile32x32>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb512__warp32x1__warp_tile32x32>>(iterations);
+        // }
+        // else if (policy<thb512__warp32x1__warp_tile32x64>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb512__warp32x1__warp_tile32x64>>(iterations);
+        // }
         // else if (policy<thb512__warp16x2__warp_tile32x8>::is_for(this->params)) {
         //     run_kernel<Direction, policy<thb512__warp16x2__warp_tile32x8>>(iterations);
         // }
@@ -186,18 +186,18 @@ class GoLCudaNaiveJustTiling : public infrastructure::Algorithm<2, grid_cell_t> 
         // else if (policy<thb512__warp16x2__warp_tile32x64>::is_for(this->params)) {
         //     run_kernel<Direction, policy<thb512__warp16x2__warp_tile32x64>>(iterations);
         // }
-            // else if (policy<thb256__warp32x1__warp_tile32x1>::is_for(this->params)) {
-            //     run_kernel<Direction, policy<thb256__warp32x1__warp_tile32x1>>(iterations);
-            // }
-            // else if (policy<thb256__warp32x1__warp_tile32x8>::is_for(this->params)) {
-            //     run_kernel<Direction, policy<thb256__warp32x1__warp_tile32x8>>(iterations);
-            // }
-            // else if (policy<thb256__warp32x1__warp_tile32x16>::is_for(this->params)) {
-            //     run_kernel<Direction, policy<thb256__warp32x1__warp_tile32x16>>(iterations);
-            // }
-            // else if (policy<thb256__warp32x1__warp_tile32x32>::is_for(this->params)) {
-            //     run_kernel<Direction, policy<thb256__warp32x1__warp_tile32x32>>(iterations);
-            // }
+        else if (policy<thb256__warp32x1__warp_tile32x1>::is_for(this->params)) {
+            run_kernel<Direction, policy<thb256__warp32x1__warp_tile32x1>>(iterations);
+        }
+        // else if (policy<thb256__warp32x1__warp_tile32x8>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb256__warp32x1__warp_tile32x8>>(iterations);
+        // }
+        // else if (policy<thb256__warp32x1__warp_tile32x16>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb256__warp32x1__warp_tile32x16>>(iterations);
+        // }
+        // else if (policy<thb256__warp32x1__warp_tile32x32>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb256__warp32x1__warp_tile32x32>>(iterations);
+        // }
         // else if (policy<thb256__warp32x1__warp_tile32x64>::is_for(this->params)) {
         //     run_kernel<Direction, policy<thb256__warp32x1__warp_tile32x64>>(iterations);
         // }
@@ -212,6 +212,33 @@ class GoLCudaNaiveJustTiling : public infrastructure::Algorithm<2, grid_cell_t> 
         // }
         // else if (policy<thb256__warp16x2__warp_tile32x64>::is_for(this->params)) {
         //     run_kernel<Direction, policy<thb256__warp16x2__warp_tile32x64>>(iterations);
+        // }
+        // else if (policy<thb128__warp32x1__warp_tile32x1>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb128__warp32x1__warp_tile32x1>>(iterations);
+        // }
+        // else if (policy<thb128__warp32x1__warp_tile32x8>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb128__warp32x1__warp_tile32x8>>(iterations);
+        // }
+        // else if (policy<thb128__warp32x1__warp_tile32x16>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb128__warp32x1__warp_tile32x16>>(iterations);
+        // }
+        // else if (policy<thb128__warp32x1__warp_tile32x32>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb128__warp32x1__warp_tile32x32>>(iterations);
+        // }
+        // else if (policy<thb128__warp32x1__warp_tile32x64>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb128__warp32x1__warp_tile32x64>>(iterations);
+        // }
+        // else if (policy<thb128__warp16x2__warp_tile32x8>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb128__warp16x2__warp_tile32x8>>(iterations);
+        // }
+        // else if (policy<thb128__warp16x2__warp_tile32x16>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb128__warp16x2__warp_tile32x16>>(iterations);
+        // }
+        // else if (policy<thb128__warp16x2__warp_tile32x32>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb128__warp16x2__warp_tile32x32>>(iterations);
+        // }
+        // else if (policy<thb128__warp16x2__warp_tile32x64>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb128__warp16x2__warp_tile32x64>>(iterations);
         // }
         else {
             throw std::runtime_error("Invalid policy");

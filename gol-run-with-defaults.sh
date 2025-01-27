@@ -64,17 +64,17 @@ __31="2147483648"
 # ALGORITHM="cuda-memcpy"
 # ALGORITHM="gol-cuda-naive"
 # ALGORITHM="gol-cuda-naive-bitwise-cols-64"
-ALGORITHM="gol-cuda-naive-local-64--bit-tiles"
+# ALGORITHM="gol-cuda-naive-local-64--bit-tiles"
 # ALGORITHM="gol-cuda-naive-local-64"
 # ALGORITHM="gol-cuda-naive-just-tiling-cols-64"
-# ALGORITHM="gol-cuda-naive-just-tiling-64--bit-tiles"
+ALGORITHM="gol-cuda-naive-just-tiling-64--bit-tiles"
 # ALGORITHM="gol-cuda-naive-just-tiling-32--bit-tiles"
 # ALGORITHM="gol-cuda-naive-just-tiling-cols-64"
 GRID_DIMENSIONS_X=$__13
 GRID_DIMENSIONS_Y=$__13
 # GRID_DIMENSIONS_X=$((8 * 6))
 # GRID_DIMENSIONS_Y=$((8 * 6))
-ITERATIONS="2000"
+ITERATIONS="4000"
 
 BASE_GRID_ENCODING="char"
 # BASE_GRID_ENCODING="int"
@@ -119,16 +119,16 @@ STATE_BITS_COUNT="64"
 # STATE_BITS_COUNT="32"
 
 # THREAD_BLOCK_SIZE="1024"
-THREAD_BLOCK_SIZE="512"
-# THREAD_BLOCK_SIZE="256"
+# THREAD_BLOCK_SIZE="512"
+THREAD_BLOCK_SIZE="256"
 # THREAD_BLOCK_SIZE="128"
 # THREAD_BLOCK_SIZE="64"
 
-WARP_DIMS_X="8"
-WARP_DIMS_Y="4"
+WARP_DIMS_X="32"
+WARP_DIMS_Y="1"
 
-WARP_TILE_DIMS_X="16"
-WARP_TILE_DIMS_Y="32"
+WARP_TILE_DIMS_X="32"
+WARP_TILE_DIMS_Y="1"
 
 STREAMING_DIRECTION="in-x"
 # STREAMING_DIRECTION="in-y"

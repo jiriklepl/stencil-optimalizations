@@ -20,18 +20,6 @@ namespace algorithms::cuda_naive_local {
 
 using StreamingDir = infrastructure::StreamingDirection;
 
-template <typename const_t>
-struct test_policy {
-    constexpr static const_t THREAD_BLOCK_SIZE = 512;
-
-    constexpr static const_t WARP_DIM_X = 8;
-    constexpr static const_t WARP_DIM_Y = 4;
-
-    constexpr static const_t WARP_TILE_DIM_X = 16;
-    constexpr static const_t WARP_TILE_DIM_Y = 32;
-};
-
-
 template <typename grid_cell_t, std::size_t Bits, typename state_store_type, typename bit_grid_mode>
 class GoLCudaNaiveLocalWithState : public infrastructure::Algorithm<2, grid_cell_t> {
 
@@ -98,8 +86,6 @@ class GoLCudaNaiveLocalWithState : public infrastructure::Algorithm<2, grid_cell
             default:
                 throw std::runtime_error("Invalid streaming direction");
         }
-
-        check_state_stores();
     }
 
     void finalize_data_structures() override {
@@ -214,17 +200,6 @@ class GoLCudaNaiveLocalWithState : public infrastructure::Algorithm<2, grid_cell
         auto x_tiles = bit_grid->x_size() / this->params.warp_tile_dims_x;
         auto y_tiles = bit_grid->y_size() / this->params.warp_tile_dims_y;
 
-        constexpr std::size_t MAX_WIDTH = 32 * 4;
-        auto shrink_factor = x_tiles / MAX_WIDTH;
-
-        if (shrink_factor == 0) {
-            shrink_factor = 1;
-        }
-
-        std::cout << "x tiles: " << x_tiles << std::endl;
-        std::cout << "y tiles: " << y_tiles << std::endl;
-        std::cout << "shrink factor: " << shrink_factor << std::endl;
-
         auto block_dims = runtime_block_dims<size_type>::get(this->params);
 
         auto x_block_count = x_tiles / block_dims.x;
@@ -259,58 +234,21 @@ class GoLCudaNaiveLocalWithState : public infrastructure::Algorithm<2, grid_cell
 
         std::cout << std::endl;
 
-        for (std::size_t y = 0; y < y_tiles; y += shrink_factor) {
-            for (std::size_t x = 0; x < x_tiles; x += shrink_factor) {
+        for (std::size_t y = 0; y < y_tiles; y++) {
+            for (std::size_t x = 0; x < x_tiles; x++) {
                 std::cout << output[y * x_tiles + x];
             }
             std::cout << std::endl;
         }
-
-
-        // auto used_bits_in_word = tiles_per_block();
-
-        // for (std::size_t y = 0; y < y_tiles; y += shrink_factor) {
-        //     for (std::size_t x = 0; x < x_tiles; x += shrink_factor) {
-        //         bool changed = false;
-
-        //         for (std::size_t i_y = y; i_y < y + shrink_factor; i_y++) {
-        //             for (std::size_t i_x = x; i_x < x + shrink_factor; i_x++) {
-        //                 auto idx = i_y * x_tiles + i_x;
-
-        //                 auto word_idx = idx / used_bits_in_word;
-        //                 auto bit_idx = idx % used_bits_in_word;
-
-        //                 auto word = store[word_idx];
-        //                 auto bit = (word >> bit_idx) & 1;
-
-        //                 if (bit) {
-        //                     changed = true;
-        //                     break;
-        //                 }
-        //             }
-        //         }
-
-        //         if (changed) {
-        //             std::cout << "X";
-        //         } else {
-        //             std::cout << ".";
-        //         }
-        //     }
-        //     std::cout << std::endl;
-        // }
-
-        // std::cout << std::endl;
     }
 
     // TILING POLICIES
 
     template <StreamingDir Direction>
     void run_kernel_in_direction(size_type iterations) {
-         run_kernel<Direction, policy<test_policy>>(iterations);
-
-        // if (policy<thb1024__warp32x1__warp_tile32x1>::is_for(this->params)) {
-        //     run_kernel<Direction, policy<thb1024__warp32x1__warp_tile32x1>>(iterations);
-        // }
+        if (policy<thb1024__warp32x1__warp_tile32x1>::is_for(this->params)) {
+            run_kernel<Direction, policy<thb1024__warp32x1__warp_tile32x1>>(iterations);
+        }
         // else if (policy<thb1024__warp32x1__warp_tile32x8>::is_for(this->params)) {
         //     run_kernel<Direction, policy<thb1024__warp32x1__warp_tile32x8>>(iterations);
         // }
@@ -344,12 +282,12 @@ class GoLCudaNaiveLocalWithState : public infrastructure::Algorithm<2, grid_cell
         // else if (policy<thb512__warp32x1__warp_tile32x16>::is_for(this->params)) {
         //     run_kernel<Direction, policy<thb512__warp32x1__warp_tile32x16>>(iterations);
         // }
-            // else if (policy<thb512__warp32x1__warp_tile32x32>::is_for(this->params)) {
-            //     run_kernel<Direction, policy<thb512__warp32x1__warp_tile32x32>>(iterations);
-            // }
-            // else if (policy<thb512__warp32x1__warp_tile32x64>::is_for(this->params)) {
-            //     run_kernel<Direction, policy<thb512__warp32x1__warp_tile32x64>>(iterations);
-            // }
+        // else if (policy<thb512__warp32x1__warp_tile32x32>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb512__warp32x1__warp_tile32x32>>(iterations);
+        // }
+        // else if (policy<thb512__warp32x1__warp_tile32x64>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb512__warp32x1__warp_tile32x64>>(iterations);
+        // }
         // else if (policy<thb512__warp16x2__warp_tile32x8>::is_for(this->params)) {
         //     run_kernel<Direction, policy<thb512__warp16x2__warp_tile32x8>>(iterations);
         // }
@@ -362,18 +300,18 @@ class GoLCudaNaiveLocalWithState : public infrastructure::Algorithm<2, grid_cell
         // else if (policy<thb512__warp16x2__warp_tile32x64>::is_for(this->params)) {
         //     run_kernel<Direction, policy<thb512__warp16x2__warp_tile32x64>>(iterations);
         // }
-            // else if (policy<thb256__warp32x1__warp_tile32x1>::is_for(this->params)) {
-            //     run_kernel<Direction, policy<thb256__warp32x1__warp_tile32x1>>(iterations);
-            // }
-            // else if (policy<thb256__warp32x1__warp_tile32x8>::is_for(this->params)) {
-            //     run_kernel<Direction, policy<thb256__warp32x1__warp_tile32x8>>(iterations);
-            // }
-            // else if (policy<thb256__warp32x1__warp_tile32x16>::is_for(this->params)) {
-            //     run_kernel<Direction, policy<thb256__warp32x1__warp_tile32x16>>(iterations);
-            // }
-            // else if (policy<thb256__warp32x1__warp_tile32x32>::is_for(this->params)) {
-            //     run_kernel<Direction, policy<thb256__warp32x1__warp_tile32x32>>(iterations);
-            // }
+        else if (policy<thb256__warp32x1__warp_tile32x1>::is_for(this->params)) {
+            run_kernel<Direction, policy<thb256__warp32x1__warp_tile32x1>>(iterations);
+        }
+        // else if (policy<thb256__warp32x1__warp_tile32x8>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb256__warp32x1__warp_tile32x8>>(iterations);
+        // }
+        // else if (policy<thb256__warp32x1__warp_tile32x16>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb256__warp32x1__warp_tile32x16>>(iterations);
+        // }
+        // else if (policy<thb256__warp32x1__warp_tile32x32>::is_for(this->params)) {
+        //     run_kernel<Direction, policy<thb256__warp32x1__warp_tile32x32>>(iterations);
+        // }
         // else if (policy<thb256__warp32x1__warp_tile32x64>::is_for(this->params)) {
         //     run_kernel<Direction, policy<thb256__warp32x1__warp_tile32x64>>(iterations);
         // }
@@ -389,9 +327,9 @@ class GoLCudaNaiveLocalWithState : public infrastructure::Algorithm<2, grid_cell
         // else if (policy<thb256__warp16x2__warp_tile32x64>::is_for(this->params)) {
         //     run_kernel<Direction, policy<thb256__warp16x2__warp_tile32x64>>(iterations);
         // }
-        // else {
-        //     throw std::runtime_error("Invalid policy");
-        // }
+        else {
+            throw std::runtime_error("Invalid policy");
+        }
     }
     
 };
