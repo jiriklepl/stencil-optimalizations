@@ -10,6 +10,9 @@
 namespace algorithms {
 using namespace algorithms::cuda_naive_local;
 
+template <std::size_t thread_block_size, typename const_t> 
+struct block_dims {};
+
 template <typename const_t, template <typename> class base_policy>
 struct extended_policy {
     constexpr static const_t THREAD_BLOCK_SIZE = base_policy<const_t>::THREAD_BLOCK_SIZE;
@@ -20,8 +23,8 @@ struct extended_policy {
     constexpr static const_t WARP_TILE_DIM_X = base_policy<const_t>::WARP_TILE_DIM_X;
     constexpr static const_t WARP_TILE_DIM_Y = base_policy<const_t>::WARP_TILE_DIM_Y;
 
-    constexpr static const_t BLOCK_TILE_DIM_X = base_policy<const_t>::BLOCK_TILE_DIM_X;
-    constexpr static const_t BLOCK_TILE_DIM_Y = base_policy<const_t>::BLOCK_TILE_DIM_Y;
+    constexpr static const_t BLOCK_TILE_DIM_X = block_dims<THREAD_BLOCK_SIZE, const_t>::x;
+    constexpr static const_t BLOCK_TILE_DIM_Y = block_dims<THREAD_BLOCK_SIZE, const_t>::y;
 
     constexpr static const_t ABSOLUTE_BLOCK_TILE_DIM_X = WARP_TILE_DIM_X * BLOCK_TILE_DIM_X;
     constexpr static const_t ABSOLUTE_BLOCK_TILE_DIM_Y = WARP_TILE_DIM_Y * BLOCK_TILE_DIM_Y;
@@ -106,31 +109,33 @@ struct extended_policy {
 };
 
 template <typename const_t>
-struct thb256__warp32x1__warp_tile32x1 {
-    constexpr static const_t THREAD_BLOCK_SIZE = 256;
-
-    constexpr static const_t WARP_DIM_X = 32;
-    constexpr static const_t WARP_DIM_Y = 1;
-
-    constexpr static const_t WARP_TILE_DIM_X = 32;
-    constexpr static const_t WARP_TILE_DIM_Y = 1;
-
-    constexpr static const_t BLOCK_TILE_DIM_X = 2;
-    constexpr static const_t BLOCK_TILE_DIM_Y = 4;
+struct block_dims<64, const_t> {
+    constexpr static const_t x = 1;
+    constexpr static const_t y = 2;
 };
 
 template <typename const_t>
-struct thb256__warp32x1__warp_tile32x4 {
-    constexpr static const_t THREAD_BLOCK_SIZE = 256;
+struct block_dims<128, const_t> {
+    constexpr static const_t x = 2;
+    constexpr static const_t y = 2;
+};
 
-    constexpr static const_t WARP_DIM_X = 32;
-    constexpr static const_t WARP_DIM_Y = 1;
+template <typename const_t>
+struct block_dims<256, const_t> {
+    constexpr static const_t x = 2;
+    constexpr static const_t y = 4;
+};
 
-    constexpr static const_t WARP_TILE_DIM_X = 32;
-    constexpr static const_t WARP_TILE_DIM_Y = 4;
+template <typename const_t>
+struct block_dims<512, const_t> {
+    constexpr static const_t x = 4;
+    constexpr static const_t y = 4;
+};
 
-    constexpr static const_t BLOCK_TILE_DIM_X = 2;
-    constexpr static const_t BLOCK_TILE_DIM_Y = 4;
+template <typename const_t>
+struct block_dims<1024, const_t> {
+    constexpr static const_t x = 4;
+    constexpr static const_t y = 8;
 };
 
 } // namespace algorithms
