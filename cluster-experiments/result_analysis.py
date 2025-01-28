@@ -3,10 +3,14 @@ import random
 import results_abstraction as ra
 import matplotlib.pyplot as plt
 
-BASE_DIR = './final-measurements/hopper'
+# BASE_DIR = './final-measurements/hopper'
+BASE_DIR = './experiments-outputs'
 GRAPH_DIR = './generated-graphs'
 
-PLOT_NAME_template = '__tmp_{plot_type}.png'
+MODE='png'
+# MODE='pdf'
+
+PLOT_NAME_template = '__tmp_{plot_type}.' + MODE
 
 class LegendNames:
     @staticmethod
@@ -20,12 +24,24 @@ class LegendNames:
             'gol-cpu-bitwise-cols-naive-64': 'CPU Bitwise Cols Naive 64',
             'gol-cpu-bitwise-cols-macro-32': 'CPU Bitwise Cols Macro 32',
             'gol-cpu-bitwise-cols-macro-64': 'CPU Bitwise Cols Macro 64',
+            'gol-cpu-bitwise-tiles-naive-32': 'CPU Bitwise Tiles Naive 32',
+            'gol-cpu-bitwise-tiles-naive-64': 'CPU Bitwise Tiles Naive 64',
+            'gol-cpu-bitwise-tiles-macro-32': 'CPU Bitwise Tiles Macro 32',
+            'gol-cpu-bitwise-tiles-macro-64': 'CPU Bitwise Tiles Macro 64',
+
             'gol-cuda-naive_char': 'CUDA Naive (char)',
             'gol-cuda-naive_int': 'CUDA Naive (int)',
             'gol-cuda-naive-bitwise-no-macro-32': 'CUDA Bitwise Naive 32',
             'gol-cuda-naive-bitwise-no-macro-64': 'CUDA Bitwise Naive 64',
             'gol-cuda-naive-bitwise-cols-32': 'CUDA Bitwise Cols Macro 32',
             'gol-cuda-naive-bitwise-cols-64': 'CUDA Bitwise Cols Macro 64',
+            'gol-cuda-naive-bitwise-tiles-32': 'CUDA Bitwise Tiles Macro 32',
+            'gol-cuda-naive-bitwise-tiles-64': 'CUDA Bitwise Tiles Macro 64',
+            'gol-cuda-local-one-cell-cols-32': 'CUDA Local Cols 32',
+            'gol-cuda-local-one-cell-cols-64': 'CUDA Local Cols 64',
+            'gol-cuda-local-one-cell-32--bit-tiles': 'CUDA Local Bit Tiles 32',
+            'gol-cuda-local-one-cell-64--bit-tiles': 'CUDA Local Bit Tiles 64',
+
         }[key]
 
 class ALG_LIST:
@@ -37,6 +53,12 @@ class ALG_LIST:
     
     cpu_bitwise_cols_macro_32 =          [(ra.Key.algorithm_name, 'gol-cpu-bitwise-cols-macro-32')]
     cpu_bitwise_cols_macro_64 =          [(ra.Key.algorithm_name, 'gol-cpu-bitwise-cols-macro-64')]
+
+    cpu_bitwise_tiles_naive_32 =         [(ra.Key.algorithm_name, 'gol-cpu-bitwise-tiles-naive-32')]    
+    cpu_bitwise_tiles_naive_64 =         [(ra.Key.algorithm_name, 'gol-cpu-bitwise-tiles-naive-64')]
+
+    cpu_bitwise_tiles_macro_32 =         [(ra.Key.algorithm_name, 'gol-cpu-bitwise-tiles-naive-32')]
+    cpu_bitwise_tiles_macro_64 =         [(ra.Key.algorithm_name, 'gol-cpu-bitwise-tiles-naive-64')]
     
     cuda_naive_char =                    [(ra.Key.algorithm_name, 'gol-cuda-naive'), (ra.Key.base_grid_encoding, 'char')]
     cuda_naive_int =                     [(ra.Key.algorithm_name, 'gol-cuda-naive'), (ra.Key.base_grid_encoding, 'int')]
@@ -47,6 +69,14 @@ class ALG_LIST:
     cuda_naive_bitwise_cols_32 =         [(ra.Key.algorithm_name, 'gol-cuda-naive-bitwise-cols-32')]
     cuda_naive_bitwise_cols_64 =         [(ra.Key.algorithm_name, 'gol-cuda-naive-bitwise-cols-64')]
 
+    cuda_naive_bitwise_tiles_32 =        [(ra.Key.algorithm_name, 'gol-cuda-naive-bitwise-tiles-32')]
+    cuda_naive_bitwise_tiles_64 =        [(ra.Key.algorithm_name, 'gol-cuda-naive-bitwise-tiles-64')]
+    
+    cuda_local_one_cell_cols_32 =        [(ra.Key.algorithm_name, 'gol-cuda-local-one-cell-cols-32')]
+    cuda_local_one_cell_cols_64 =        [(ra.Key.algorithm_name, 'gol-cuda-local-one-cell-cols-64')]
+
+    cuda_local_one_cell_bit_tiles_32 =   [(ra.Key.algorithm_name, 'gol-cuda-local-one-cell-32--bit-tiles')]
+    cuda_local_one_cell_bit_tiles_64 =   [(ra.Key.algorithm_name, 'gol-cuda-local-one-cell-64--bit-tiles')]
 
     ALGS = [
         cpu_naive_char,
@@ -112,6 +142,11 @@ class TimePerCellPerIter__InputSize:
                 measurements = exp[0].get_measurement_set()
                 
                 val = measurements.get_median(lambda m: m.compute_runtime_per_cell_per_iter())
+
+                if val is None:
+                    print ('None value for:', alg, grid)
+                    val = 0
+
                 time_per_million = val * 1_000_000
 
                 all_vals = measurements.get_valid_vals(lambda m: m.compute_runtime_per_cell_per_iter())
@@ -143,13 +178,13 @@ class TimePerCellPerIter__InputSize:
 
         plt.xlabel("Grid Size")
         plt.ylabel("Time / Million Cells / One Iteration")
-
+        plt.ylim(bottom=0)
         plt.legend([LegendNames.get(alg) for alg in self.algs])
 
         out_path = os.path.join(GRAPH_DIR, PLOT_NAME_template.format(plot_type=self.PLOT_NAME))
 
         plt.tight_layout()
-        plt.savefig(out_path)
+        plt.savefig(out_path, format=MODE)
 
 results = ra.Results.from_directory(BASE_DIR)
 
@@ -162,13 +197,29 @@ TimePerCellPerIter__InputSize(results) \
         # ALG_LIST.cpu_bitwise_cols_naive_64,
         # ALG_LIST.cpu_bitwise_cols_macro_32,
         # ALG_LIST.cpu_bitwise_cols_macro_64,
+        # ALG_LIST.cpu_bitwise_tiles_naive_32,
+        # ALG_LIST.cpu_bitwise_tiles_naive_64,
+        # ALG_LIST.cpu_bitwise_cols_macro_32,
+        # ALG_LIST.cpu_bitwise_cols_macro_64,
         
-        ALG_LIST.cuda_naive_char,
-        ALG_LIST.cuda_naive_int,
-        ALG_LIST.cuda_naive_bitwise_no_macro_32,
-        ALG_LIST.cuda_naive_bitwise_no_macro_64,
-        # ALG_LIST.cuda_naive_bitwise_cols_32,
-        # ALG_LIST.cuda_naive_bitwise_cols_64,
+
+        # ALG_LIST.cuda_naive_char,
+        # ALG_LIST.cuda_naive_int,
+        
+        # ALG_LIST.cuda_naive_bitwise_no_macro_32,
+        # ALG_LIST.cuda_naive_bitwise_no_macro_64,
+
+        ALG_LIST.cuda_naive_bitwise_cols_32,
+        ALG_LIST.cuda_naive_bitwise_cols_64,
+
+        ALG_LIST.cuda_naive_bitwise_tiles_32,
+        ALG_LIST.cuda_naive_bitwise_tiles_64,
+        
+        # ALG_LIST.cuda_local_one_cell_cols_32,
+        # ALG_LIST.cuda_local_one_cell_cols_64,
+        # ALG_LIST.cuda_local_one_cell_bit_tiles_32,
+        # ALG_LIST.cuda_local_one_cell_bit_tiles_64,
+
         
         # *ALG_LIST.ALGS
     ]) \

@@ -70,6 +70,9 @@ class GOL_Baseline : public infrastructure::Algorithm<2, grid_cell_t> {
     }
 
     void set_params(const infrastructure::ExperimentParams& params) override {
+        this->params = params;
+        dim = params.grid_dimensions[0];
+
         if (params.grid_dimensions[0] != params.grid_dimensions[1]) {
             throw std::runtime_error("Only square grids are supported");
         }
@@ -82,8 +85,6 @@ class GOL_Baseline : public infrastructure::Algorithm<2, grid_cell_t> {
             }
         }
 
-        this->params = params;
-        dim = params.grid_dimensions[0];
     }
 
   private:
