@@ -39,7 +39,7 @@ __device__ __forceinline__ idx_t get_idx(idx_t x, idx_t y, idx_t x_size) {
 }
 
 template <typename word_type, typename CudaData>
-__device__ __forceinline__ word_type load(idx_t x, idx_t y, CudaData&& data) {
+__device__ __forceinline__ word_type load(idx_t x, idx_t y, CudaData data) {
     if (x < 0 || y < 0 || x >= data.x_size || y >= data.y_size)
         return 0;
 
@@ -48,17 +48,15 @@ __device__ __forceinline__ word_type load(idx_t x, idx_t y, CudaData&& data) {
 
 template <typename word_type, typename bit_grid_mode, typename tiling_policy, typename CudaData>
 __device__ __forceinline__ bool compute_GOL_on_tile__naive_no_streaming(
-    const WarpInfo& info, CudaData&& data) {
+    WarpInfo info, CudaData data) {
     
     bool tile_changed = false;
 
-    auto x_fst = info.x_abs_start;
-    auto x_lst = info.x_abs_start + tiling_policy::X_COMPUTED_WORD_COUNT;
-    auto y_fst = info.y_abs_start;
-    auto y_lst = info.y_abs_start + tiling_policy::Y_COMPUTED_WORD_COUNT;
+    for (idx_t i_x = 0; i_x < tiling_policy::X_COMPUTED_WORD_COUNT; ++i_x) {
+        for (idx_t i_y = 0; i_y < tiling_policy::Y_COMPUTED_WORD_COUNT; ++i_y) {
 
-    for (idx_t y = y_fst; y < y_lst; ++y) {
-        for (idx_t x = x_fst; x < x_lst; ++x) {
+            idx_t x = info.x_abs_start + i_x;
+            idx_t y = info.y_abs_start + i_y;
     
             word_type lt = load<word_type>(x - 1, y - 1, data);
             word_type ct = load<word_type>(x + 0, y - 1, data);
@@ -85,17 +83,13 @@ __device__ __forceinline__ bool compute_GOL_on_tile__naive_no_streaming(
 
 template <typename word_type, typename bit_grid_mode, typename tiling_policy, typename CudaData>
 __device__ __forceinline__ bool compute_GOL_on_tile__streaming_in_x(
-    const WarpInfo& info, CudaData&& data) {
+    WarpInfo info, CudaData data) {
     
     bool tile_changed = false;
 
-    auto x_fst = info.x_abs_start;
-    auto x_lst = info.x_abs_start + tiling_policy::X_COMPUTED_WORD_COUNT;
-    auto y_fst = info.y_abs_start;
-    auto y_lst = info.y_abs_start + tiling_policy::Y_COMPUTED_WORD_COUNT;
-
-    for (idx_t x = x_fst; x < x_lst; ++x) {
-        idx_t y = y_fst;
+    for (idx_t i_x = 0; i_x < tiling_policy::X_COMPUTED_WORD_COUNT; ++i_x) {
+        idx_t x = info.x_abs_start + i_x;
+        idx_t y = info.y_abs_start;
         
         word_type lt, ct, rt;
         word_type lc, cc, rc;
@@ -109,7 +103,8 @@ __device__ __forceinline__ bool compute_GOL_on_tile__streaming_in_x(
         cb = load<word_type>(x + 0, y + 0, data);
         rb = load<word_type>(x + 1, y + 0, data);
 
-        for (; y < y_lst; ++y) {
+        for (idx_t i_y = 0; i_y < tiling_policy::Y_COMPUTED_WORD_COUNT; ++i_y) {
+            y = info.y_abs_start + i_y;
 
             lt = lc; 
             ct = cc; 
@@ -138,17 +133,13 @@ __device__ __forceinline__ bool compute_GOL_on_tile__streaming_in_x(
 
 template <typename word_type, typename bit_grid_mode, typename tiling_policy, typename CudaData>
 __device__ __forceinline__ bool compute_GOL_on_tile__streaming_in_y(
-    const WarpInfo& info, CudaData&& data) {
+    WarpInfo info, CudaData data) {
     
     bool tile_changed = false;
 
-    auto x_fst = info.x_abs_start;
-    auto x_lst = info.x_abs_start + tiling_policy::X_COMPUTED_WORD_COUNT;
-    auto y_fst = info.y_abs_start;
-    auto y_lst = info.y_abs_start + tiling_policy::Y_COMPUTED_WORD_COUNT;
-
-    for (idx_t y = y_fst; y < y_lst; ++y) {
-        idx_t x = x_fst;
+    for (idx_t i_y = 0; i_y < tiling_policy::Y_COMPUTED_WORD_COUNT; ++i_y) {
+        idx_t x = info.x_abs_start;
+        idx_t y = info.y_abs_start + i_y;
 
         word_type lt, ct, rt;
         word_type lc, cc, rc;
@@ -162,7 +153,8 @@ __device__ __forceinline__ bool compute_GOL_on_tile__streaming_in_y(
         rc = load<word_type>(x + 0, y + 0, data);
         rb = load<word_type>(x + 0, y + 1, data);
 
-        for (; x < x_lst; ++x) {
+        for (idx_t i_x = 0; i_x < tiling_policy::X_COMPUTED_WORD_COUNT; ++i_x) {
+            x = info.x_abs_start + i_x;
 
             lt = ct;
             lc = cc;
@@ -191,7 +183,7 @@ __device__ __forceinline__ bool compute_GOL_on_tile__streaming_in_y(
 
 template <typename word_type, typename bit_grid_mode, StreamingDir DIRECTION, typename tiling_policy, typename CudaData>
 __device__ __forceinline__ bool compute_GOL_on_tile(
-    const WarpInfo& info, CudaData&& data) {
+    WarpInfo info, CudaData data) {
 
     if constexpr (DIRECTION == StreamingDir::in_X) {
         return compute_GOL_on_tile__streaming_in_x<word_type, bit_grid_mode, tiling_policy>(info, data);

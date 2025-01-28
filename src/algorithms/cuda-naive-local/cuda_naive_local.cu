@@ -20,7 +20,7 @@ namespace {
 
 template <typename tiling_policy, typename word_type, typename state_store_type>
 __device__ __forceinline__ void cpy_to_output(
-    const WarpInfo& info, const BitGridWithChangeInfo<word_type, state_store_type>& data) {
+    WarpInfo info, BitGridWithChangeInfo<word_type, state_store_type> data) {
 
     auto x_fst = info.x_abs_start;
     auto x_lst = info.x_abs_start + tiling_policy::X_COMPUTED_WORD_COUNT;
@@ -37,7 +37,7 @@ __device__ __forceinline__ void cpy_to_output(
 
 template <typename state_store_type>
 __device__ __forceinline__ void set_changed_state_for_block(
-    const WarpInfo& info, shm_private_value_t* block_store, state_store_type* global_store) {
+    WarpInfo info, shm_private_value_t* block_store, state_store_type* global_store) {
         
     auto tiles = blockDim.x / WARP_SIZE;
     state_store_type result = 0;
@@ -53,7 +53,7 @@ __device__ __forceinline__ void set_changed_state_for_block(
 template <typename tiling_policy, typename state_store_type>
 __device__ __forceinline__ bool warp_tile_changed(
     idx_t x_tile, idx_t y_tile, 
-    const WarpInfo& info, state_store_type* cached_store) {
+    WarpInfo info, state_store_type* cached_store) {
 
     x_tile += tiling_policy::BLOCK_TILE_DIM_X;
     y_tile += tiling_policy::BLOCK_TILE_DIM_Y;
@@ -75,7 +75,7 @@ __device__ __forceinline__ bool warp_tile_changed(
 template <typename tiling_policy, typename state_store_type>
 __device__ __forceinline__ bool tile_or_neighbours_changed(
     idx_t x_tile, idx_t y_tile,
-    const WarpInfo& info, state_store_type* cached_store) {
+    WarpInfo info, state_store_type* cached_store) {
 
     for(idx_t y = y_tile - 1; y <= y_tile + 1; ++y) {
         for(idx_t x = x_tile - 1; x <= x_tile + 1; ++x) {
@@ -90,7 +90,7 @@ __device__ __forceinline__ bool tile_or_neighbours_changed(
 
 template <typename tiling_policy, typename state_store_type>
 __device__ __forceinline__ void load_state_store(
-    const WarpInfo& info,
+    WarpInfo info,
     state_store_type* store, state_store_type* shared_store) {
     
     auto idx = threadIdx.x % StateStoreInfo<state_store_type>::CACHE_SIZE;
@@ -110,7 +110,7 @@ __device__ __forceinline__ void load_state_store(
 
 template <typename tiling_policy, typename word_type, typename state_store_type>
 __device__ __forceinline__ void prefetch_state_stores(
-    const WarpInfo& info,
+    WarpInfo info,
     BitGridWithChangeInfo<word_type, state_store_type> data,
     state_store_type* cache_last, state_store_type* cache_before_last) {
      

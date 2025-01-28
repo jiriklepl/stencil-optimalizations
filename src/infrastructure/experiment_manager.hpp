@@ -12,6 +12,7 @@
 #include "../algorithms/cuda-naive-bitwise-no-macro/gol_cuda_naive_bitwise_no_macro.hpp"
 #include "../algorithms/cuda-naive-local/gol_cuda_naive_local.hpp"
 #include "../algorithms/cuda-naive-local/gol_cuda_naive_just_tiling.hpp"
+#include "../algorithms/cuda-naive-local-one-cell/cuda_local_one_cell.hpp"
 #include "./data_loader.hpp"
 #include "../algorithms/rel-work/eff-sim-ex-of-cell-auto-GPU/register-all-algs.hpp"
 #include "algorithm.hpp"
@@ -34,6 +35,7 @@
 using namespace debug_utils;
 namespace alg = algorithms;
 namespace cuda_naive_local = algorithms::cuda_naive_local;
+namespace cuda_local_one_cell = algorithms::cuda_local_one_cell;
 
 using state_in_64_bits_t = std::uint64_t;
 using state_in_32_bits_t = std::uint32_t;
@@ -141,6 +143,14 @@ class ExperimentManager {
         _2d_repo-> template register_algorithm<cuda_naive_local::GoLCudaNaiveJustTiling<grid_cell_t, 32, alg::BitWastefulRowsMode>>("gol-cuda-naive-just-tiling-32--wrows");
         _2d_repo-> template register_algorithm<cuda_naive_local::GoLCudaNaiveJustTiling<grid_cell_t, 64, alg::BitWastefulRowsMode>>("gol-cuda-naive-just-tiling-64--wrows");
 
+        _2d_repo-> template register_algorithm<cuda_local_one_cell::GoLCudaLocalOneCell<grid_cell_t, 16, alg::BitColumnsMode>>("gol-cuda-local-one-cell-cols-16");
+        _2d_repo-> template register_algorithm<cuda_local_one_cell::GoLCudaLocalOneCell<grid_cell_t, 32, alg::BitColumnsMode>>("gol-cuda-local-one-cell-cols-32");
+        _2d_repo-> template register_algorithm<cuda_local_one_cell::GoLCudaLocalOneCell<grid_cell_t, 64, alg::BitColumnsMode>>("gol-cuda-local-one-cell-cols-64");
+
+        _2d_repo-> template register_algorithm<cuda_local_one_cell::GoLCudaLocalOneCell<grid_cell_t, 16, alg::BitTileMode>>("gol-cuda-local-one-cell-16--bit-tiles");
+        _2d_repo-> template register_algorithm<cuda_local_one_cell::GoLCudaLocalOneCell<grid_cell_t, 32, alg::BitTileMode>>("gol-cuda-local-one-cell-32--bit-tiles");
+        _2d_repo-> template register_algorithm<cuda_local_one_cell::GoLCudaLocalOneCell<grid_cell_t, 64, alg::BitTileMode>>("gol-cuda-local-one-cell-64--bit-tiles");
+
         // AN5D
 
         _2d_repo-> template register_algorithm<alg::An5dAlg<grid_cell_t, 32, alg::ExecModel::CPU, alg::BitColumnsMode>>("an5d-cpu-32-cols");
@@ -186,6 +196,11 @@ class ExperimentManager {
         std::cout << c::label_color() << "  Data loaded in   " << c::value_color() << milli_secs << " ms" << c::reset_color() << std::endl << std::endl;
 
         TimeReport bench_report;
+
+        if (params.warmup_rounds != 0 && params.measure_speedup) {
+            auto alg = repo.fetch_algorithm(params.speedup_bench_algorithm_name);
+            warm_up(*alg, data, params);
+        }
 
         if (params.measure_speedup) {
             bench_report = measure_speedup(params, data);

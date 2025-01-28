@@ -47,37 +47,46 @@ struct extended_policy {
             idx_t x_size, idx_t y_size
         ) {
 #ifdef __CUDA_ARCH__
-        WarpInformation<idx_t> info;
+        const auto idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-        auto idx = blockIdx.x * blockDim.x + threadIdx.x;
-
-        auto lane_idx = idx % WARP_SIZE;
+        const auto lane_idx = idx % WARP_SIZE;
         
-        info.x_block_count = x_size / ABSOLUTE_BLOCK_TILE_DIM_X;
-        info.y_block_count = y_size / ABSOLUTE_BLOCK_TILE_DIM_Y;
+        const idx_t x_block_count = x_size / ABSOLUTE_BLOCK_TILE_DIM_X;
+        const idx_t y_block_count = y_size / ABSOLUTE_BLOCK_TILE_DIM_Y;
 
-        info.x_block = blockIdx.x % info.x_block_count;
-        info.y_block = blockIdx.x / info.x_block_count;
+        const idx_t x_block = blockIdx.x % x_block_count;
+        const idx_t y_block = blockIdx.x / x_block_count;
 
-        idx_t first_abs_x_in_block = info.x_block * ABSOLUTE_BLOCK_TILE_DIM_X;
-        idx_t first_abs_y_in_block = info.y_block * ABSOLUTE_BLOCK_TILE_DIM_Y;
+        const idx_t first_abs_x_in_block = x_block * ABSOLUTE_BLOCK_TILE_DIM_X;
+        const idx_t first_abs_y_in_block = y_block * ABSOLUTE_BLOCK_TILE_DIM_Y;
 
-        idx_t warp_idx_within_block = threadIdx.x / WARP_SIZE;
+        const idx_t warp_idx_within_block = threadIdx.x / WARP_SIZE;
 
-        info.x_warp = warp_idx_within_block % BLOCK_TILE_DIM_X;
-        info.y_warp = warp_idx_within_block / BLOCK_TILE_DIM_X;
+        const idx_t x_warp = warp_idx_within_block % BLOCK_TILE_DIM_X;
+        const idx_t y_warp = warp_idx_within_block / BLOCK_TILE_DIM_X;
 
-        idx_t first_abs_x_in_warp = first_abs_x_in_block + info.x_warp * WARP_TILE_DIM_X;
-        idx_t first_abs_y_in_warp = first_abs_y_in_block + info.y_warp * WARP_TILE_DIM_Y;
+        const idx_t first_abs_x_in_warp = first_abs_x_in_block + x_warp * WARP_TILE_DIM_X;
+        const idx_t first_abs_y_in_warp = first_abs_y_in_block + y_warp * WARP_TILE_DIM_Y;
 
-        idx_t x_within_warp = lane_idx % WARP_DIM_X;
-        idx_t y_within_warp = lane_idx / WARP_DIM_X;
+        const idx_t x_within_warp = lane_idx % WARP_DIM_X;
+        const idx_t y_within_warp = lane_idx / WARP_DIM_X;
 
-        info.x_abs_start = first_abs_x_in_warp + x_within_warp * X_COMPUTED_WORD_COUNT;
-        info.y_abs_start = first_abs_y_in_warp + y_within_warp * Y_COMPUTED_WORD_COUNT;
+        const idx_t x_abs_start = first_abs_x_in_warp + x_within_warp * X_COMPUTED_WORD_COUNT;
+        const idx_t y_abs_start = first_abs_y_in_warp + y_within_warp * Y_COMPUTED_WORD_COUNT;
 
+        return {
+            .x_block = x_block,
+            .y_block = y_block,
 
-        return info;
+            .x_warp = x_warp,
+            .y_warp = y_warp,
+            
+            .x_block_count = x_block_count,
+            .y_block_count = y_block_count,
+            
+            .x_abs_start = x_abs_start,
+            .y_abs_start = y_abs_start
+        };
 #else
         WarpInformation<idx_t> info;
         
