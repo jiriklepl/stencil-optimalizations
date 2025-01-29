@@ -61,84 +61,84 @@ per_alg_hps = [
     # GPUs
     #   - best hyper-parameters was determined experimentally
 
-    [['gol-cuda-naive', [' BASE_GRID_ENCODING="char" ', ' BASE_GRID_ENCODING="int" ']],
-     [*simple_cases_base, [HP().block_size(128).str()]]],
+    # [['gol-cuda-naive', [' BASE_GRID_ENCODING="char" ', ' BASE_GRID_ENCODING="int" ']],
+    #  [*simple_cases_base, [HP().block_size(128).str()]]],
 
-    [['gol-cuda-naive-bitwise-cols-32', None],
-     [*simple_cases_base, [HP().block_size(512).str()]]],
+    # [['gol-cuda-naive-bitwise-cols-32', None],
+    #  [*simple_cases_base, [HP().block_size(512).str()]]],
     
-    [['gol-cuda-naive-bitwise-cols-64', None],
-     [*simple_cases_base, [HP().block_size(512).str()]]],
+    # [['gol-cuda-naive-bitwise-cols-64', None],
+    #  [*simple_cases_base, [HP().block_size(512).str()]]],
 
-    [['gol-cuda-naive-bitwise-tiles-32', None],                                              
-     [*simple_cases_base, [HP().block_size(128).str()]]],
+    # [['gol-cuda-naive-bitwise-tiles-32', None],                                              
+    #  [*simple_cases_base, [HP().block_size(128).str()]]],
     
-    [['gol-cuda-naive-bitwise-tiles-64', None],                                              
-     [*simple_cases_base, [HP().block_size(256).str()]]],
+    # [['gol-cuda-naive-bitwise-tiles-64', None],                                              
+    #  [*simple_cases_base, [HP().block_size(256).str()]]],
 
-    [['gol-cuda-naive-bitwise-no-macro-32', None],                                           
-     [*simple_cases_base, [HP().block_size(128).str()]]],
+    # [['gol-cuda-naive-bitwise-no-macro-32', None],                                           
+    #  [*simple_cases_base, [HP().block_size(128).str()]]],
     
-    [['gol-cuda-naive-bitwise-no-macro-64', None],                                           
-     [*simple_cases_base, [HP().block_size(256).str()]]],
+    # [['gol-cuda-naive-bitwise-no-macro-64', None],                                           
+    #  [*simple_cases_base, [HP().block_size(256).str()]]],
 
-    [['gol-cuda-local-one-cell-cols-32', None],                                              
-     [*local_cases_base, [HP().block_size(256).state_bits(32).str()]],],
+    # [['gol-cuda-local-one-cell-cols-32', None],                                              
+    #  [*local_cases_base, [HP().block_size(256).state_bits(32).str()]],],
     
-    [['gol-cuda-local-one-cell-cols-64', None],                                              
-     [*local_cases_base, [HP().block_size(128).state_bits(32).str()]]],
+    # [['gol-cuda-local-one-cell-cols-64', None],                                              
+    #  [*local_cases_base, [HP().block_size(128).state_bits(32).str()]]],
 
-    [['gol-cuda-local-one-cell-32--bit-tiles', None],                                        
-     [*local_cases_base, [HP().block_size(256).state_bits(32).str()]]],
+    # [['gol-cuda-local-one-cell-32--bit-tiles', None],                                        
+    #  [*local_cases_base, [HP().block_size(256).state_bits(32).str()]]],
     
-    [['gol-cuda-local-one-cell-64--bit-tiles', None],                                        
-     [*local_cases_base, [HP().block_size(128).state_bits(32).str()]]],
+    # [['gol-cuda-local-one-cell-64--bit-tiles', None],                                        
+    #  [*local_cases_base, [HP().block_size(128).state_bits(32).str()]]],
 
-    # CPUs
+    # # CPUs
 
-    [['gol-cpu-naive', [' BASE_GRID_ENCODING="char" ', ' BASE_GRID_ENCODING="int" ']],                                        
-     [*simple_cases_base]],
+    # [['gol-cpu-naive', [' BASE_GRID_ENCODING="char" ', ' BASE_GRID_ENCODING="int" ']],                                        
+    #  [*simple_cases_base]],
 
-    [['gol-cpu-bitwise-cols-naive-32', None],                                        
-     [*simple_cases_base]],
+    # [['gol-cpu-bitwise-cols-naive-32', None],                                        
+    #  [*simple_cases_base]],
 
-    [['gol-cpu-bitwise-cols-naive-64', None],                                        
-     [*simple_cases_base]],
+    # [['gol-cpu-bitwise-cols-naive-64', None],                                        
+    #  [*simple_cases_base]],
 
-    [['gol-cpu-bitwise-tiles-naive-32', None],                                        
-     [*simple_cases_base]],
+    # [['gol-cpu-bitwise-tiles-naive-32', None],                                        
+    #  [*simple_cases_base]],
 
-    [['gol-cpu-bitwise-tiles-naive-64', None],                                        
-     [*simple_cases_base]],
+    # [['gol-cpu-bitwise-tiles-naive-64', None],                                        
+    #  [*simple_cases_base]],
 
-    [['gol-cpu-bitwise-cols-macro-32', None],                                        
-     [*simple_cases_base]],
+    # [['gol-cpu-bitwise-cols-macro-32', None],                                        
+    #  [*simple_cases_base]],
 
-    [['gol-cpu-bitwise-cols-macro-64', None],                                        
-     [*simple_cases_base]],
+    # [['gol-cpu-bitwise-cols-macro-64', None],                                        
+    #  [*simple_cases_base]],
 
-    [['gol-cpu-bitwise-tiles-macro-32', None],                                        
-     [*simple_cases_base]],
+    # [['gol-cpu-bitwise-tiles-macro-32', None],                                        
+    #  [*simple_cases_base]],
 
-    [['gol-cpu-bitwise-tiles-macro-64', None],                                        
-     [*simple_cases_base]],
+    # [['gol-cpu-bitwise-tiles-macro-64', None],                                        
+    #  [*simple_cases_base]],
 
     # Related Work
     
     [['eff-baseline', None],
-     [*simple_cases_base, [HP().block_size(xx)]]],
+     [*simple_cases_base, [HP().block_size(1024).str()]]],
 
     [['eff-baseline-shm', None],
-     [*simple_cases_base, [HP().block_size(xx)]]],
+     [*simple_cases_base, [HP().block_size(256).str()]]],
 
-    [['eff-baseline-texture', None],
-     [*simple_cases_base, [HP().block_size(xx)]]],
+    # [['eff-baseline-texture', None],
+    #  [*simple_cases_base, [HP().block_size(xx)]]],
 
     [['eff-sota-packed-32', None],
-     [*simple_cases_base, [HP().block_size(xx)]]],
+     [*simple_cases_base, [HP().block_size(1024).str()]]],
 
     [['eff-sota-packed-64', None],
-     [*simple_cases_base, [HP().block_size(xx)]]],
+     [*simple_cases_base, [HP().block_size(1024).str()]]],
 ]
 
 if len(sys.argv) != 3:

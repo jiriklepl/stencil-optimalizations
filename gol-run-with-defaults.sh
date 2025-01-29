@@ -39,7 +39,7 @@ __30="1073741824"
 __31="2147483648"
 
 # ALGORITHM="eff-baseline"
-ALGORITHM="eff-baseline-shm"
+# ALGORITHM="eff-baseline-shm"
 # ALGORITHM="eff-baseline-texture"
 # ALGORITHM="eff-sota-packed-32"
 # ALGORITHM="eff-sota-packed-64"
@@ -55,14 +55,14 @@ ALGORITHM="eff-baseline-shm"
 # ALGORITHM="gol-cpu-bitwise-tiles-naive-64"
 
 # ALGORITHM="gol-cpu-bitwise-cols-macro-64"
-# ALGORITHM="gol-cuda-naive-bitwise-tiles-64"
 # ALGORITHM="gol-cpu-bitwise-cols-naive-64"
 # ALGORITHM="gol-cuda-naive-bitwise-tiles-32"
-# ALGORITHM="gol-cuda-naive-bitwise-tiles-64"
+ALGORITHM="gol-cuda-naive-bitwise-tiles-64"
 # ALGORITHM="gol-cuda-naive-bitwise-no-macro-64"
 # ALGORITHM="an5d-cpu-64"
 # ALGORITHM="cuda-memcpy"
 # ALGORITHM="gol-cuda-naive"
+# ALGORITHM="gol-cuda-naive-bitwise-cols-32"
 # ALGORITHM="gol-cuda-naive-bitwise-cols-64"
 # ALGORITHM="gol-cuda-naive-local-64--bit-tiles"
 # ALGORITHM="gol-cuda-naive-local-64"
@@ -81,9 +81,9 @@ BASE_GRID_ENCODING="char"
 # BASE_GRID_ENCODING="int"
 
 WARMUP_ROUNDS="1"
-MEASUREMENT_ROUNDS="2"
+MEASUREMENT_ROUNDS="1"
 
-DATA_LOADER_NAME="random-ones-zeros"
+# DATA_LOADER_NAME="random-ones-zeros"
 # DATA_LOADER_NAME="always-changing"
 # DATA_LOADER_NAME="zeros"
 DATA_LOADER_NAME="lexicon"
@@ -138,8 +138,8 @@ MAX_RUNTIME_SECONDS="10"
 
 TAG="test-run"
 
-# srun -p gpu-short -A kdss --cpus-per-task=64 --mem=256GB --gres=gpu:H100 --time=2:00:00 $GOL_EXE_NAME \
-srun -p gpu-short -A kdss --cpus-per-task=64 --mem=256GB --gres=gpu:V100 --time=2:00:00 $GOL_EXE_NAME \
+# srun -p gpu-short -A kdss --cpus-per-task=64 --mem=256GB --gres=gpu:V100 --time=2:00:00 $GOL_EXE_NAME \
+srun -p gpu-short -A kdss --cpus-per-task=64 --mem=256GB --gres=gpu:H100 --time=2:00:00 $GOL_EXE_NAME \
     --algorithm="$ALGORITHM" \
     --grid-dimensions-x="$GRID_DIMENSIONS_X" \
     --grid-dimensions-y="$GRID_DIMENSIONS_Y" \

@@ -58,7 +58,11 @@ def print_state_of_job(fname):
     percent_done = experiments_completed / total_experiments * 100
 
     squeue_out = get_squeue_jobs()
-    current_run_time = get_job_run_time_secs(fname, squeue_out)
+    try:
+        current_run_time = get_job_run_time_secs(fname, squeue_out)
+    except:
+        print (BLUE + 'Job:' + RESET, YELLOW + fname + RESET, BLUE + 'is not running' + RESET + '\n')
+        return
 
     estimated_total_time = current_run_time / percent_done * 100
     est_time_to_finish = estimated_total_time - current_run_time

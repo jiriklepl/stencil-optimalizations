@@ -1,0 +1,1853 @@
+Starting job 142957
+Node:  hopper01
+SCRIPT_TEMPLATE: ./final-measurements/_scripts/final-measurements-rel-work
+WORKER_ID: 1
+SCRIPT: ./final-measurements/_scripts/final-measurements-rel-work--part_1.sh
+exp-0
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: eff-baseline
+  grid_dimensions: 8192x8192
+  iterations: 100000
+  base_grid_encoding: char
+  max_runtime_seconds: 5
+  warmup_rounds: 5
+  measurement_rounds: 10
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[4096,4096]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  tag: 
+  state_bits_count: 32
+  thread_block_size: 1024
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[4096,4096]
+  Data loaded in   40.7002 ms
+
+Warming up... 1 / 5
+Warming up... 2 / 5
+Warming up... 3 / 5
+Warming up... 4 / 5
+Warming up... 5 / 5
+
+
+Running experiment...        eff-baseline
+
+Measurement round 1 / 10
+Time report:
+  set_and_format_input_data:  3545.083790 ms
+  initialize_data_structures: 12.503564 ms
+  run:                        5442.676033 ms
+   performed iters:  12584
+   runtime per iter: 0.432508 ms
+  finalize_data_structures:   14.983321 ms
+
+Measurement round 2 / 10
+Time report:
+  set_and_format_input_data:  3556.664007 ms
+  initialize_data_structures: 12.444522 ms
+  run:                        5442.608620 ms
+   performed iters:  12587
+   runtime per iter: 0.432399 ms
+  finalize_data_structures:   12.442630 ms
+
+Measurement round 3 / 10
+Time report:
+  set_and_format_input_data:  3543.610226 ms
+  initialize_data_structures: 12.537174 ms
+  run:                        5442.591634 ms
+   performed iters:  12587
+   runtime per iter: 0.432398 ms
+  finalize_data_structures:   14.744418 ms
+
+Measurement round 4 / 10
+Time report:
+  set_and_format_input_data:  3549.795049 ms
+  initialize_data_structures: 12.442139 ms
+  run:                        5442.633748 ms
+   performed iters:  12587
+   runtime per iter: 0.432401 ms
+  finalize_data_structures:   12.164586 ms
+
+Measurement round 5 / 10
+Time report:
+  set_and_format_input_data:  3554.474650 ms
+  initialize_data_structures: 12.469320 ms
+  run:                        5442.622962 ms
+   performed iters:  12587
+   runtime per iter: 0.432400 ms
+  finalize_data_structures:   14.760182 ms
+
+Measurement round 6 / 10
+Time report:
+  set_and_format_input_data:  3550.569550 ms
+  initialize_data_structures: 12.503133 ms
+  run:                        5442.612516 ms
+   performed iters:  12587
+   runtime per iter: 0.432400 ms
+  finalize_data_structures:   12.146188 ms
+
+Measurement round 7 / 10
+Time report:
+  set_and_format_input_data:  3542.837809 ms
+  initialize_data_structures: 12.510924 ms
+  run:                        5442.613197 ms
+   performed iters:  12587
+   runtime per iter: 0.432400 ms
+  finalize_data_structures:   14.724788 ms
+
+Measurement round 8 / 10
+Time report:
+  set_and_format_input_data:  3544.735320 ms
+  initialize_data_structures: 12.495872 ms
+  run:                        5442.943972 ms
+   performed iters:  12588
+   runtime per iter: 0.432391 ms
+  finalize_data_structures:   11.964963 ms
+
+Measurement round 9 / 10
+Time report:
+  set_and_format_input_data:  3559.722557 ms
+  initialize_data_structures: 12.490753 ms
+  run:                        5442.644535 ms
+   performed iters:  12587
+   runtime per iter: 0.432402 ms
+  finalize_data_structures:   15.003773 ms
+
+Measurement round 10 / 10
+Time report:
+  set_and_format_input_data:  3551.435259 ms
+  initialize_data_structures: 12.495060 ms
+  run:                        5442.669403 ms
+   performed iters:  12587
+   runtime per iter: 0.432404 ms
+  finalize_data_structures:   11.952804 ms
+
+exp-1
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: eff-baseline
+  grid_dimensions: 32768x32768
+  iterations: 100000
+  base_grid_encoding: char
+  max_runtime_seconds: 5
+  warmup_rounds: 5
+  measurement_rounds: 10
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[16384,16384]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  tag: 
+  state_bits_count: 32
+  thread_block_size: 1024
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[16384,16384]
+  Data loaded in   142.447 ms
+
+Warming up... 1 / 5
+Warming up... 2 / 5
+Warming up... 3 / 5
+Warming up... 4 / 5
+Warming up... 5 / 5
+
+
+Running experiment...        eff-baseline
+
+Measurement round 1 / 10
+Time report:
+  set_and_format_input_data:  56726.454860 ms
+  initialize_data_structures: 192.362163 ms
+  run:                        12061.074889 ms
+   performed iters:  1746
+   runtime per iter: 6.907832 ms
+  finalize_data_structures:   185.614281 ms
+
+Measurement round 2 / 10
+Time report:
+  set_and_format_input_data:  56760.321556 ms
+  initialize_data_structures: 193.773874 ms
+  run:                        12060.805459 ms
+   performed iters:  1746
+   runtime per iter: 6.907678 ms
+  finalize_data_structures:   221.105853 ms
+
+Measurement round 3 / 10
+Time report:
+  set_and_format_input_data:  56723.798381 ms
+  initialize_data_structures: 192.098311 ms
+  run:                        12061.011673 ms
+   performed iters:  1746
+   runtime per iter: 6.907796 ms
+  finalize_data_structures:   185.460026 ms
+
+Measurement round 4 / 10
+Time report:
+  set_and_format_input_data:  56725.785330 ms
+  initialize_data_structures: 193.789609 ms
+  run:                        12060.906192 ms
+   performed iters:  1746
+   runtime per iter: 6.907736 ms
+  finalize_data_structures:   221.342033 ms
+
+Measurement round 5 / 10
+Time report:
+  set_and_format_input_data:  56727.016206 ms
+  initialize_data_structures: 192.148768 ms
+  run:                        12061.121600 ms
+   performed iters:  1746
+   runtime per iter: 6.907859 ms
+  finalize_data_structures:   185.398572 ms
+
+Measurement round 6 / 10
+Time report:
+  set_and_format_input_data:  56711.544339 ms
+  initialize_data_structures: 193.533198 ms
+  run:                        12060.807020 ms
+   performed iters:  1746
+   runtime per iter: 6.907679 ms
+  finalize_data_structures:   221.347702 ms
+
+Measurement round 7 / 10
+Time report:
+  set_and_format_input_data:  56770.851192 ms
+  initialize_data_structures: 192.361603 ms
+  run:                        12061.414376 ms
+   performed iters:  1746
+   runtime per iter: 6.908027 ms
+  finalize_data_structures:   185.612038 ms
+
+Measurement round 8 / 10
+Time report:
+  set_and_format_input_data:  56794.536303 ms
+  initialize_data_structures: 193.844963 ms
+  run:                        12061.421327 ms
+   performed iters:  1746
+   runtime per iter: 6.908031 ms
+  finalize_data_structures:   221.149810 ms
+
+Measurement round 9 / 10
+Time report:
+  set_and_format_input_data:  56730.033784 ms
+  initialize_data_structures: 191.960672 ms
+  run:                        12060.943428 ms
+   performed iters:  1746
+   runtime per iter: 6.907757 ms
+  finalize_data_structures:   185.483702 ms
+
+Measurement round 10 / 10
+Time report:
+  set_and_format_input_data:  56777.309212 ms
+  initialize_data_structures: 193.651578 ms
+  run:                        12061.225348 ms
+   performed iters:  1746
+   runtime per iter: 6.907918 ms
+  finalize_data_structures:   221.176681 ms
+
+exp-2
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: eff-baseline
+  grid_dimensions: 16384x16384
+  iterations: 100000
+  base_grid_encoding: char
+  max_runtime_seconds: 5
+  warmup_rounds: 5
+  measurement_rounds: 10
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[8192,8192]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  tag: 
+  state_bits_count: 32
+  thread_block_size: 1024
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[8192,8192]
+  Data loaded in   60.9848 ms
+
+Warming up... 1 / 5
+Warming up... 2 / 5
+Warming up... 3 / 5
+Warming up... 4 / 5
+Warming up... 5 / 5
+
+
+Running experiment...        eff-baseline
+
+Measurement round 1 / 10
+Time report:
+  set_and_format_input_data:  14171.118045 ms
+  initialize_data_structures: 48.461536 ms
+  run:                        6759.032462 ms
+   performed iters:  3929
+   runtime per iter: 1.720293 ms
+  finalize_data_structures:   46.540799 ms
+
+Measurement round 2 / 10
+Time report:
+  set_and_format_input_data:  14168.766892 ms
+  initialize_data_structures: 48.562440 ms
+  run:                        6758.755480 ms
+   performed iters:  3929
+   runtime per iter: 1.720223 ms
+  finalize_data_structures:   57.562955 ms
+
+Measurement round 3 / 10
+Time report:
+  set_and_format_input_data:  14156.257209 ms
+  initialize_data_structures: 48.503791 ms
+  run:                        6758.925960 ms
+   performed iters:  3929
+   runtime per iter: 1.720266 ms
+  finalize_data_structures:   46.265630 ms
+
+Measurement round 4 / 10
+Time report:
+  set_and_format_input_data:  14160.297375 ms
+  initialize_data_structures: 48.571454 ms
+  run:                        6759.289254 ms
+   performed iters:  3929
+   runtime per iter: 1.720359 ms
+  finalize_data_structures:   57.623447 ms
+
+Measurement round 5 / 10
+Time report:
+  set_and_format_input_data:  14167.057416 ms
+  initialize_data_structures: 48.462357 ms
+  run:                        6759.168009 ms
+   performed iters:  3929
+   runtime per iter: 1.720328 ms
+  finalize_data_structures:   46.221133 ms
+
+Measurement round 6 / 10
+Time report:
+  set_and_format_input_data:  14182.917370 ms
+  initialize_data_structures: 48.589482 ms
+  run:                        6759.299726 ms
+   performed iters:  3929
+   runtime per iter: 1.720361 ms
+  finalize_data_structures:   57.576436 ms
+
+Measurement round 7 / 10
+Time report:
+  set_and_format_input_data:  14170.733335 ms
+  initialize_data_structures: 48.412572 ms
+  run:                        6758.911635 ms
+   performed iters:  3929
+   runtime per iter: 1.720263 ms
+  finalize_data_structures:   46.206060 ms
+
+Measurement round 8 / 10
+Time report:
+  set_and_format_input_data:  14167.506817 ms
+  initialize_data_structures: 48.625065 ms
+  run:                        6758.909461 ms
+   performed iters:  3929
+   runtime per iter: 1.720262 ms
+  finalize_data_structures:   57.669197 ms
+
+Measurement round 9 / 10
+Time report:
+  set_and_format_input_data:  14172.467977 ms
+  initialize_data_structures: 48.498182 ms
+  run:                        6759.242408 ms
+   performed iters:  3929
+   runtime per iter: 1.720347 ms
+  finalize_data_structures:   46.282216 ms
+
+Measurement round 10 / 10
+Time report:
+  set_and_format_input_data:  14175.608282 ms
+  initialize_data_structures: 48.751108 ms
+  run:                        6760.359631 ms
+   performed iters:  3930
+   runtime per iter: 1.720193 ms
+  finalize_data_structures:   65.076394 ms
+
+exp-3
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: eff-baseline
+  grid_dimensions: 2048x2048
+  iterations: 100000
+  base_grid_encoding: char
+  max_runtime_seconds: 5
+  warmup_rounds: 5
+  measurement_rounds: 10
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[1024,1024]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  tag: 
+  state_bits_count: 32
+  thread_block_size: 1024
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[1024,1024]
+  Data loaded in   35.4494 ms
+
+Warming up... 1 / 5
+Warming up... 2 / 5
+Warming up... 3 / 5
+Warming up... 4 / 5
+Warming up... 5 / 5
+
+
+Running experiment...        eff-baseline
+
+Measurement round 1 / 10
+Time report:
+  set_and_format_input_data:  219.965848 ms
+  initialize_data_structures: 1.164415 ms
+  run:                        2664.595806 ms
+   performed iters:  100000
+   runtime per iter: 0.026646 ms
+  finalize_data_structures:   1.583673 ms
+
+Measurement round 2 / 10
+Time report:
+  set_and_format_input_data:  222.558859 ms
+  initialize_data_structures: 1.179568 ms
+  run:                        2672.835462 ms
+   performed iters:  100000
+   runtime per iter: 0.026728 ms
+  finalize_data_structures:   1.095189 ms
+
+Measurement round 3 / 10
+Time report:
+  set_and_format_input_data:  220.185923 ms
+  initialize_data_structures: 1.161790 ms
+  run:                        2674.916764 ms
+   performed iters:  100000
+   runtime per iter: 0.026749 ms
+  finalize_data_structures:   1.609132 ms
+
+Measurement round 4 / 10
+Time report:
+  set_and_format_input_data:  219.921670 ms
+  initialize_data_structures: 1.141549 ms
+  run:                        2674.771612 ms
+   performed iters:  100000
+   runtime per iter: 0.026748 ms
+  finalize_data_structures:   1.128380 ms
+
+Measurement round 5 / 10
+Time report:
+  set_and_format_input_data:  219.356218 ms
+  initialize_data_structures: 1.134548 ms
+  run:                        2674.736970 ms
+   performed iters:  100000
+   runtime per iter: 0.026747 ms
+  finalize_data_structures:   1.584114 ms
+
+Measurement round 6 / 10
+Time report:
+  set_and_format_input_data:  220.633035 ms
+  initialize_data_structures: 1.146858 ms
+  run:                        2674.818454 ms
+   performed iters:  100000
+   runtime per iter: 0.026748 ms
+  finalize_data_structures:   1.121770 ms
+
+Measurement round 7 / 10
+Time report:
+  set_and_format_input_data:  220.171391 ms
+  initialize_data_structures: 1.157413 ms
+  run:                        2674.715858 ms
+   performed iters:  100000
+   runtime per iter: 0.026747 ms
+  finalize_data_structures:   1.112215 ms
+
+Measurement round 8 / 10
+Time report:
+  set_and_format_input_data:  220.943818 ms
+  initialize_data_structures: 1.155000 ms
+  run:                        2674.682326 ms
+   performed iters:  100000
+   runtime per iter: 0.026747 ms
+  finalize_data_structures:   1.108719 ms
+
+Measurement round 9 / 10
+Time report:
+  set_and_format_input_data:  222.000247 ms
+  initialize_data_structures: 1.558274 ms
+  run:                        2674.790561 ms
+   performed iters:  100000
+   runtime per iter: 0.026748 ms
+  finalize_data_structures:   1.127769 ms
+
+Measurement round 10 / 10
+Time report:
+  set_and_format_input_data:  221.066885 ms
+  initialize_data_structures: 1.175001 ms
+  run:                        2674.955633 ms
+   performed iters:  100000
+   runtime per iter: 0.026750 ms
+  finalize_data_structures:   1.102110 ms
+
+exp-4
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: eff-baseline-shm
+  grid_dimensions: 4096x4096
+  iterations: 100000
+  base_grid_encoding: char
+  max_runtime_seconds: 5
+  warmup_rounds: 5
+  measurement_rounds: 10
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[2048,2048]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  tag: 
+  state_bits_count: 32
+  thread_block_size: 256
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[2048,2048]
+  Data loaded in   36.5896 ms
+
+Warming up... 1 / 5
+Warming up... 2 / 5
+Warming up... 3 / 5
+Warming up... 4 / 5
+Warming up... 5 / 5
+
+
+Running experiment...        eff-baseline-shm
+
+Measurement round 1 / 10
+Time report:
+  set_and_format_input_data:  891.951091 ms
+  initialize_data_structures: 3.516639 ms
+  run:                        5129.450814 ms
+   performed iters:  40486
+   runtime per iter: 0.126697 ms
+  finalize_data_structures:   3.861725 ms
+
+Measurement round 2 / 10
+Time report:
+  set_and_format_input_data:  890.050194 ms
+  initialize_data_structures: 3.529609 ms
+  run:                        5129.551878 ms
+   performed iters:  40487
+   runtime per iter: 0.126696 ms
+  finalize_data_structures:   3.433051 ms
+
+Measurement round 3 / 10
+Time report:
+  set_and_format_input_data:  889.063510 ms
+  initialize_data_structures: 3.530259 ms
+  run:                        5129.513360 ms
+   performed iters:  40489
+   runtime per iter: 0.126689 ms
+  finalize_data_structures:   3.879321 ms
+
+Measurement round 4 / 10
+Time report:
+  set_and_format_input_data:  890.278461 ms
+  initialize_data_structures: 3.518461 ms
+  run:                        5129.479177 ms
+   performed iters:  40486
+   runtime per iter: 0.126698 ms
+  finalize_data_structures:   3.417918 ms
+
+Measurement round 5 / 10
+Time report:
+  set_and_format_input_data:  887.684108 ms
+  initialize_data_structures: 3.522157 ms
+  run:                        5129.488502 ms
+   performed iters:  40487
+   runtime per iter: 0.126695 ms
+  finalize_data_structures:   3.885461 ms
+
+Measurement round 6 / 10
+Time report:
+  set_and_format_input_data:  886.904270 ms
+  initialize_data_structures: 3.537581 ms
+  run:                        5129.429772 ms
+   performed iters:  40490
+   runtime per iter: 0.126684 ms
+  finalize_data_structures:   3.309333 ms
+
+Measurement round 7 / 10
+Time report:
+  set_and_format_input_data:  887.166529 ms
+  initialize_data_structures: 3.646677 ms
+  run:                        5129.533550 ms
+   performed iters:  40491
+   runtime per iter: 0.126683 ms
+  finalize_data_structures:   3.894364 ms
+
+Measurement round 8 / 10
+Time report:
+  set_and_format_input_data:  886.471630 ms
+  initialize_data_structures: 3.538071 ms
+  run:                        5129.498728 ms
+   performed iters:  40490
+   runtime per iter: 0.126686 ms
+  finalize_data_structures:   3.305427 ms
+
+Measurement round 9 / 10
+Time report:
+  set_and_format_input_data:  886.483048 ms
+  initialize_data_structures: 3.495667 ms
+  run:                        5129.543035 ms
+   performed iters:  40489
+   runtime per iter: 0.126690 ms
+  finalize_data_structures:   3.859772 ms
+
+Measurement round 10 / 10
+Time report:
+  set_and_format_input_data:  883.504590 ms
+  initialize_data_structures: 3.558643 ms
+  run:                        5129.443503 ms
+   performed iters:  40492
+   runtime per iter: 0.126678 ms
+  finalize_data_structures:   3.450428 ms
+
+exp-5
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: eff-baseline-shm
+  grid_dimensions: 1024x1024
+  iterations: 100000
+  base_grid_encoding: char
+  max_runtime_seconds: 5
+  warmup_rounds: 5
+  measurement_rounds: 10
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[512,512]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  tag: 
+  state_bits_count: 32
+  thread_block_size: 256
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[512,512]
+  Data loaded in   34.9077 ms
+
+Warming up... 1 / 5
+Warming up... 2 / 5
+Warming up... 3 / 5
+Warming up... 4 / 5
+Warming up... 5 / 5
+
+
+Running experiment...        eff-baseline-shm
+
+Measurement round 1 / 10
+Time report:
+  set_and_format_input_data:  55.818928 ms
+  initialize_data_structures: 0.820550 ms
+  run:                        823.127406 ms
+   performed iters:  100000
+   runtime per iter: 0.008231 ms
+  finalize_data_structures:   0.558902 ms
+
+Measurement round 2 / 10
+Time report:
+  set_and_format_input_data:  55.653245 ms
+  initialize_data_structures: 0.488294 ms
+  run:                        823.094796 ms
+   performed iters:  100000
+   runtime per iter: 0.008231 ms
+  finalize_data_structures:   0.512181 ms
+
+Measurement round 3 / 10
+Time report:
+  set_and_format_input_data:  55.065750 ms
+  initialize_data_structures: 0.490477 ms
+  run:                        823.360591 ms
+   performed iters:  100000
+   runtime per iter: 0.008234 ms
+  finalize_data_structures:   0.526963 ms
+
+Measurement round 4 / 10
+Time report:
+  set_and_format_input_data:  56.443780 ms
+  initialize_data_structures: 0.586594 ms
+  run:                        823.359139 ms
+   performed iters:  100000
+   runtime per iter: 0.008234 ms
+  finalize_data_structures:   0.567245 ms
+
+Measurement round 5 / 10
+Time report:
+  set_and_format_input_data:  55.561816 ms
+  initialize_data_structures: 0.488104 ms
+  run:                        823.187067 ms
+   performed iters:  100000
+   runtime per iter: 0.008232 ms
+  finalize_data_structures:   0.535426 ms
+
+Measurement round 6 / 10
+Time report:
+  set_and_format_input_data:  55.074214 ms
+  initialize_data_structures: 0.468754 ms
+  run:                        823.180406 ms
+   performed iters:  100000
+   runtime per iter: 0.008232 ms
+  finalize_data_structures:   0.522507 ms
+
+Measurement round 7 / 10
+Time report:
+  set_and_format_input_data:  55.168106 ms
+  initialize_data_structures: 0.493062 ms
+  run:                        823.205294 ms
+   performed iters:  100000
+   runtime per iter: 0.008232 ms
+  finalize_data_structures:   0.998782 ms
+
+Measurement round 8 / 10
+Time report:
+  set_and_format_input_data:  56.323516 ms
+  initialize_data_structures: 0.496166 ms
+  run:                        823.304005 ms
+   performed iters:  100000
+   runtime per iter: 0.008233 ms
+  finalize_data_structures:   0.539262 ms
+
+Measurement round 9 / 10
+Time report:
+  set_and_format_input_data:  55.306477 ms
+  initialize_data_structures: 0.490337 ms
+  run:                        823.263223 ms
+   performed iters:  100000
+   runtime per iter: 0.008233 ms
+  finalize_data_structures:   0.535516 ms
+
+Measurement round 10 / 10
+Time report:
+  set_and_format_input_data:  54.913769 ms
+  initialize_data_structures: 0.487844 ms
+  run:                        823.298306 ms
+   performed iters:  100000
+   runtime per iter: 0.008233 ms
+  finalize_data_structures:   0.509707 ms
+
+exp-6
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: eff-baseline-shm
+  grid_dimensions: 32768x32768
+  iterations: 100000
+  base_grid_encoding: char
+  max_runtime_seconds: 5
+  warmup_rounds: 5
+  measurement_rounds: 10
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[16384,16384]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  tag: 
+  state_bits_count: 32
+  thread_block_size: 256
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[16384,16384]
+  Data loaded in   142.587 ms
+
+Warming up... 1 / 5
+Warming up... 2 / 5
+Warming up... 3 / 5
+Warming up... 4 / 5
+Warming up... 5 / 5
+
+
+Running experiment...        eff-baseline-shm
+
+Measurement round 1 / 10
+Time report:
+  set_and_format_input_data:  56780.674607 ms
+  initialize_data_structures: 189.064740 ms
+  run:                        12741.352249 ms
+   performed iters:  1683
+   runtime per iter: 7.570619 ms
+  finalize_data_structures:   181.578082 ms
+
+Measurement round 2 / 10
+Time report:
+  set_and_format_input_data:  56969.489425 ms
+  initialize_data_structures: 191.441712 ms
+  run:                        12745.597838 ms
+   performed iters:  1682
+   runtime per iter: 7.577644 ms
+  finalize_data_structures:   270.671203 ms
+
+Measurement round 3 / 10
+Time report:
+  set_and_format_input_data:  56801.565761 ms
+  initialize_data_structures: 188.980001 ms
+  run:                        12745.658731 ms
+   performed iters:  1682
+   runtime per iter: 7.577681 ms
+  finalize_data_structures:   181.486242 ms
+
+Measurement round 4 / 10
+Time report:
+  set_and_format_input_data:  56808.687532 ms
+  initialize_data_structures: 191.568866 ms
+  run:                        12745.248997 ms
+   performed iters:  1682
+   runtime per iter: 7.577437 ms
+  finalize_data_structures:   270.519782 ms
+
+Measurement round 5 / 10
+Time report:
+  set_and_format_input_data:  56803.376419 ms
+  initialize_data_structures: 189.341041 ms
+  run:                        12741.640138 ms
+   performed iters:  1683
+   runtime per iter: 7.570790 ms
+  finalize_data_structures:   181.805299 ms
+
+Measurement round 6 / 10
+Time report:
+  set_and_format_input_data:  56811.454419 ms
+  initialize_data_structures: 191.546862 ms
+  run:                        12741.838480 ms
+   performed iters:  1683
+   runtime per iter: 7.570908 ms
+  finalize_data_structures:   270.634537 ms
+
+Measurement round 7 / 10
+Time report:
+  set_and_format_input_data:  56850.913593 ms
+  initialize_data_structures: 189.098301 ms
+  run:                        12745.354762 ms
+   performed iters:  1682
+   runtime per iter: 7.577500 ms
+  finalize_data_structures:   181.546925 ms
+
+Measurement round 8 / 10
+Time report:
+  set_and_format_input_data:  56791.752015 ms
+  initialize_data_structures: 191.892420 ms
+  run:                        12745.585654 ms
+   performed iters:  1682
+   runtime per iter: 7.577637 ms
+  finalize_data_structures:   270.551742 ms
+
+Measurement round 9 / 10
+Time report:
+  set_and_format_input_data:  56793.838914 ms
+  initialize_data_structures: 189.308532 ms
+  run:                        12745.739359 ms
+   performed iters:  1682
+   runtime per iter: 7.577729 ms
+  finalize_data_structures:   181.743024 ms
+
+Measurement round 10 / 10
+Time report:
+  set_and_format_input_data:  56754.247153 ms
+  initialize_data_structures: 191.788181 ms
+  run:                        12745.776566 ms
+   performed iters:  1682
+   runtime per iter: 7.577751 ms
+  finalize_data_structures:   270.687029 ms
+
+exp-7
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: eff-sota-packed-32
+  grid_dimensions: 65536x65536
+  iterations: 100000
+  base_grid_encoding: char
+  max_runtime_seconds: 5
+  warmup_rounds: 5
+  measurement_rounds: 10
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[32768,32768]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  tag: 
+  state_bits_count: 32
+  thread_block_size: 1024
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[32768,32768]
+  Data loaded in   467.759 ms
+
+Warming up... 1 / 5
+Warming up... 2 / 5
+Warming up... 3 / 5
+Warming up... 4 / 5
+Warming up... 5 / 5
+
+
+Running experiment...        eff-sota-packed-32
+
+Measurement round 1 / 10
+Time report:
+  set_and_format_input_data:  253276.404028 ms
+  initialize_data_structures: 197.910230 ms
+  run:                        12941.659241 ms
+   performed iters:  1667
+   runtime per iter: 7.763443 ms
+  finalize_data_structures:   184.368545 ms
+
+Measurement round 2 / 10
+Time report:
+  set_and_format_input_data:  253165.199986 ms
+  initialize_data_structures: 194.731024 ms
+  run:                        12941.596775 ms
+   performed iters:  1667
+   runtime per iter: 7.763405 ms
+  finalize_data_structures:   244.195541 ms
+
+Measurement round 3 / 10
+Time report:
+  set_and_format_input_data:  253218.694307 ms
+  initialize_data_structures: 195.364129 ms
+  run:                        12941.759613 ms
+   performed iters:  1667
+   runtime per iter: 7.763503 ms
+  finalize_data_structures:   183.729970 ms
+
+Measurement round 4 / 10
+Time report:
+  set_and_format_input_data:  253132.020506 ms
+  initialize_data_structures: 194.717703 ms
+  run:                        12941.840927 ms
+   performed iters:  1667
+   runtime per iter: 7.763552 ms
+  finalize_data_structures:   243.250091 ms
+
+Measurement round 5 / 10
+Time report:
+  set_and_format_input_data:  253173.469235 ms
+  initialize_data_structures: 195.214250 ms
+  run:                        12941.608782 ms
+   performed iters:  1667
+   runtime per iter: 7.763413 ms
+  finalize_data_structures:   183.706184 ms
+
+Measurement round 6 / 10
+Time report:
+  set_and_format_input_data:  253081.457383 ms
+  initialize_data_structures: 194.564912 ms
+  run:                        12941.662720 ms
+   performed iters:  1667
+   runtime per iter: 7.763445 ms
+  finalize_data_structures:   242.901457 ms
+
+Measurement round 7 / 10
+Time report:
+  set_and_format_input_data:  253109.872014 ms
+  initialize_data_structures: 195.220159 ms
+  run:                        12941.790154 ms
+   performed iters:  1667
+   runtime per iter: 7.763521 ms
+  finalize_data_structures:   184.487074 ms
+
+Measurement round 8 / 10
+Time report:
+  set_and_format_input_data:  253125.971818 ms
+  initialize_data_structures: 194.676812 ms
+  run:                        12941.864537 ms
+   performed iters:  1667
+   runtime per iter: 7.763566 ms
+  finalize_data_structures:   243.470213 ms
+
+Measurement round 9 / 10
+Time report:
+  set_and_format_input_data:  253337.666461 ms
+  initialize_data_structures: 195.272009 ms
+  run:                        12942.028678 ms
+   performed iters:  1667
+   runtime per iter: 7.763664 ms
+  finalize_data_structures:   184.285918 ms
+
+Measurement round 10 / 10
+Time report:
+  set_and_format_input_data:  253229.921207 ms
+  initialize_data_structures: 194.817414 ms
+  run:                        12941.914853 ms
+   performed iters:  1667
+   runtime per iter: 7.763596 ms
+  finalize_data_structures:   244.384504 ms
+
+exp-8
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: eff-sota-packed-32
+  grid_dimensions: 32768x32768
+  iterations: 100000
+  base_grid_encoding: char
+  max_runtime_seconds: 5
+  warmup_rounds: 5
+  measurement_rounds: 10
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[16384,16384]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  tag: 
+  state_bits_count: 32
+  thread_block_size: 1024
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[16384,16384]
+  Data loaded in   143.539 ms
+
+Warming up... 1 / 5
+Warming up... 2 / 5
+Warming up... 3 / 5
+Warming up... 4 / 5
+Warming up... 5 / 5
+
+
+Running experiment...        eff-sota-packed-32
+
+Measurement round 1 / 10
+Time report:
+  set_and_format_input_data:  63355.448202 ms
+  initialize_data_structures: 49.325752 ms
+  run:                        6972.785024 ms
+   performed iters:  3613
+   runtime per iter: 1.929916 ms
+  finalize_data_structures:   46.323388 ms
+
+Measurement round 2 / 10
+Time report:
+  set_and_format_input_data:  63368.698801 ms
+  initialize_data_structures: 49.610777 ms
+  run:                        6972.734617 ms
+   performed iters:  3613
+   runtime per iter: 1.929902 ms
+  finalize_data_structures:   69.500245 ms
+
+Measurement round 3 / 10
+Time report:
+  set_and_format_input_data:  63389.546430 ms
+  initialize_data_structures: 49.372594 ms
+  run:                        6972.711001 ms
+   performed iters:  3613
+   runtime per iter: 1.929895 ms
+  finalize_data_structures:   46.886065 ms
+
+Measurement round 4 / 10
+Time report:
+  set_and_format_input_data:  63274.685675 ms
+  initialize_data_structures: 49.352904 ms
+  run:                        6972.801028 ms
+   performed iters:  3613
+   runtime per iter: 1.929920 ms
+  finalize_data_structures:   69.949048 ms
+
+Measurement round 5 / 10
+Time report:
+  set_and_format_input_data:  63445.911590 ms
+  initialize_data_structures: 49.684459 ms
+  run:                        6972.732354 ms
+   performed iters:  3613
+   runtime per iter: 1.929901 ms
+  finalize_data_structures:   46.350249 ms
+
+Measurement round 6 / 10
+Time report:
+  set_and_format_input_data:  63472.480866 ms
+  initialize_data_structures: 49.667323 ms
+  run:                        6972.755549 ms
+   performed iters:  3613
+   runtime per iter: 1.929907 ms
+  finalize_data_structures:   69.505863 ms
+
+Measurement round 7 / 10
+Time report:
+  set_and_format_input_data:  63493.572605 ms
+  initialize_data_structures: 49.432044 ms
+  run:                        6972.732263 ms
+   performed iters:  3613
+   runtime per iter: 1.929901 ms
+  finalize_data_structures:   46.375707 ms
+
+Measurement round 8 / 10
+Time report:
+  set_and_format_input_data:  63468.638410 ms
+  initialize_data_structures: 49.624151 ms
+  run:                        6972.730307 ms
+   performed iters:  3613
+   runtime per iter: 1.929900 ms
+  finalize_data_structures:   69.556291 ms
+
+Measurement round 9 / 10
+Time report:
+  set_and_format_input_data:  63335.126256 ms
+  initialize_data_structures: 49.439609 ms
+  run:                        6972.691768 ms
+   performed iters:  3613
+   runtime per iter: 1.929890 ms
+  finalize_data_structures:   46.326226 ms
+
+Measurement round 10 / 10
+Time report:
+  set_and_format_input_data:  63425.801987 ms
+  initialize_data_structures: 49.511309 ms
+  run:                        6972.609974 ms
+   performed iters:  3613
+   runtime per iter: 1.929867 ms
+  finalize_data_structures:   69.438001 ms
+
+exp-9
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: eff-sota-packed-32
+  grid_dimensions: 16384x16384
+  iterations: 100000
+  base_grid_encoding: char
+  max_runtime_seconds: 5
+  warmup_rounds: 5
+  measurement_rounds: 10
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[8192,8192]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  tag: 
+  state_bits_count: 32
+  thread_block_size: 1024
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[8192,8192]
+  Data loaded in   61.5682 ms
+
+Warming up... 1 / 5
+Warming up... 2 / 5
+Warming up... 3 / 5
+Warming up... 4 / 5
+Warming up... 5 / 5
+
+
+Running experiment...        eff-sota-packed-32
+
+Measurement round 1 / 10
+Time report:
+  set_and_format_input_data:  15827.194604 ms
+  initialize_data_structures: 12.554649 ms
+  run:                        5494.446072 ms
+   performed iters:  11359
+   runtime per iter: 0.483709 ms
+  finalize_data_structures:   11.877417 ms
+
+Measurement round 2 / 10
+Time report:
+  set_and_format_input_data:  15820.124543 ms
+  initialize_data_structures: 12.916881 ms
+  run:                        5494.774603 ms
+   performed iters:  11352
+   runtime per iter: 0.484036 ms
+  finalize_data_structures:   16.079870 ms
+
+Measurement round 3 / 10
+Time report:
+  set_and_format_input_data:  15827.909073 ms
+  initialize_data_structures: 12.584254 ms
+  run:                        5494.543901 ms
+   performed iters:  11359
+   runtime per iter: 0.483717 ms
+  finalize_data_structures:   11.925721 ms
+
+Measurement round 4 / 10
+Time report:
+  set_and_format_input_data:  15815.520968 ms
+  initialize_data_structures: 12.661732 ms
+  run:                        5494.707129 ms
+   performed iters:  11359
+   runtime per iter: 0.483732 ms
+  finalize_data_structures:   16.564129 ms
+
+Measurement round 5 / 10
+Time report:
+  set_and_format_input_data:  15836.755383 ms
+  initialize_data_structures: 12.545095 ms
+  run:                        5494.647579 ms
+   performed iters:  11359
+   runtime per iter: 0.483726 ms
+  finalize_data_structures:   11.988146 ms
+
+Measurement round 6 / 10
+Time report:
+  set_and_format_input_data:  15832.600121 ms
+  initialize_data_structures: 12.574569 ms
+  run:                        5494.772920 ms
+   performed iters:  11359
+   runtime per iter: 0.483737 ms
+  finalize_data_structures:   16.299866 ms
+
+Measurement round 7 / 10
+Time report:
+  set_and_format_input_data:  15839.388766 ms
+  initialize_data_structures: 12.585286 ms
+  run:                        5494.444820 ms
+   performed iters:  11359
+   runtime per iter: 0.483708 ms
+  finalize_data_structures:   11.902225 ms
+
+Measurement round 8 / 10
+Time report:
+  set_and_format_input_data:  15829.755678 ms
+  initialize_data_structures: 12.574740 ms
+  run:                        5494.610022 ms
+   performed iters:  11359
+   runtime per iter: 0.483723 ms
+  finalize_data_structures:   16.292184 ms
+
+Measurement round 9 / 10
+Time report:
+  set_and_format_input_data:  15835.391724 ms
+  initialize_data_structures: 12.565405 ms
+  run:                        5494.492122 ms
+   performed iters:  11359
+   runtime per iter: 0.483713 ms
+  finalize_data_structures:   11.907003 ms
+
+Measurement round 10 / 10
+Time report:
+  set_and_format_input_data:  15792.873692 ms
+  initialize_data_structures: 12.571024 ms
+  run:                        5494.562839 ms
+   performed iters:  11359
+   runtime per iter: 0.483719 ms
+  finalize_data_structures:   16.253295 ms
+
+exp-10
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: eff-sota-packed-32
+  grid_dimensions: 1024x1024
+  iterations: 100000
+  base_grid_encoding: char
+  max_runtime_seconds: 5
+  warmup_rounds: 5
+  measurement_rounds: 10
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[512,512]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  tag: 
+  state_bits_count: 32
+  thread_block_size: 1024
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[512,512]
+  Data loaded in   34.9681 ms
+
+Warming up... 1 / 5
+Warming up... 2 / 5
+Warming up... 3 / 5
+Warming up... 4 / 5
+Warming up... 5 / 5
+
+
+Running experiment...        eff-sota-packed-32
+
+Measurement round 1 / 10
+Time report:
+  set_and_format_input_data:  61.635643 ms
+  initialize_data_structures: 0.374751 ms
+  run:                        489.676267 ms
+   performed iters:  100000
+   runtime per iter: 0.004897 ms
+  finalize_data_structures:   0.361030 ms
+
+Measurement round 2 / 10
+Time report:
+  set_and_format_input_data:  61.509610 ms
+  initialize_data_structures: 0.385197 ms
+  run:                        489.665061 ms
+   performed iters:  100000
+   runtime per iter: 0.004897 ms
+  finalize_data_structures:   0.379247 ms
+
+Measurement round 3 / 10
+Time report:
+  set_and_format_input_data:  61.636584 ms
+  initialize_data_structures: 0.387069 ms
+  run:                        489.240153 ms
+   performed iters:  100000
+   runtime per iter: 0.004892 ms
+  finalize_data_structures:   0.379949 ms
+
+Measurement round 4 / 10
+Time report:
+  set_and_format_input_data:  62.286064 ms
+  initialize_data_structures: 0.523567 ms
+  run:                        489.662857 ms
+   performed iters:  100000
+   runtime per iter: 0.004897 ms
+  finalize_data_structures:   0.418208 ms
+
+Measurement round 5 / 10
+Time report:
+  set_and_format_input_data:  62.176547 ms
+  initialize_data_structures: 0.382282 ms
+  run:                        489.218520 ms
+   performed iters:  100000
+   runtime per iter: 0.004892 ms
+  finalize_data_structures:   0.384556 ms
+
+Measurement round 6 / 10
+Time report:
+  set_and_format_input_data:  61.599337 ms
+  initialize_data_structures: 0.393159 ms
+  run:                        489.619651 ms
+   performed iters:  100000
+   runtime per iter: 0.004896 ms
+  finalize_data_structures:   0.356323 ms
+
+Measurement round 7 / 10
+Time report:
+  set_and_format_input_data:  61.586839 ms
+  initialize_data_structures: 0.377034 ms
+  run:                        489.193251 ms
+   performed iters:  100000
+   runtime per iter: 0.004892 ms
+  finalize_data_structures:   0.385317 ms
+
+Measurement round 8 / 10
+Time report:
+  set_and_format_input_data:  61.701103 ms
+  initialize_data_structures: 0.393639 ms
+  run:                        489.711982 ms
+   performed iters:  100000
+   runtime per iter: 0.004897 ms
+  finalize_data_structures:   0.701909 ms
+
+Measurement round 9 / 10
+Time report:
+  set_and_format_input_data:  62.330010 ms
+  initialize_data_structures: 0.380890 ms
+  run:                        489.214904 ms
+   performed iters:  100000
+   runtime per iter: 0.004892 ms
+  finalize_data_structures:   0.388501 ms
+
+Measurement round 10 / 10
+Time report:
+  set_and_format_input_data:  61.804510 ms
+  initialize_data_structures: 0.367019 ms
+  run:                        489.704651 ms
+   performed iters:  100000
+   runtime per iter: 0.004897 ms
+  finalize_data_structures:   0.378136 ms
+
+exp-11
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: eff-sota-packed-64
+  grid_dimensions: 32768x32768
+  iterations: 100000
+  base_grid_encoding: char
+  max_runtime_seconds: 5
+  warmup_rounds: 5
+  measurement_rounds: 10
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[16384,16384]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  tag: 
+  state_bits_count: 32
+  thread_block_size: 1024
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[16384,16384]
+  Data loaded in   142.419 ms
+
+Warming up... 1 / 5
+Warming up... 2 / 5
+Warming up... 3 / 5
+Warming up... 4 / 5
+Warming up... 5 / 5
+
+
+Running experiment...        eff-sota-packed-64
+
+Measurement round 1 / 10
+Time report:
+  set_and_format_input_data:  60193.730984 ms
+  initialize_data_structures: 49.132309 ms
+  run:                        7654.484891 ms
+   performed iters:  2949
+   runtime per iter: 2.595621 ms
+  finalize_data_structures:   66.376395 ms
+
+Measurement round 2 / 10
+Time report:
+  set_and_format_input_data:  60126.599880 ms
+  initialize_data_structures: 48.767292 ms
+  run:                        7654.548308 ms
+   performed iters:  2949
+   runtime per iter: 2.595642 ms
+  finalize_data_structures:   45.986374 ms
+
+Measurement round 3 / 10
+Time report:
+  set_and_format_input_data:  60075.266728 ms
+  initialize_data_structures: 49.163576 ms
+  run:                        7654.556250 ms
+   performed iters:  2949
+   runtime per iter: 2.595645 ms
+  finalize_data_structures:   65.768679 ms
+
+Measurement round 4 / 10
+Time report:
+  set_and_format_input_data:  60056.594569 ms
+  initialize_data_structures: 49.077224 ms
+  run:                        7654.484552 ms
+   performed iters:  2949
+   runtime per iter: 2.595620 ms
+  finalize_data_structures:   45.439912 ms
+
+Measurement round 5 / 10
+Time report:
+  set_and_format_input_data:  60102.277069 ms
+  initialize_data_structures: 48.784448 ms
+  run:                        7654.584404 ms
+   performed iters:  2949
+   runtime per iter: 2.595654 ms
+  finalize_data_structures:   65.841009 ms
+
+Measurement round 6 / 10
+Time report:
+  set_and_format_input_data:  60153.263923 ms
+  initialize_data_structures: 48.974838 ms
+  run:                        7654.760543 ms
+   performed iters:  2949
+   runtime per iter: 2.595714 ms
+  finalize_data_structures:   45.356284 ms
+
+Measurement round 7 / 10
+Time report:
+  set_and_format_input_data:  60159.745810 ms
+  initialize_data_structures: 48.904100 ms
+  run:                        7654.494087 ms
+   performed iters:  2949
+   runtime per iter: 2.595624 ms
+  finalize_data_structures:   65.787799 ms
+
+Measurement round 8 / 10
+Time report:
+  set_and_format_input_data:  60170.195404 ms
+  initialize_data_structures: 48.886884 ms
+  run:                        7654.670545 ms
+   performed iters:  2949
+   runtime per iter: 2.595683 ms
+  finalize_data_structures:   45.453603 ms
+
+Measurement round 9 / 10
+Time report:
+  set_and_format_input_data:  60086.436712 ms
+  initialize_data_structures: 48.668491 ms
+  run:                        7654.448537 ms
+   performed iters:  2949
+   runtime per iter: 2.595608 ms
+  finalize_data_structures:   65.774878 ms
+
+Measurement round 10 / 10
+Time report:
+  set_and_format_input_data:  60077.334431 ms
+  initialize_data_structures: 49.027569 ms
+  run:                        7654.681171 ms
+   performed iters:  2949
+   runtime per iter: 2.595687 ms
+  finalize_data_structures:   45.354812 ms
+
+exp-12
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: eff-sota-packed-64
+  grid_dimensions: 16384x16384
+  iterations: 100000
+  base_grid_encoding: char
+  max_runtime_seconds: 5
+  warmup_rounds: 5
+  measurement_rounds: 10
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[8192,8192]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  tag: 
+  state_bits_count: 32
+  thread_block_size: 1024
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[8192,8192]
+  Data loaded in   61.1652 ms
+
+Warming up... 1 / 5
+Warming up... 2 / 5
+Warming up... 3 / 5
+Warming up... 4 / 5
+Warming up... 5 / 5
+
+
+Running experiment...        eff-sota-packed-64
+
+Measurement round 1 / 10
+Time report:
+  set_and_format_input_data:  15026.130953 ms
+  initialize_data_structures: 12.504174 ms
+  run:                        5664.749218 ms
+   performed iters:  8716
+   runtime per iter: 0.649925 ms
+  finalize_data_structures:   11.815785 ms
+
+Measurement round 2 / 10
+Time report:
+  set_and_format_input_data:  15025.985081 ms
+  initialize_data_structures: 12.905856 ms
+  run:                        5664.334536 ms
+   performed iters:  8715
+   runtime per iter: 0.649952 ms
+  finalize_data_structures:   11.830317 ms
+
+Measurement round 3 / 10
+Time report:
+  set_and_format_input_data:  15033.776434 ms
+  initialize_data_structures: 12.537024 ms
+  run:                        5664.385705 ms
+   performed iters:  8715
+   runtime per iter: 0.649958 ms
+  finalize_data_structures:   11.833011 ms
+
+Measurement round 4 / 10
+Time report:
+  set_and_format_input_data:  15037.636916 ms
+  initialize_data_structures: 12.569443 ms
+  run:                        5664.492647 ms
+   performed iters:  8715
+   runtime per iter: 0.649970 ms
+  finalize_data_structures:   12.379855 ms
+
+Measurement round 5 / 10
+Time report:
+  set_and_format_input_data:  15032.485376 ms
+  initialize_data_structures: 12.481950 ms
+  run:                        5664.562023 ms
+   performed iters:  8715
+   runtime per iter: 0.649978 ms
+  finalize_data_structures:   11.830518 ms
+
+Measurement round 6 / 10
+Time report:
+  set_and_format_input_data:  15033.721560 ms
+  initialize_data_structures: 12.504074 ms
+  run:                        5664.441429 ms
+   performed iters:  8715
+   runtime per iter: 0.649965 ms
+  finalize_data_structures:   12.085035 ms
+
+Measurement round 7 / 10
+Time report:
+  set_and_format_input_data:  15032.975804 ms
+  initialize_data_structures: 12.520719 ms
+  run:                        5664.469963 ms
+   performed iters:  8715
+   runtime per iter: 0.649968 ms
+  finalize_data_structures:   11.814624 ms
+
+Measurement round 8 / 10
+Time report:
+  set_and_format_input_data:  15034.659319 ms
+  initialize_data_structures: 12.527149 ms
+  run:                        5664.415179 ms
+   performed iters:  8715
+   runtime per iter: 0.649962 ms
+  finalize_data_structures:   11.814053 ms
+
+Measurement round 9 / 10
+Time report:
+  set_and_format_input_data:  15030.316150 ms
+  initialize_data_structures: 12.723769 ms
+  run:                        5664.374998 ms
+   performed iters:  8715
+   runtime per iter: 0.649957 ms
+  finalize_data_structures:   12.139478 ms
+
+Measurement round 10 / 10
+Time report:
+  set_and_format_input_data:  15029.352782 ms
+  initialize_data_structures: 12.524986 ms
+  run:                        5664.464825 ms
+   performed iters:  8715
+   runtime per iter: 0.649967 ms
+  finalize_data_structures:   11.801713 ms
+
+exp-13
+next-experiment
+Hello
+Experiment Parameters:
+  algorithm_name: eff-sota-packed-64
+  grid_dimensions: 8192x8192
+  iterations: 100000
+  base_grid_encoding: char
+  max_runtime_seconds: 5
+  warmup_rounds: 5
+  measurement_rounds: 10
+  data_loader_name: lexicon
+  pattern_expression: spacefiller[4096,4096]
+  measure_speedup: 0
+  speedup_bench_algorithm_name: gol-cuda-naive
+  validate: 0
+  print_validation_diff: 0
+  validation_algorithm_name: gol-cuda-naive
+  animate_output: 0
+  colorful: 0
+  random_seed: 42
+  tag: 
+  state_bits_count: 32
+  thread_block_size: 1024
+  warp_dims_x: 32
+  warp_dims_y: 1
+  warp_tile_dims_x: 32
+  warp_tile_dims_y: 8
+  streaming_direction: in-x
+
+Loading data...              lexicon with pattern spacefiller[4096,4096]
+  Data loaded in   40.6781 ms
+
+Warming up... 1 / 5
+Warming up... 2 / 5
+Warming up... 3 / 5
+Warming up... 4 / 5
+Warming up... 5 / 5
+
+
+Running experiment...        eff-sota-packed-64
+
+Measurement round 1 / 10
+Time report:
+  set_and_format_input_data:  3757.722326 ms
+  initialize_data_structures: 3.543519 ms
+  run:                        5170.987721 ms
+   performed iters:  30914
+   runtime per iter: 0.167270 ms
+  finalize_data_structures:   3.928627 ms
+
+Measurement round 2 / 10
+Time report:
+  set_and_format_input_data:  3752.322928 ms
+  initialize_data_structures: 3.553304 ms
+  run:                        5171.000049 ms
+   performed iters:  30913
+   runtime per iter: 0.167276 ms
+  finalize_data_structures:   4.591727 ms
+
+Measurement round 3 / 10
+Time report:
+  set_and_format_input_data:  3760.516424 ms
+  initialize_data_structures: 3.553435 ms
+  run:                        5171.066731 ms
+   performed iters:  30914
+   runtime per iter: 0.167273 ms
+  finalize_data_structures:   3.916088 ms
+
+Measurement round 4 / 10
+Time report:
+  set_and_format_input_data:  3756.902898 ms
+  initialize_data_structures: 3.543880 ms
+  run:                        5170.982282 ms
+   performed iters:  30914
+   runtime per iter: 0.167270 ms
+  finalize_data_structures:   4.590124 ms
+
+Measurement round 5 / 10
+Time report:
+  set_and_format_input_data:  3748.147456 ms
+  initialize_data_structures: 3.562288 ms
+  run:                        5171.014492 ms
+   performed iters:  30913
+   runtime per iter: 0.167276 ms
+  finalize_data_structures:   3.862095 ms
+
+Measurement round 6 / 10
+Time report:
+  set_and_format_input_data:  3756.577451 ms
+  initialize_data_structures: 3.555247 ms
+  run:                        5171.074192 ms
+   performed iters:  30912
+   runtime per iter: 0.167284 ms
+  finalize_data_structures:   4.566358 ms
+
+Measurement round 7 / 10
+Time report:
+  set_and_format_input_data:  3732.664773 ms
+  initialize_data_structures: 3.565333 ms
+  run:                        5171.078950 ms
+   performed iters:  30913
+   runtime per iter: 0.167278 ms
+  finalize_data_structures:   3.324926 ms
+
+Measurement round 8 / 10
+Time report:
+  set_and_format_input_data:  3762.828066 ms
+  initialize_data_structures: 3.558242 ms
+  run:                        5171.066330 ms
+   performed iters:  30913
+   runtime per iter: 0.167278 ms
+  finalize_data_structures:   5.134495 ms
+
+Measurement round 9 / 10
+Time report:
+  set_and_format_input_data:  3763.228696 ms
+  initialize_data_structures: 3.573055 ms
+  run:                        5171.110048 ms
+   performed iters:  30913
+   runtime per iter: 0.167279 ms
+  finalize_data_structures:   3.311066 ms
+
+Measurement round 10 / 10
+Time report:
+  set_and_format_input_data:  3764.841405 ms
+  initialize_data_structures: 3.571743 ms
+  run:                        5171.096026 ms
+   performed iters:  30913
+   runtime per iter: 0.167279 ms
+  finalize_data_structures:   4.570174 ms
+
