@@ -44,6 +44,8 @@ class ExperimentParams {
     bool animate_output = false;
     bool colorful = true;
 
+    bool collect_touched_tiles_stats = false;
+
     std::size_t random_seed = 42;
 
     std::string tag = "";
@@ -93,6 +95,8 @@ class ExperimentParams {
       ss << label_color << "  warp_dims_y: " << value_color << warp_dims_y << std::endl << c::extra_line_in_params();
       ss << label_color << "  warp_tile_dims_x: " << value_color << warp_tile_dims_x << std::endl;
       ss << label_color << "  warp_tile_dims_y: " << value_color << warp_tile_dims_y << std::endl << c::extra_line_in_params();
+      ss << label_color << "  collect_touched_tiles_stats: " << value_color << collect_touched_tiles_stats << std::endl << c::extra_line_in_params();
+      
       ss << label_color << "  streaming_direction: " << value_color;
       switch (streaming_direction) {
         case StreamingDirection::in_X: ss << "in-x"; break;
@@ -100,6 +104,7 @@ class ExperimentParams {
         case StreamingDirection::NAIVE: ss << "naive"; break;
       }
       ss << reset_color << std::endl;
+
 
       return ss.str();
     }
@@ -133,6 +138,7 @@ const std::string STREAMING_DIRECTION          = "streaming-direction";
 const std::string STATE_BITS_COUNT             = "state-bits-count";
 const std::string BASE_GRID_ENCODING           = "base-grid-encoding";
 const std::string TAG                          = "tag";
+const std::string COLLECT_TOUCHED_TILES_STATS  = "collect-touched-tiles-stats";
 // clang-format on
 }
 
@@ -220,7 +226,10 @@ class ParamsParser {
         (opts::BASE_GRID_ENCODING, "Base grid encoding (char|int)",
           cxxopts::value<std::string>()->default_value("char"))
 
-        (opts::TAG, "Tag", cxxopts::value<std::string>()->default_value(""));
+        (opts::TAG, "Tag", cxxopts::value<std::string>()->default_value(""))
+
+        (opts::COLLECT_TOUCHED_TILES_STATS, "Collect touched tiles stats",
+          cxxopts::value<bool>()->default_value("false"));
       ;
 
       auto result = optConfig.parse(argc, argv);
@@ -282,6 +291,8 @@ class ParamsParser {
       params.base_grid_encoding = result[opts::BASE_GRID_ENCODING].as<std::string>();
 
       params.tag = result[opts::TAG].as<std::string>();
+
+      params.collect_touched_tiles_stats = result[opts::COLLECT_TOUCHED_TILES_STATS].as<bool>();
 
       return params;
     }

@@ -209,6 +209,7 @@ __global__ void game_of_live_kernel(BitGridWithChangeInfo<word_type, state_store
 }
 
 template <typename grid_cell_t, std::size_t Bits, typename state_store_type, typename bit_grid_mode>
+template <bool RECORD_CHANGED_TILES>
 void GoLCudaLocalOneCellImpl<grid_cell_t, Bits, state_store_type, bit_grid_mode>::run_kernel(size_type iterations) {
     dim3 block = {static_cast<unsigned int>(BLOCK_X_DIM), static_cast<unsigned int>(this->params.thread_block_size / BLOCK_X_DIM)};
     dim3 grid(cuda_data.x_size / block.x, cuda_data.y_size / block.y);
@@ -230,6 +231,10 @@ void GoLCudaLocalOneCellImpl<grid_cell_t, Bits, state_store_type, bit_grid_mode>
         if (i != 0) {
             std::swap(cuda_data.input, cuda_data.output);
             rotate_state_stores();      
+        }
+
+        if constexpr (RECORD_CHANGED_TILES) {
+            record_changed_tiles(i);
         }
 
         game_of_live_kernel<bit_grid_mode><<<grid, block, shm_size>>>(cuda_data);

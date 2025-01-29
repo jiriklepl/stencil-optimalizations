@@ -70,7 +70,8 @@ ALGORITHM="gol-cuda-naive-bitwise-tiles-64"
 # ALGORITHM="gol-cuda-naive-just-tiling-64--bit-tiles"
 # ALGORITHM="gol-cuda-naive-just-tiling-32--bit-tiles"
 # ALGORITHM="gol-cuda-naive-just-tiling-cols-64"
-# ALGORITHM="gol-cuda-local-one-cell-64--bit-tiles"
+ALGORITHM="gol-cuda-local-one-cell-64--bit-tiles"
+ALGORITHM="gol-cuda-local-one-cell-32--bit-tiles"
 GRID_DIMENSIONS_X=$__14
 GRID_DIMENSIONS_Y=$__14
 # GRID_DIMENSIONS_X=$((8 * 6))
@@ -80,7 +81,7 @@ ITERATIONS="10000"
 BASE_GRID_ENCODING="char"
 # BASE_GRID_ENCODING="int"
 
-WARMUP_ROUNDS="1"
+WARMUP_ROUNDS="0"
 MEASUREMENT_ROUNDS="1"
 
 # DATA_LOADER_NAME="random-ones-zeros"
@@ -89,8 +90,22 @@ MEASUREMENT_ROUNDS="1"
 DATA_LOADER_NAME="lexicon"
 # PATTERN_EXPRESSION="blinker[10,10]"
 # PATTERN_EXPRESSION="glider[3,3] glider[10,10] glider[20,20]"
-PATTERN_EXPRESSION="spacefiller[$((GRID_DIMENSIONS_X/2)),$((GRID_DIMENSIONS_Y/2))]"
+# PATTERN_EXPRESSION="spacefiller[$((GRID_DIMENSIONS_X/2)),$((GRID_DIMENSIONS_Y/2))]"
 # PATTERN_EXPRESSION="gosper-glider-gun[0,0]"
+
+# 6x5 sp & 16k & 10000 iters --> total cca 63w/37off workload (on 64 bit)
+# PATTERN_EXPRESSION="spacefiller[2340, 2730]; spacefiller[2340, 5460]; spacefiller[2340, 8190]; spacefiller[2340, 10920]; spacefiller[2340, 13650]; spacefiller[4680, 2730]; spacefiller[4680, 5460]; spacefiller[4680, 8190]; spacefiller[4680, 10920]; spacefiller[4680, 13650]; spacefiller[7020, 2730]; spacefiller[7020, 5460]; spacefiller[7020, 8190]; spacefiller[7020, 10920]; spacefiller[7020, 13650]; spacefiller[9360, 2730]; spacefiller[9360, 5460]; spacefiller[9360, 8190]; spacefiller[9360, 10920]; spacefiller[9360, 13650]; spacefiller[11700, 2730]; spacefiller[11700, 5460]; spacefiller[11700, 8190]; spacefiller[11700, 10920]; spacefiller[11700, 13650]; spacefiller[14040, 2730]; spacefiller[14040, 5460]; spacefiller[14040, 8190]; spacefiller[14040, 10920]; spacefiller[14040, 13650];"
+# 5x4 sp & 16k & 10000 iters --> total cca 53w/47off workload (on 64 bit)
+# PATTERN_EXPRESSION="spacefiller[2730, 3276]; spacefiller[2730, 6552]; spacefiller[2730, 9828]; spacefiller[2730, 13104]; spacefiller[5460, 3276]; spacefiller[5460, 6552]; spacefiller[5460, 9828]; spacefiller[5460, 13104]; spacefiller[8190, 3276]; spacefiller[8190, 6552]; spacefiller[8190, 9828]; spacefiller[8190, 13104]; spacefiller[10920, 3276]; spacefiller[10920, 6552]; spacefiller[10920, 9828]; spacefiller[10920, 13104]; spacefiller[13650, 3276]; spacefiller[13650, 6552]; spacefiller[13650, 9828]; spacefiller[13650, 13104];"
+# 4x4 sp & 16k & 10000 iters
+# PATTERN_EXPRESSION="spacefiller[5461, 5461]; spacefiller[5461, 10922]; spacefiller[10922, 5461]; spacefiller[10922, 10922];"
+# 4x4 sp & 16k & 10000 iters --> total cca 50w/50off workload (on 64 bit) & 
+# PATTERN_EXPRESSION="spacefiller[3276, 3276]; spacefiller[3276, 6552]; spacefiller[3276, 9828]; spacefiller[3276, 13104]; spacefiller[6552, 3276]; spacefiller[6552, 6552]; spacefiller[6552, 9828]; spacefiller[6552, 13104]; spacefiller[9828, 3276]; spacefiller[9828, 6552]; spacefiller[9828, 9828]; spacefiller[9828, 13104]; spacefiller[13104, 3276]; spacefiller[13104, 6552]; spacefiller[13104, 9828]; spacefiller[13104, 13104];"
+# 4x3 sp & 16k & 10000 iters --> total cca 42w/58off workload (on 64 bit)
+# PATTERN_EXPRESSION="spacefiller[3276, 4096]; spacefiller[3276, 8192]; spacefiller[3276, 12288]; spacefiller[6552, 4096]; spacefiller[6552, 8192]; spacefiller[6552, 12288]; spacefiller[9828, 4096]; spacefiller[9828, 8192]; spacefiller[9828, 12288]; spacefiller[13104, 4096]; spacefiller[13104, 8192]; spacefiller[13104, 12288];"
+# 3x3 sp & 16k & 10000 iters --> total cca 33w/67off workload (on 64 bit)
+# PATTERN_EXPRESSION="spacefiller[4096, 4096]; spacefiller[4096, 8192]; spacefiller[4096, 12288]; spacefiller[8192, 4096]; spacefiller[8192, 8192]; spacefiller[8192, 12288]; spacefiller[12288, 4096]; spacefiller[12288, 8192]; spacefiller[12288, 12288];"
+
 
 # MEASURE_SPEEDUP="true"
 MEASURE_SPEEDUP="false"
@@ -134,12 +149,15 @@ WARP_TILE_DIMS_Y="1"
 STREAMING_DIRECTION="in-x"
 # STREAMING_DIRECTION="in-y"
 # STREAMING_DIRECTION="naive"
-MAX_RUNTIME_SECONDS="10"
+MAX_RUNTIME_SECONDS="10000"
 
 TAG="test-run"
 
-# srun -p gpu-short -A kdss --cpus-per-task=64 --mem=256GB --gres=gpu:V100 --time=2:00:00 $GOL_EXE_NAME \
-srun -p gpu-short -A kdss --cpus-per-task=64 --mem=256GB --gres=gpu:H100 --time=2:00:00 $GOL_EXE_NAME \
+# COLLECT_TOUCHED_TILES_STATS="true"
+COLLECT_TOUCHED_TILES_STATS="false"
+
+# srun -p gpu-short -A kdss --cpus-per-task=64 --mem=256GB --gres=gpu:H100 --time=2:00:00 $GOL_EXE_NAME \
+srun -p gpu-short -A kdss --cpus-per-task=64 --mem=256GB --gres=gpu:L40 --time=2:00:00 $GOL_EXE_NAME \
     --algorithm="$ALGORITHM" \
     --grid-dimensions-x="$GRID_DIMENSIONS_X" \
     --grid-dimensions-y="$GRID_DIMENSIONS_Y" \
@@ -166,3 +184,4 @@ srun -p gpu-short -A kdss --cpus-per-task=64 --mem=256GB --gres=gpu:H100 --time=
     --streaming-direction="$STREAMING_DIRECTION" \
     --state-bits-count="$STATE_BITS_COUNT" \
     --tag="$TAG" \
+    --collect-touched-tiles-stats="$COLLECT_TOUCHED_TILES_STATS" \
