@@ -17,6 +17,9 @@
 namespace algorithms::cuda_local_one_cell {
 
 
+constexpr bool RECORD_CHANGED_TILES = true;
+constexpr bool DO_NOT_RECORD_CHANGED_TILES = false;
+
 using StreamingDir = infrastructure::StreamingDirection;
 
 template <typename grid_cell_t, std::size_t Bits, typename state_store_type, typename bit_grid_mode>
@@ -57,7 +60,16 @@ class GoLCudaLocalOneCellImpl : public infrastructure::Algorithm<2, grid_cell_t>
     }
 
     void run(size_type iterations) override {
-        run_kernel(iterations);
+        if (this->params.collect_touched_tiles_stats) {
+            init_changed_tiles_stats(iterations);
+
+            run_kernel<RECORD_CHANGED_TILES>(iterations);
+
+            print_changed_tiles_stats();
+        }
+        else {
+            run_kernel<DO_NOT_RECORD_CHANGED_TILES>(iterations);
+        }
     }
 
     void finalize_data_structures() override {
@@ -88,6 +100,11 @@ class GoLCudaLocalOneCellImpl : public infrastructure::Algorithm<2, grid_cell_t>
 
     std::size_t _performed_iterations;
 
+    std::vector<size_type> computed_tiles;
+    std::vector<size_type> copied_tiles;
+    std::vector<size_type> untouched_tiles;
+
+    template <bool RECORD_CHANGED_TILES>
     void run_kernel(size_type iterations);
     
     std::size_t get_thread_block_count() {
@@ -114,6 +131,32 @@ class GoLCudaLocalOneCellImpl : public infrastructure::Algorithm<2, grid_cell_t>
 
     // DEBUG FUNCTIONS
 
+    void init_changed_tiles_stats(size_type iterations) {
+        computed_tiles.resize(iterations, 0);
+        copied_tiles.resize(iterations, 0);
+        untouched_tiles.resize(iterations, 0);
+    }
+
+    void print_changed_tiles_stats() {
+        std::cout << "Changed_tiles: ";
+        for (std::size_t i = 0; i < _performed_iterations; i++) {
+            std::cout << computed_tiles[i] << ";";
+        }
+        std::cout << std::endl;
+
+        std::cout << "Copied_tiles: ";
+        for (std::size_t i = 0; i < _performed_iterations; i++) {
+            std::cout << copied_tiles[i] << ";";
+        }
+        std::cout << std::endl;
+
+        std::cout << "Untouched_tiles: ";
+        for (std::size_t i = 0; i < _performed_iterations; i++) {
+            std::cout << untouched_tiles[i] << ";";
+        }
+        std::cout << std::endl;
+    }
+
     void check_state_stores() {
         std::vector<state_store_type> last(state_store_word_count(), 0);
         std::vector<state_store_type> current(state_store_word_count(), 0);
@@ -138,8 +181,100 @@ class GoLCudaLocalOneCellImpl : public infrastructure::Algorithm<2, grid_cell_t>
     }
 
     void print_state_store(state_store_type* store) {
-        auto x_tiles = bit_grid->x_size() / this->params.warp_tile_dims_x;
-        auto y_tiles = bit_grid->y_size() / this->params.warp_tile_dims_y;
+        auto x_tiles = bit_grid->x_size() / 32;
+        auto y_tiles = bit_grid->y_size() / 1;
+
+        dim3 block_dims = {
+            static_cast<unsigned int>(1),
+            static_cast<unsigned int>(this->params.thread_block_size / 32)
+        };
+
+        auto x_block_count = x_tiles / block_dims.x;
+        auto y_block_count = y_tiles / block_dims.y;
+
+        std::vector<char> output = get_tile_grid(store);
+
+        for (std::size_t y = 0; y < y_tiles; y++) {
+            for (std::size_t x = 0; x < x_tiles; x++) {
+                std::cout << output[y * x_tiles + x];
+            }
+            std::cout << std::endl;
+        }
+    }
+
+    void record_changed_tiles(size_type iter) {
+        auto stats = count_computed_tiles_in_next_step();
+
+        computed_tiles[iter] = stats.computed_tiles;
+        copied_tiles[iter] = stats.copied_tiles;
+        untouched_tiles[iter] = stats.untouched_tiles;
+    }
+
+    struct compute_stats {
+        size_type computed_tiles;
+        size_type copied_tiles;
+        size_type untouched_tiles;
+    };
+
+    compute_stats count_computed_tiles_in_next_step() {
+        std::vector<state_store_type> last(state_store_word_count(), 0);
+        std::vector<state_store_type> before_last(state_store_word_count(), 0);
+        CUCH(cudaMemcpy(last.data(), cuda_data.change_state_store.last, state_store_word_count() * sizeof(state_store_type), cudaMemcpyDeviceToHost));
+        CUCH(cudaMemcpy(before_last.data(), cuda_data.change_state_store.before_last, state_store_word_count() * sizeof(state_store_type), cudaMemcpyDeviceToHost));
+
+        auto x_tiles = bit_grid->x_size() / 32;
+        auto y_tiles = bit_grid->y_size() / 1;
+
+        auto changed_grid = get_tile_grid(last.data());
+        auto changed_grid_before_last = get_tile_grid(before_last.data());
+
+        std::size_t computed_tiles = 0;
+        std::size_t copied = 0;
+
+        for (std::size_t y = 0; y < y_tiles; y++) {
+            for (std::size_t x = 0; x < x_tiles; x++) {
+                
+                bool is_neighborhood_modified = false;
+
+                for(int dy = -1; dy <= 1; dy++) {
+                    for(int dx = -1; dx <= 1; dx++) {
+
+                        auto nx = x + dx;
+                        auto ny = y + dy;
+
+                        if (nx >= x_tiles || ny >= y_tiles) {
+                            continue;
+                        }
+
+                        if (changed_grid[ny * x_tiles + nx] == 'X') {
+                            is_neighborhood_modified = true;
+                            break;
+                        }
+                    }
+                    if (is_neighborhood_modified) {
+                        break;
+                    }
+                }
+
+                if (is_neighborhood_modified) {
+                        computed_tiles++;
+                }
+                else if (changed_grid_before_last[y * x_tiles + x] == 'X') {
+                    copied++;
+                }
+            }
+        }
+
+        return {
+            .computed_tiles = computed_tiles,
+            .copied_tiles = copied,
+            .untouched_tiles = x_tiles * y_tiles - computed_tiles - copied
+        };
+    }
+
+    std::vector<char> get_tile_grid(state_store_type* store) {
+        auto x_tiles = bit_grid->x_size() / 32;
+        auto y_tiles = bit_grid->y_size() / 1;
 
         dim3 block_dims = {
             static_cast<unsigned int>(1),
@@ -151,12 +286,9 @@ class GoLCudaLocalOneCellImpl : public infrastructure::Algorithm<2, grid_cell_t>
 
         std::vector<char> output(x_tiles * y_tiles, 0);
 
-
         for (std::size_t y_block = 0; y_block < y_block_count; y_block++) {
             for (std::size_t x_block = 0; x_block < x_block_count; x_block++) {
-
                 state_store_type block_state = store[y_block * x_block_count + x_block];
-                std::cout << std::bitset<16>(block_state) << " ";
 
                 auto x_base_out = x_block * block_dims.x;
                 auto y_base_out = y_block * block_dims.y;
@@ -171,20 +303,11 @@ class GoLCudaLocalOneCellImpl : public infrastructure::Algorithm<2, grid_cell_t>
                         output[output_idx] = tile_changed ? 'X' : '.';
                     }
                 }
-
             }
-            std::cout << std::endl;
         }
 
-        std::cout << std::endl;
-
-        for (std::size_t y = 0; y < y_tiles; y++) {
-            for (std::size_t x = 0; x < x_tiles; x++) {
-                std::cout << output[y * x_tiles + x];
-            }
-            std::cout << std::endl;
-        }
-    }
+        return output;
+    } 
 };
 
 
