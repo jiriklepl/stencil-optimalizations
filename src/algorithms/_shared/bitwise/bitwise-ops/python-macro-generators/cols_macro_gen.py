@@ -1,6 +1,15 @@
-# COL_TYPE_SIZE = 16
-# COL_TYPE_SIZE = 32
-COL_TYPE_SIZE = 64
+import sys
+
+if len(sys.argv) != 2:
+    print("Usage: python cols_macro_gen.py <COL_TYPE_SIZE>")
+    sys.exit(1)
+try:
+    COL_TYPE_SIZE = int(sys.argv[1])
+    if COL_TYPE_SIZE not in [16, 32, 64]:
+        raise ValueError
+except ValueError:
+    print("COL_TYPE_SIZE must be one of 16, 32, or 64")
+    sys.exit(1)
 
 POP_COUNT_FUNC = f'POPCOUNT_{COL_TYPE_SIZE}'
 COL_TYPE = f'std::uint{COL_TYPE_SIZE}_t'
@@ -28,13 +37,32 @@ def if_else(cond, if_expr, else_expr):
 def _and(expr1, expr2):
     return f'(({expr1}) & ({expr2}))'
 
-def game_of_live(cell_is_alive, alive_neighbours, alive_cell, dead_cell):
+def _eq(expr1, expr2):
+    return f'(({expr1}) == ({expr2}))'
 
-    return if_else(f'({cell_is_alive})',
-                    # this version is even faster than the original one
-                    if_else(f'({alive_neighbours} & ~1) == 2', alive_cell, dead_cell),
-                    # if_else(f'({alive_neighbours} == 2 || {alive_neighbours} == 3)', alive_cell, dead_cell),
-                    if_else(f'({alive_neighbours} == 3)', alive_cell, dead_cell))
+def _or(expr1, expr2):
+    return f'(({expr1}) | ({expr2}))'
+
+
+# def game_of_live(cell_is_alive, alive_neighbours, alive_cell, dead_cell):
+#     return if_else(f'({cell_is_alive})',
+#                     # this version is even faster than the original one
+#                     if_else(f'({alive_neighbours} & ~1) == 2', alive_cell, dead_cell),
+#                     # if_else(f'({alive_neighbours} == 2 || {alive_neighbours} == 3)', alive_cell, dead_cell),
+#                     if_else(f'({alive_neighbours} == 3)', alive_cell, dead_cell))
+
+def game_of_live(cell_is_alive, alive_neighbours, alive_cell, dead_cell):
+        is_alive_expr = _eq(cell_is_alive, alive_cell)
+
+        n_or_c = _or(
+            is_alive_expr,
+            alive_neighbours
+        )
+
+        res = _eq(n_or_c, 3)
+        res = cast(res)
+
+        return if_else(res, alive_cell, dead_cell)
 
 class INNER_BITS:
     @staticmethod

@@ -192,6 +192,14 @@ class Num:
     def _y_mod(self, y):
         return (y + self.y) % self.y
 
+    def max_order_of_set_bit(self):
+        str_rep = self.to_grid_view().replace('\n', '').lstrip('0')
+        return len(str_rep) - 1
+
+    @staticmethod
+    def cast_expr(expr, to_bits):
+        return f'static_cast<{Num(to_bits)._get_cpp_type()}>({expr})'
+
 class GOL:
     def __init__(self, bits):
         self.bits = bits
@@ -373,13 +381,60 @@ class GOL:
         
         return '(' + '&'.join([f'({a})' for a in args]) + ')'
 
+    @staticmethod
+    def _eq(*args):
+        if isinstance(args[0], list):
+            args = args[0]
+        
+        return '(' + '=='.join([f'({a})' for a in args]) + ')'
     
     @staticmethod
-    def game_of_live(cell_is_alive, alive_neighbours, alive_cell, dead_cell):
-        return GOL.if_else(f'({cell_is_alive})',
-            GOL.if_else(f'({alive_neighbours} & ~1) == 2', alive_cell, dead_cell),
-            GOL.if_else(f'({alive_neighbours} == 3)', alive_cell, dead_cell))
+    def _shift_left(expr, shift):
+        return f'(({expr}) << {shift})'
     
+    @staticmethod
+    def _shift_right(expr, shift):
+        return f'(({expr}) >> {shift})'
+
+    # @staticmethod
+    # def game_of_live(cell_is_alive, alive_neighbours, alive_cell, dead_cell):
+    #     return GOL.if_else(f'({cell_is_alive})',
+    #         GOL.if_else(f'({alive_neighbours} & ~1) == 2', alive_cell, dead_cell),
+    #         GOL.if_else(f'({alive_neighbours} == 3)', alive_cell, dead_cell))
+    
+    # @staticmethod
+    # def game_of_live(cell_is_alive, alive_neighbours, alive_cell: Num, dead_cell: Num):
+
+    #     is_alive_expr = GOL._eq(cell_is_alive, alive_cell)
+    #     n_is_2 = GOL._eq(alive_neighbours, 2)
+    #     n_is_3 = GOL._eq(alive_neighbours, 3)
+
+    #     res = GOL._or(
+    #         n_is_3,
+    #         GOL._and(is_alive_expr, n_is_2)
+    #     )
+        
+    #     res = Num.cast_expr(res, alive_cell.bit_count)
+
+    #     alive_cell_order = alive_cell.max_order_of_set_bit()
+
+    #     return GOL._shift_left(res, alive_cell_order)
+
+    @staticmethod
+    def game_of_live(cell_is_alive, alive_neighbours, alive_cell: Num, dead_cell: Num):
+
+        is_alive_expr = GOL._eq(cell_is_alive, alive_cell)
+
+        n_or_c = GOL._or(
+            is_alive_expr,
+            alive_neighbours
+        )
+
+        res = GOL._eq(n_or_c, 3)
+        res = Num.cast_expr(res, alive_cell.bit_count)
+
+        return GOL.if_else(res, alive_cell, dead_cell)
+
     @staticmethod
     def if_else(condition, true_expr, false_expr):
         return f'(({condition}) ? ({true_expr}) : ({false_expr}))'
