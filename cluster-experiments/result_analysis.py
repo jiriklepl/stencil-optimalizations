@@ -312,7 +312,7 @@ class CompareAlgsOnGrids:
         self.PLOT_NAME = name
         return self
 
-    def gen_graphs(self):
+    def gen_graphs_bars_as_baseline(self):
         plt.figure(figsize=(8, 6))
 
         x = np.arange(len(self.data_loaders)) * 1.2
@@ -363,6 +363,79 @@ class CompareAlgsOnGrids:
         plt.tight_layout(pad=1.0)
         plt.savefig(out_path, format=MODE)
 
+    def gen_graphs_lines_as_base_lines(self):
+        plt.figure(figsize=(8, 6))
+
+        x = np.arange(len(self.data_loaders)) * 1.2
+        bar_width = 0.5 / len(self.algs)
+
+        # bar_colors = ["#3B6790", "#23486A", "#77B254", "#5B913B"]
+
+        bar_colors = ["#3B6790", "#77B254"]
+        base_line_colors = ["tab:blue", "tab:green"]
+
+        # bar_patterns = ["//", "\\\\", "..", "o"]
+        bar_patterns = ['//', ".."]
+        ax_pattern = ['-', '--', '-.', ':']
+
+        for i, alg in enumerate(self.algs):
+            y_vals = []
+            
+            base_exp = results.get_experiments_with(
+                [*self.base_algs[i], *self.tested_grid])[0]
+
+            base_alg_value = base_exp.get_measurement_set().get_median(
+                lambda m: m.compute_runtime_per_cell_per_iter())
+            
+            base_alg_value = from_ms_to_pico_seconds(base_alg_value)
+            
+            print('Base alg value:', base_alg_value)
+
+            plt.axhline(
+                y=base_alg_value, color=base_line_colors[i],
+                linestyle=ax_pattern[i % len(ax_pattern)],
+                label=LegendNames.get(self.base_algs[i]) + ' (base)')
+
+            for loader in self.data_loaders:
+                is_base = alg in self.base_algs
+                
+                if is_base:
+                    grid = [*self.tested_grid]
+                else:
+                    grid = [*self.tested_grid, *loader]
+
+                exp = self.results.get_experiments_with([*alg, *grid])
+                if not exp:
+                    y_vals.append(0)
+                    continue
+
+                measurements = exp[0].get_measurement_set()
+                time = measurements.get_median(lambda m: m.compute_runtime_per_cell_per_iter())
+                if time is None:
+                    time = 0
+
+                y_vals.append(time)
+
+            y_vals = [from_ms_to_pico_seconds(v) for v in y_vals]
+            plt.bar(
+                x + i * bar_width - bar_width / 2,
+                y_vals,
+                bar_width,
+                label=LegendNames.get(alg),
+                color=bar_colors[i % len(bar_colors)],
+                hatch=bar_patterns[i % len(bar_patterns)],
+                edgecolor='white' 
+            )
+            
+
+        plt.xticks(x, self.x_labels, rotation=0, fontsize=X_TICKS_FONT_SIZE, y=X_TICKS_OFFSET)
+        # plt.xlabel("Cases on grid " + self.tested_grid[0][1], fontsize=X_LABEL_FONT_SIZE)
+        plt.ylabel("Time per one cell (ps)", fontsize=Y_LABEL_FONT_SIZE)
+        plt.legend(fontsize=LEGEND_FONT_SIZE, loc='upper right', bbox_to_anchor=(1.0, 0.85))
+        out_path = os.path.join(GRAPH_DIR, self.PLOT_NAME + '.' + MODE)
+        plt.tight_layout(pad=1.0)
+        plt.savefig(out_path, format=MODE)
+
     def _interleave(self, a, b):
         return [val for pair in zip(a, b) for val in pair]            
 
@@ -400,7 +473,7 @@ def print_line_graph(
         .gen_graphs()
 
 def print_bar_plot(results, plot_name):
-    CompareAlgsOnGrids(results) \
+    setup = CompareAlgsOnGrids(results) \
         .set_plot_name(plot_name) \
         .set_base_algs([
             # ALG_LIST.cuda_naive_bitwise_cols_32,
@@ -425,9 +498,11 @@ def print_bar_plot(results, plot_name):
         ]) \
         .set_grid(
             ALG_LIST.g_16384,
-        ) \
-        .gen_graphs()
-
+        )
+    
+    setup.set_plot_name(plot_name + '__bars').gen_graphs_bars_as_baseline()
+    setup.set_plot_name(plot_name + '__lines').gen_graphs_lines_as_base_lines()
+    
 def print_stats(results):
     grid = '16384x16384'
 
