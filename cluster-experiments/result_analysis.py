@@ -10,8 +10,8 @@ BASE_DIR = './final-measurements/hopper'
 # BASE_DIR = './experiments-outputs'
 GRAPH_DIR = './generated-graphs'
 
-# MODE='png'
-MODE='pdf'
+MODE='png'
+# MODE='pdf'
 
 PLOT_NAME_template = '__tmp_{plot_type}.' + MODE
 
@@ -55,6 +55,8 @@ class LegendNames:
             'gol-cuda-local-one-cell-64--bit-tiles_glider-gun': 'CUDA Local Bit Tiles 64 Glider Gun',
             'gol-cuda-local-one-cell-64--bit-tiles_spacefiller': 'CUDA Local Bit Tiles 64 Spacefiller',
 
+            'an5d': 'AN5D',
+
         }[key]
 
 class ALG_LIST:
@@ -90,6 +92,8 @@ class ALG_LIST:
 
     cuda_local_one_cell_bit_tiles_32 =   [(ra.Key.algorithm_name, 'gol-cuda-local-one-cell-32--bit-tiles')]
     cuda_local_one_cell_bit_tiles_64 =   [(ra.Key.algorithm_name, 'gol-cuda-local-one-cell-64--bit-tiles')]
+
+    cuda_an5d =   [(ra.Key.algorithm_name, 'an5d')]
 
     eff_baseline = [(ra.Key.algorithm_name, 'eff-baseline')]
     eff_baseline_shm = [(ra.Key.algorithm_name, 'eff-baseline-shm')]
@@ -326,6 +330,8 @@ TimePerCellPerIter__InputSize(results) \
         ALG_LIST.cuda_naive_char,
         ALG_LIST.cuda_naive_int,
         
+        ALG_LIST.cuda_an5d,
+        
         # ALG_LIST.cuda_naive_bitwise_no_macro_32,
         # ALG_LIST.cuda_naive_bitwise_no_macro_64,
 
@@ -340,9 +346,9 @@ TimePerCellPerIter__InputSize(results) \
         # ALG_LIST.cuda_local_one_cell_bit_tiles_32,
         # ALG_LIST.cuda_local_one_cell_bit_tiles_64,
 
-        ALG_LIST.eff_baseline,
-        ALG_LIST.eff_baseline_shm,
-        ALG_LIST.eff_sota_packed_32,
+        # ALG_LIST.eff_baseline,
+        # ALG_LIST.eff_baseline_shm,
+        ALG_LIST.eff_sota_packed_32, # best SOTA
         ALG_LIST.eff_sota_packed_64,
         
         # combined(ALG_LIST.cuda_local_one_cell_bit_tiles_64, ALG_LIST.data__no_work),
@@ -409,6 +415,9 @@ naive_int_val = naive_int.get_measurement_set().get_mean(lambda m: m.compute_run
 sota_packed_32 = results.get_experiments_with([(ra.Key.algorithm_name, 'eff-sota-packed-32'), (ra.Key.grid_dimensions, '16384x16384')])[0]
 sota_packed_32_val = sota_packed_32.get_measurement_set().get_mean(lambda m: m.compute_runtime_per_cell_per_iter())
 
+and5 = results.get_experiments_with([(ra.Key.algorithm_name, 'an5d'), (ra.Key.grid_dimensions, '16384x16384')])[0]
+and5_val = and5.get_measurement_set().get_mean(lambda m: m.compute_runtime_per_cell_per_iter())
+
 bitwise_tiles_64 = results.get_experiments_with([(ra.Key.algorithm_name, 'gol-cuda-naive-bitwise-tiles-64'), (ra.Key.grid_dimensions, '16384x16384')])[0]
 bitwise_tiles_64_val = bitwise_tiles_64.get_measurement_set().get_mean(lambda m: m.compute_runtime_per_cell_per_iter())
 
@@ -417,6 +426,10 @@ local_tiles_66_val = local_tiles_66.get_measurement_set().get_mean(lambda m: m.c
 
 print(f'base case (no work reduction) speedup over best naive: {naive_char_val / bitwise_tiles_64_val:.2f} x')
 print(f'base case (no work reduction) speedup over best sota: {sota_packed_32_val / bitwise_tiles_64_val:.2f} x')
+print(f'base case (no work reduction) speedup over AN5D: {and5_val / bitwise_tiles_64_val:.2f} x')
 
 print(f'work reduction (no work) speedup over best naive: {naive_char_val / local_tiles_66_val:.2f} x')
 print(f'work reduction (no work) speedup over best sota: {sota_packed_32_val / local_tiles_66_val:.2f} x')
+print(f'work reduction (no work) speedup over AN5D: {and5_val / local_tiles_66_val:.2f} x')
+
+
