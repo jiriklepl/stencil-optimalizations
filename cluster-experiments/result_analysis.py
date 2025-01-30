@@ -4,16 +4,15 @@ import results_abstraction as ra
 import matplotlib.pyplot as plt
 import numpy as np
 
-BASE_DIR = './final-measurements/hopper'
-# BASE_DIR = './final-measurements/ampere'
-# BASE_DIR = './final-measurements/volta'
-# BASE_DIR = './experiments-outputs'
+USE_DEBUG_NAMES = False
+
+ARCHITECTURES = ['hopper', 'ampere', 'volta']
+BASE_DIR = './final-measurements/{architecture}'
+
 GRAPH_DIR = './generated-graphs'
 
-MODE='png'
-# MODE='pdf'
-
-USE_DEBUG_NAMES = False
+# MODE='png'
+MODE='pdf'
 
 X_LABEL_FONT_SIZE = 16
 Y_LABEL_FONT_SIZE = 16
@@ -28,7 +27,6 @@ class LegendNames:
     @staticmethod
     def get(alg):
         key = '_'.join([k[1] for k in alg])
-
 
         if USE_DEBUG_NAMES:
             names = LegendNames.get_debug_names()
@@ -86,18 +84,21 @@ class LegendNames:
     @staticmethod
     def get_paper_names():
         return {
-            'cuda_naive_bitwise_cols_32': 'Core Linear 32-bit',
-            'cuda_naive_bitwise_cols_64': 'Core Linear 64-bit',
-            'cuda_naive_bitwise_tiles_32': 'Core Tiled 32-bit',
-            'cuda_naive_bitwise_tiles_64': 'Core Tiled 64-bit',
-            'eff_sota_packed_32': 'Packed 32-bit (SOTA)',
+            'gol-cuda-naive-bitwise-cols-32': 'Core Linear 32-bit',
+            'gol-cuda-naive-bitwise-cols-64': 'Core Linear 64-bit',
+            'gol-cuda-naive-bitwise-tiles-32': 'Core Tiled 32-bit',
+            'gol-cuda-naive-bitwise-tiles-64': 'Core Tiled 64-bit',
             
-            'cuda_naive_char': 'Baseline (char)',
-            'cuda_naive_int': 'Baseline (int)',
-            'cuda_an5d': 'AN5D',
-            'cuda_naive_bitwise_tiles_64': 'Core Tiled 64-bit',
-            'cuda_local_one_cell_bit_tiles_64': 'Optimized Tiled 64-bit (Optimal)',
-            'data__no_work': 'Optimized Tiled 64-bit (Optimal)'
+            'eff-sota-packed-32': 'Packed 32-bit (SOTA)',
+            
+            'gol-cuda-naive_char': 'Baseline (char)',
+            'gol-cuda-naive_int': 'Baseline (int)',
+            
+            'an5d': 'AN5D',
+
+            'gol-cuda-local-one-cell-cols-64': 'Optimized Linear 64-bit',
+            'gol-cuda-local-one-cell-64--bit-tiles': 'Optimized Tiled 64-bit',
+            'gol-cuda-local-one-cell-64--bit-tiles_no-work': 'Optimized Tiled 64-bit (Optimal)',
         }
 
 class ALG_LIST:
@@ -269,9 +270,9 @@ class TimePerCellPerIter__InputSize:
         plt.xticks(x_positions, x_labels, rotation=0, fontsize=X_TICKS_FONT_SIZE, y=X_TICKS_OFFSET)
 
         # plt.xlabel("Grid Size", fontsize=X_LABEL_FONT_SIZE)
-        plt.ylabel("Time per cell (ps)", fontsize=Y_LABEL_FONT_SIZE)
+        plt.ylabel("Time per one cell (ps)", fontsize=Y_LABEL_FONT_SIZE)
         plt.ylim(bottom=0)
-        plt.legend([LegendNames.get(alg) for alg in self.algs], fontsize=LEGEND_FONT_SIZE)
+        plt.legend([LegendNames.get(alg) for alg in self.algs], fontsize=LEGEND_FONT_SIZE, loc=self.position, bbox_to_anchor=self.bbox)
 
         out_path = os.path.join(GRAPH_DIR, self.PLOT_NAME + '.' + MODE)
 
@@ -356,7 +357,7 @@ class CompareAlgsOnGrids:
 
         plt.xticks(x + bar_width * (len(self.algs) / 2), self.x_labels, rotation=0, fontsize=X_TICKS_FONT_SIZE, y=X_TICKS_OFFSET)
         # plt.xlabel("Cases on grid " + self.tested_grid[0][1], fontsize=X_LABEL_FONT_SIZE)
-        plt.ylabel("Time per cell (ps)", fontsize=Y_LABEL_FONT_SIZE)
+        plt.ylabel("Time per one cell (ps)", fontsize=Y_LABEL_FONT_SIZE)
         plt.legend(fontsize=LEGEND_FONT_SIZE)
         out_path = os.path.join(GRAPH_DIR, self.PLOT_NAME + '.' + MODE)
         plt.tight_layout(pad=1.0)
@@ -376,7 +377,6 @@ def print_line_graph(
     algs_with_colors_etcs,
     position=None,
     bbox=None,
-    architecture='hopper',
 ):
     algs = [alg for alg, _, _, _ in algs_with_colors_etcs]
     colors = [color for _, color, _, _ in algs_with_colors_etcs]
@@ -390,20 +390,18 @@ def print_line_graph(
         .set_colors(colors) \
         .set_markers(markers) \
         .set_linestyles(linestyles) \
-        .set_plot_name(f'{architecture}_{plot_name}') \
+        .set_plot_name(plot_name) \
         .set_grids([
-            # ALG_LIST.g_1024,
             ALG_LIST.g_2048,
             ALG_LIST.g_4096,
             ALG_LIST.g_8192,
             ALG_LIST.g_16384,
-            # ALG_LIST.g_32768,
-            # ALG_LIST.g_65536,
         ]) \
         .gen_graphs()
 
-def print_bar_plot(results):
+def print_bar_plot(results, plot_name):
     CompareAlgsOnGrids(results) \
+        .set_plot_name(plot_name) \
         .set_base_algs([
             # ALG_LIST.cuda_naive_bitwise_cols_32,
             ALG_LIST.cuda_naive_bitwise_cols_64,
@@ -418,24 +416,15 @@ def print_bar_plot(results):
 
             # ALG_LIST.cuda_local_one_cell_bit_tiles_32,
             ALG_LIST.cuda_local_one_cell_bit_tiles_64,
-
         ]) \
         .set_data_loaders_with_labels([
             (ALG_LIST.data__full_work, 'Busy 100%'),
             (ALG_LIST.data__66_work, 'Busy 66%'),
             (ALG_LIST.data__33_work, 'Busy 33%'),
             (ALG_LIST.data__no_work, 'Busy 0%'),
-            # (ALG_LIST.data__spacefiller, 'Spacefiller'),
-            # (ALG_LIST.data__glider_gun, 'Glider Gun'),
         ]) \
         .set_grid(
-            # ALG_LIST.g_1024,
-            # ALG_LIST.g_2048,
-            # ALG_LIST.g_4096,
-            # ALG_LIST.g_8192,
             ALG_LIST.g_16384,
-            # ALG_LIST.g_32768,
-            # ALG_LIST.g_65536,
         ) \
         .gen_graphs()
 
@@ -465,41 +454,55 @@ def print_stats(results):
     print(f'work reduction (no work) speedup over best sota: {sota_packed_32_val / local_tiles_66_val:.2f} x')
     print(f'work reduction (no work) speedup over AN5D: {and5_val / local_tiles_66_val:.2f} x')
 
-results = ra.Results.from_directory(BASE_DIR)
+for architecture in ARCHITECTURES:
+    DATA_DIR = BASE_DIR.format(architecture=architecture)
+    results = ra.Results.from_directory(DATA_DIR)
 
-print_line_graph(
-    results,
-    plot_name='__new_ours',
-    algs_with_colors_etcs=[
+    print_line_graph(
+        results,
+        plot_name=f'{architecture}__ours_cols_tiles_vs_sota',
+        algs_with_colors_etcs=[
 
-        (ALG_LIST.cuda_naive_bitwise_cols_32, 'tab:blue', 'd', ':'),  
-        (ALG_LIST.cuda_naive_bitwise_cols_64, 'tab:blue', 's', '-'),  
-        (ALG_LIST.cuda_naive_bitwise_tiles_32, 'tab:green', 'o', ':'),
-        (ALG_LIST.cuda_naive_bitwise_tiles_64, 'tab:green', '^', '-'),
-        
-        (ALG_LIST.eff_sota_packed_32, 'tab:red', '<', '--'), 
-    ])
+            (ALG_LIST.eff_sota_packed_32, 'tab:red', '<', '--'), 
 
-print_line_graph(
-    results,
-    plot_name='__new_final',
-    algs_with_colors_etcs=[
+            (ALG_LIST.cuda_naive_bitwise_cols_32, 'tab:blue', 'd', ':'),  
+            (ALG_LIST.cuda_naive_bitwise_cols_64, 'tab:blue', 's', '-'),  
+            
+            (ALG_LIST.cuda_naive_bitwise_tiles_32, 'tab:green', 'o', ':'),
+            (ALG_LIST.cuda_naive_bitwise_tiles_64, 'tab:green', '^', '-'),
+        ])
 
-        (ALG_LIST.cuda_naive_char, 'tab:blue', 'o', '-'),  # Blue, circle marker, solid line
-        (ALG_LIST.cuda_naive_int, 'tab:pink', 's', '--'),  # Pink, square marker, dashed line
+    print_line_graph(
+        results,
+        plot_name=f'{architecture}__final_comparison',
+        position='center right',
+        bbox=(1.0, 0.45),
+        algs_with_colors_etcs=[
 
-        (ALG_LIST.cuda_an5d, 'tab:orange', 'd', '-.'),  # Orange, diamond marker, dash-dot line
-        
-        (ALG_LIST.cuda_naive_bitwise_tiles_64, 'tab:green', '^', '-'),  # Green, triangle marker, solid line
-        
-        (ALG_LIST.eff_sota_packed_32, 'tab:red', '<', '-.'),  # Red, left triangle marker, dash-dot line
-        (combined(ALG_LIST.cuda_local_one_cell_bit_tiles_64, ALG_LIST.data__no_work), 'tab:blue', '*', '-'),  # Blue, star marker, solid line
-    ])
+            (ALG_LIST.cuda_naive_int, 'tab:pink', 's', '--'),   
+            (ALG_LIST.cuda_naive_char, 'tab:blue', 'o', '-'),   
 
+            (ALG_LIST.cuda_an5d, 'tab:orange', 'd', '-.'), 
+            
+            (ALG_LIST.eff_sota_packed_32, 'tab:red', '<', '-.'), 
+            
+            (ALG_LIST.cuda_naive_bitwise_tiles_64, 'tab:green', '^', '-'), 
+
+            (combined(ALG_LIST.cuda_local_one_cell_bit_tiles_64, ALG_LIST.data__no_work), 'tab:blue', '*', '-'), 
+        ])
+
+    print_bar_plot(results, f'{architecture}__algs_on_different_data')
+
+    print ('Stats for:', architecture)
+    print_stats(results)
+
+    print()
+
+exit()
 # debug graph
 print_line_graph(
     results,
-    plot_name='time_per_cell_per_iter__input_size',
+    plot_name='__tmp_working_line_graph.png',
     algs_with_colors_etcs=[
         (ALG_LIST.cuda_naive_char, 'blue', 'o', '-'),
         (ALG_LIST.cuda_naive_int,  'red', 's', '-.'),
@@ -514,47 +517,3 @@ print_line_graph(
         (ALG_LIST.eff_baseline_shm, 'red', 's', '-.'),
         (ALG_LIST.eff_sota_packed_32, 'green', 'v', 'dotted'), 
     ])
-
-
-# # ALG_LIST.cpu_naive_char,
-# # ALG_LIST.cpu_naive_int,
-# # ALG_LIST.cpu_bitwise_cols_naive_32,
-# # ALG_LIST.cpu_bitwise_cols_naive_64,
-# # ALG_LIST.cpu_bitwise_cols_macro_32,
-# # ALG_LIST.cpu_bitwise_cols_macro_64,
-# # ALG_LIST.cpu_bitwise_tiles_naive_32,
-# # ALG_LIST.cpu_bitwise_tiles_naive_64,
-# # ALG_LIST.cpu_bitwise_cols_macro_32,
-# # ALG_LIST.cpu_bitwise_cols_macro_64,
-
-
-# ALG_LIST.cuda_naive_char,
-# ALG_LIST.cuda_naive_int,
-
-# ALG_LIST.cuda_an5d,
-
-# # ALG_LIST.cuda_naive_bitwise_no_macro_32,
-# # ALG_LIST.cuda_naive_bitwise_no_macro_64,
-
-# ALG_LIST.cuda_naive_bitwise_cols_32,
-# ALG_LIST.cuda_naive_bitwise_cols_64,
-
-# ALG_LIST.cuda_naive_bitwise_tiles_32,
-# ALG_LIST.cuda_naive_bitwise_tiles_64,
-
-# # ALG_LIST.cuda_local_one_cell_cols_32,
-# # ALG_LIST.cuda_local_one_cell_cols_64,
-# # ALG_LIST.cuda_local_one_cell_bit_tiles_32,
-# # ALG_LIST.cuda_local_one_cell_bit_tiles_64,
-
-# # ALG_LIST.eff_baseline,
-# # ALG_LIST.eff_baseline_shm,
-# ALG_LIST.eff_sota_packed_32, # best SOTA
-# ALG_LIST.eff_sota_packed_64,
-
-# # combined(ALG_LIST.cuda_local_one_cell_bit_tiles_64, ALG_LIST.data__no_work),
-# # combined(ALG_LIST.cuda_local_one_cell_bit_tiles_64, ALG_LIST.data__full_work),
-# # combined(ALG_LIST.cuda_local_one_cell_bit_tiles_64, ALG_LIST.data__glider_gun),
-# # combined(ALG_LIST.cuda_local_one_cell_bit_tiles_64, ALG_LIST.data__spacefiller),
-
-# # *ALG_LIST.ALGS
