@@ -13,7 +13,14 @@ GRAPH_DIR = './generated-graphs'
 MODE='png'
 # MODE='pdf'
 
-PLOT_NAME_template = '__tmp_{plot_type}.' + MODE
+X_LABEL_FONT_SIZE = 16
+Y_LABEL_FONT_SIZE = 16
+LEGEND_FONT_SIZE = 11
+X_TICKS_FONT_SIZE = 12
+Y_TICKS_FONT_SIZE = 12
+
+X_TICKS_OFFSET = -0.02
+Y_LABEL_OFFSET = 12
 
 class LegendNames:
     @staticmethod
@@ -131,16 +138,21 @@ class ALG_LIST:
     data__33_work = [(ra.Key.tag, '33-work')]
     data__66_work = [(ra.Key.tag, '66-work')]
 
-def from_ms_to_micro_seconds(val):
-    return val * 1_000 if val is not None else None
+def from_ms_to_pico_seconds(val):
+    return val * 1_000_000_000 if val is not None else None
 
 class TimePerCellPerIter__InputSize:
-    PLOT_NAME = 'time_per_cell_per_iter__input_size'
 
     def __init__(self, results: ra.Results):
         self.results = results
         self.tested_grids = []
         self.algs = []
+        self.PLOT_NAME = 'time_per_cell_per_iter__input_size'
+        self.position = None
+        self.bbox = None
+        self.markers = ['o', 's', 'v', 'x', 'd', 'p', 'h', 'H', 'D', 'P', '*', '+', '|', '_', '1', '2', '3', '4', '8', '<', '>', '^', 'v']
+        self.colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
+        self.linestyles = ['-', '--', '-.', ':']
 
     def set_algs(self, algs):
         self.algs = algs
@@ -149,12 +161,31 @@ class TimePerCellPerIter__InputSize:
     def set_grids(self, grids):
         self.tested_grids = grids
         return self
+    
+    def set_position(self, position):
+        self.position = position
+        return self
+    
+    def set_bbox(self, bbox):
+        self.bbox = bbox
+        return self
+    
+    def set_plot_name(self, name):
+        self.PLOT_NAME = name
+        return self
+    
+    def set_markers(self, markers):
+        self.markers = markers
+        return self
+    
+    def set_colors(self, colors):
+        self.colors = colors
+        return self
 
     def gen_graphs(self):
         plt.figure(figsize=(8, 6))
 
         means = []
-        box_data = []
         
         for alg in self.algs:
             alg_values = []
@@ -173,55 +204,44 @@ class TimePerCellPerIter__InputSize:
 
                 measurements = exp[0].get_measurement_set()
                 
-                val = measurements.get_median(lambda m: m.compute_runtime_per_cell_per_iter())
+                time = measurements.get_median(lambda m: m.compute_runtime_per_cell_per_iter())
 
-                if val is None:
+                if time is None:
                     print ('None value for:', alg, grid)
-                    val = 0
+                    time = 0
 
-                time_per_million = val * 1_000_000
-
-                all_vals = measurements.get_valid_vals(lambda m: m.compute_runtime_per_cell_per_iter())
-                alg_values.append(time_per_million)
+                alg_values.append(time)
                 
-                b_data = [v * 1_000_000 for v in all_vals]
-                
-                # for i in range(len(b_data)):
-                #     random_coef = random.uniform(0.5, 1.5)
-                #     b_data[i] *= random_coef
-
-                alg_box_data.append(b_data)
-
             means.append(alg_values)
-            box_data.append(alg_box_data)
 
         x_labels = [grid[0][1] for grid in self.tested_grids]
         x_positions = range(len(x_labels))
         
-        for i, (mean_vals, dist_vals) in enumerate(zip(means, box_data)):
-            mean_vals = [from_ms_to_micro_seconds(v) for v in mean_vals]
-            plt.plot(x_positions, mean_vals, label=str(self.algs[i]))
+        for i, mean_vals in enumerate(means):
+            mean_vals = [from_ms_to_pico_seconds(v) for v in mean_vals]
+            plt.plot(
+                x_positions,
+                mean_vals,
+                label=str(self.algs[i]),
+                color=self.colors[i % len(self.colors)],
+                marker=self.markers[i % len(self.markers)],
+                linestyle=self.linestyles[i % len(self.linestyles)]
+            )
 
-        # for i, (mean_vals, dist_vals) in enumerate(zip(means, box_data)):
-        #     for j, mean_val in enumerate(mean_vals):
-        #         if mean_val is not None and dist_vals[j] is not None:
-        #             plt.boxplot(dist_vals[j], positions=[j], widths=0.07)
+        plt.xticks(x_positions, x_labels, rotation=0, fontsize=X_TICKS_FONT_SIZE)
 
-        plt.xticks(x_positions, x_labels, rotation=45)
-
-        plt.xlabel("Grid Size")
-        plt.ylabel("Time / Million Cells / One Iteration (µs)")
+        plt.xlabel("Grid Size", fontsize=X_LABEL_FONT_SIZE)
+        plt.ylabel("Time / Million Cells / One Iteration (µs)", fontsize=Y_LABEL_FONT_SIZE)
         plt.ylim(bottom=0)
-        plt.legend([LegendNames.get(alg) for alg in self.algs])
+        plt.legend([LegendNames.get(alg) for alg in self.algs], fontsize=LEGEND_FONT_SIZE)
 
-        out_path = os.path.join(GRAPH_DIR, PLOT_NAME_template.format(plot_type=self.PLOT_NAME))
+        out_path = os.path.join(GRAPH_DIR, self.PLOT_NAME + '.' + MODE)
 
-        plt.tight_layout()
+        plt.tight_layout(pad=1.0)
         plt.savefig(out_path, format=MODE)
 
 
 class CompareAlgsOnGrids:
-    PLOT_NAME = 'compare_algs_on_data'
 
     def __init__(self, results: ra.Results):
         self.results = results
@@ -230,6 +250,7 @@ class CompareAlgsOnGrids:
         self.base_algs = []
         self.data_loaders = []
         self.x_labels = []
+        self.PLOT_NAME = 'compare_algs_on_data'
 
     def set_base_algs(self, algs):
         self.base_algs = algs
@@ -248,14 +269,15 @@ class CompareAlgsOnGrids:
         self.x_labels = [l for _, l in loaders_labels]
         return self
 
+    def set_plot_name(self, name):
+        self.PLOT_NAME = name
+        return self
+
     def gen_graphs(self):
         plt.figure(figsize=(8, 6))
 
         x = np.arange(len(self.data_loaders)) * 1.2
         bar_width = 0.5 / len(self.algs)
-
-        # bar_colors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728",
-        #               "#9467bd", "#8c564b", "#e377c2", "#7f7f7f"]
 
         bar_colors = ["#3B6790", "#23486A", "#77B254", "#5B913B"]
         bar_patterns = ["//", "\\\\", "..", "o"]
@@ -276,13 +298,13 @@ class CompareAlgsOnGrids:
                     continue
 
                 measurements = exp[0].get_measurement_set()
-                val = measurements.get_median(lambda m: m.compute_runtime_per_cell_per_iter())
-                if val is None:
-                    val = 0
+                time = measurements.get_median(lambda m: m.compute_runtime_per_cell_per_iter())
+                if time is None:
+                    time = 0
 
-                y_vals.append(val * 1_000_000)
+                y_vals.append(time)
 
-            y_vals = [from_ms_to_micro_seconds(v) for v in y_vals]
+            y_vals = [from_ms_to_pico_seconds(v) for v in y_vals]
             plt.bar(
                 x + i * bar_width - bar_width / 2,
                 y_vals,
@@ -294,12 +316,12 @@ class CompareAlgsOnGrids:
             )
             
 
-        plt.xticks(x + bar_width * (len(self.algs) / 2), self.x_labels, rotation=45)
-        plt.xlabel("Cases on grid " + self.tested_grid[0][1])
-        plt.ylabel("Time / Million Cells / One Iteration (µs)")
-        plt.legend()
-        out_path = os.path.join(GRAPH_DIR, PLOT_NAME_template.format(plot_type=self.PLOT_NAME))
-        plt.tight_layout()
+        plt.xticks(x + bar_width * (len(self.algs) / 2), self.x_labels, rotation=0, fontsize=X_TICKS_FONT_SIZE)
+        plt.xlabel("Cases on grid " + self.tested_grid[0][1], fontsize=X_LABEL_FONT_SIZE)
+        plt.ylabel("Time / Million Cells / One Iteration (µs)", fontsize=Y_LABEL_FONT_SIZE)
+        plt.legend(fontsize=LEGEND_FONT_SIZE)
+        out_path = os.path.join(GRAPH_DIR, self.PLOT_NAME + '.' + MODE)
+        plt.tight_layout(pad=1.0)
         plt.savefig(out_path, format=MODE)
 
     def _interleave(self, a, b):
@@ -310,126 +332,161 @@ class CompareAlgsOnGrids:
 def combined(alg, data):
     return [*alg, *data]
 
+def print_line_graph(
+    results: ra.Results,
+    plot_name: str,
+    algs_with_colors_etcs,
+    position=None,
+    bbox=None,
+    architecture='hopper',
+):
+    algs = [alg for alg, _, _, _ in algs_with_colors_etcs]
+    colors = [color for _, color, _, _ in algs_with_colors_etcs]
+    markers = [marker for _, _, marker, _ in algs_with_colors_etcs]
+    linestyles = [linestyle for _, _, _, linestyle in algs_with_colors_etcs]
+
+    TimePerCellPerIter__InputSize(results) \
+        .set_algs(algs) \
+        .set_position(position) \
+        .set_bbox(bbox) \
+        .set_plot_name(f'{architecture}_{plot_name}') \
+        .set_grids([
+            # ALG_LIST.g_1024,
+            ALG_LIST.g_2048,
+            ALG_LIST.g_4096,
+            ALG_LIST.g_8192,
+            ALG_LIST.g_16384,
+            # ALG_LIST.g_32768,
+            # ALG_LIST.g_65536,
+        ]) \
+        .gen_graphs()
+
+def print_bar_plot(results):
+    CompareAlgsOnGrids(results) \
+        .set_base_algs([
+            # ALG_LIST.cuda_naive_bitwise_cols_32,
+            ALG_LIST.cuda_naive_bitwise_cols_64,
+
+            # ALG_LIST.cuda_naive_bitwise_tiles_32,
+            ALG_LIST.cuda_naive_bitwise_tiles_64,
+        ]) \
+        .set_algs([
+
+            # ALG_LIST.cuda_local_one_cell_cols_32,
+            ALG_LIST.cuda_local_one_cell_cols_64,
+
+            # ALG_LIST.cuda_local_one_cell_bit_tiles_32,
+            ALG_LIST.cuda_local_one_cell_bit_tiles_64,
+
+        ]) \
+        .set_data_loaders_with_labels([
+            (ALG_LIST.data__full_work, 'Busy 100%'),
+            (ALG_LIST.data__66_work, 'Busy 66%'),
+            (ALG_LIST.data__33_work, 'Busy 33%'),
+            (ALG_LIST.data__no_work, 'Busy 0%'),
+            # (ALG_LIST.data__spacefiller, 'Spacefiller'),
+            # (ALG_LIST.data__glider_gun, 'Glider Gun'),
+        ]) \
+        .set_grid(
+            # ALG_LIST.g_1024,
+            # ALG_LIST.g_2048,
+            # ALG_LIST.g_4096,
+            # ALG_LIST.g_8192,
+            ALG_LIST.g_16384,
+            # ALG_LIST.g_32768,
+            # ALG_LIST.g_65536,
+        ) \
+        .gen_graphs()
+
+def print_stats(results):
+    grid = '16384x16384'
+
+    naive_char = results.get_experiments_with([(ra.Key.algorithm_name, 'gol-cuda-naive'), (ra.Key.base_grid_encoding, 'char'), (ra.Key.grid_dimensions, grid)])[0]
+    naive_char_val = naive_char.get_measurement_set().get_mean(lambda m: m.compute_runtime_per_cell_per_iter())
+
+    sota_packed_32 = results.get_experiments_with([(ra.Key.algorithm_name, 'eff-sota-packed-32'), (ra.Key.grid_dimensions, grid)])[0]
+    sota_packed_32_val = sota_packed_32.get_measurement_set().get_mean(lambda m: m.compute_runtime_per_cell_per_iter())
+
+    and5 = results.get_experiments_with([(ra.Key.algorithm_name, 'an5d'), (ra.Key.grid_dimensions, grid)])[0]
+    and5_val = and5.get_measurement_set().get_mean(lambda m: m.compute_runtime_per_cell_per_iter())
+
+    bitwise_tiles_64 = results.get_experiments_with([(ra.Key.algorithm_name, 'gol-cuda-naive-bitwise-tiles-64'), (ra.Key.grid_dimensions, grid)])[0]
+    bitwise_tiles_64_val = bitwise_tiles_64.get_measurement_set().get_mean(lambda m: m.compute_runtime_per_cell_per_iter())
+
+    local_tiles_66 = results.get_experiments_with([(ra.Key.algorithm_name, 'gol-cuda-local-one-cell-64--bit-tiles'), (ra.Key.tag, 'no-work'), (ra.Key.grid_dimensions, grid)])[0]
+    local_tiles_66_val = local_tiles_66.get_measurement_set().get_mean(lambda m: m.compute_runtime_per_cell_per_iter())
+
+    print(f'base case (no work reduction) speedup over best naive: {naive_char_val / bitwise_tiles_64_val:.2f} x')
+    print(f'base case (no work reduction) speedup over best sota: {sota_packed_32_val / bitwise_tiles_64_val:.2f} x')
+    print(f'base case (no work reduction) speedup over AN5D: {and5_val / bitwise_tiles_64_val:.2f} x')
+
+    print(f'work reduction (no work) speedup over best naive: {naive_char_val / local_tiles_66_val:.2f} x')
+    print(f'work reduction (no work) speedup over best sota: {sota_packed_32_val / local_tiles_66_val:.2f} x')
+    print(f'work reduction (no work) speedup over AN5D: {and5_val / local_tiles_66_val:.2f} x')
+
 results = ra.Results.from_directory(BASE_DIR)
 
-TimePerCellPerIter__InputSize(results) \
-    .set_algs([
+# debug graph
+print_line_graph(
+    results,
+    plot_name='time_per_cell_per_iter__input_size',
+    algs_with_colors_etcs=[
+        (ALG_LIST.cuda_naive_char, 'blue', 'o', '-'),
+        (ALG_LIST.cuda_naive_int,  'red', 's', '-.'),
+
+        (ALG_LIST.cuda_an5d, 'green', 'v', '.'),
         
-        # ALG_LIST.cpu_naive_char,
-        # ALG_LIST.cpu_naive_int,
-        # ALG_LIST.cpu_bitwise_cols_naive_32,
-        # ALG_LIST.cpu_bitwise_cols_naive_64,
-        # ALG_LIST.cpu_bitwise_cols_macro_32,
-        # ALG_LIST.cpu_bitwise_cols_macro_64,
-        # ALG_LIST.cpu_bitwise_tiles_naive_32,
-        # ALG_LIST.cpu_bitwise_tiles_naive_64,
-        # ALG_LIST.cpu_bitwise_cols_macro_32,
-        # ALG_LIST.cpu_bitwise_cols_macro_64,
+        (ALG_LIST.cuda_naive_bitwise_cols_32, 'purple', 'x', '--'),
+        (ALG_LIST.cuda_naive_bitwise_cols_64, 'orange', 'd', ':'),
+        (ALG_LIST.cuda_naive_bitwise_tiles_32, 'black', 'p', '-'),
+        (ALG_LIST.cuda_naive_bitwise_tiles_64, 'brown', 'h', '-.'),
         
-
-        ALG_LIST.cuda_naive_char,
-        ALG_LIST.cuda_naive_int,
-        
-        ALG_LIST.cuda_an5d,
-        
-        # ALG_LIST.cuda_naive_bitwise_no_macro_32,
-        # ALG_LIST.cuda_naive_bitwise_no_macro_64,
-
-        ALG_LIST.cuda_naive_bitwise_cols_32,
-        ALG_LIST.cuda_naive_bitwise_cols_64,
-
-        ALG_LIST.cuda_naive_bitwise_tiles_32,
-        ALG_LIST.cuda_naive_bitwise_tiles_64,
-        
-        # ALG_LIST.cuda_local_one_cell_cols_32,
-        # ALG_LIST.cuda_local_one_cell_cols_64,
-        # ALG_LIST.cuda_local_one_cell_bit_tiles_32,
-        # ALG_LIST.cuda_local_one_cell_bit_tiles_64,
-
-        # ALG_LIST.eff_baseline,
-        # ALG_LIST.eff_baseline_shm,
-        ALG_LIST.eff_sota_packed_32, # best SOTA
-        ALG_LIST.eff_sota_packed_64,
-        
-        # combined(ALG_LIST.cuda_local_one_cell_bit_tiles_64, ALG_LIST.data__no_work),
-        # combined(ALG_LIST.cuda_local_one_cell_bit_tiles_64, ALG_LIST.data__full_work),
-        # combined(ALG_LIST.cuda_local_one_cell_bit_tiles_64, ALG_LIST.data__glider_gun),
-        # combined(ALG_LIST.cuda_local_one_cell_bit_tiles_64, ALG_LIST.data__spacefiller),
-
-        # *ALG_LIST.ALGS
-    ]) \
-    .set_grids([
-        # ALG_LIST.g_1024,
-        ALG_LIST.g_2048,
-        ALG_LIST.g_4096,
-        ALG_LIST.g_8192,
-        ALG_LIST.g_16384,
-        # ALG_LIST.g_32768,
-        # ALG_LIST.g_65536,
-    ]) \
-    .gen_graphs()
-
-CompareAlgsOnGrids(results) \
-    .set_base_algs([
-        # ALG_LIST.cuda_naive_bitwise_cols_32,
-        ALG_LIST.cuda_naive_bitwise_cols_64,
-
-        # ALG_LIST.cuda_naive_bitwise_tiles_32,
-        ALG_LIST.cuda_naive_bitwise_tiles_64,
-    ]) \
-    .set_algs([
-
-        # ALG_LIST.cuda_local_one_cell_cols_32,
-        ALG_LIST.cuda_local_one_cell_cols_64,
-
-        # ALG_LIST.cuda_local_one_cell_bit_tiles_32,
-        ALG_LIST.cuda_local_one_cell_bit_tiles_64,
-
-    ]) \
-    .set_data_loaders_with_labels([
-        (ALG_LIST.data__full_work, 'Busy 100%'),
-        (ALG_LIST.data__66_work, 'Busy 66%'),
-        (ALG_LIST.data__33_work, 'Busy 33%'),
-        (ALG_LIST.data__no_work, 'Busy 0%'),
-        # (ALG_LIST.data__spacefiller, 'Spacefiller'),
-        # (ALG_LIST.data__glider_gun, 'Glider Gun'),
-    ]) \
-    .set_grid(
-        # ALG_LIST.g_1024,
-        # ALG_LIST.g_2048,
-        # ALG_LIST.g_4096,
-        # ALG_LIST.g_8192,
-        ALG_LIST.g_16384,
-        # ALG_LIST.g_32768,
-        # ALG_LIST.g_65536,
-    ) \
-    .gen_graphs()
+        (ALG_LIST.eff_baseline, 'blue', 'o', '-'),
+        (ALG_LIST.eff_baseline_shm, 'red', 's', '-.'),
+        (ALG_LIST.eff_sota_packed_32, 'green', 'v', '.'), 
+        (ALG_LIST.eff_sota_packed_64, 'purple', 'x', '--'),
+    ])
 
 
-naive_char = results.get_experiments_with([(ra.Key.algorithm_name, 'gol-cuda-naive'), (ra.Key.base_grid_encoding, 'char'), (ra.Key.grid_dimensions, '16384x16384')])[0]
-naive_char_val = naive_char.get_measurement_set().get_mean(lambda m: m.compute_runtime_per_cell_per_iter())
-
-naive_int = results.get_experiments_with([(ra.Key.algorithm_name, 'gol-cuda-naive'), (ra.Key.base_grid_encoding, 'int'), (ra.Key.grid_dimensions, '16384x16384')])[0]
-naive_int_val = naive_int.get_measurement_set().get_mean(lambda m: m.compute_runtime_per_cell_per_iter())
-
-sota_packed_32 = results.get_experiments_with([(ra.Key.algorithm_name, 'eff-sota-packed-32'), (ra.Key.grid_dimensions, '16384x16384')])[0]
-sota_packed_32_val = sota_packed_32.get_measurement_set().get_mean(lambda m: m.compute_runtime_per_cell_per_iter())
-
-and5 = results.get_experiments_with([(ra.Key.algorithm_name, 'an5d'), (ra.Key.grid_dimensions, '16384x16384')])[0]
-and5_val = and5.get_measurement_set().get_mean(lambda m: m.compute_runtime_per_cell_per_iter())
-
-bitwise_tiles_64 = results.get_experiments_with([(ra.Key.algorithm_name, 'gol-cuda-naive-bitwise-tiles-64'), (ra.Key.grid_dimensions, '16384x16384')])[0]
-bitwise_tiles_64_val = bitwise_tiles_64.get_measurement_set().get_mean(lambda m: m.compute_runtime_per_cell_per_iter())
-
-local_tiles_66 = results.get_experiments_with([(ra.Key.algorithm_name, 'gol-cuda-local-one-cell-64--bit-tiles'), (ra.Key.tag, 'no-work'), (ra.Key.grid_dimensions, '16384x16384')])[0]
-local_tiles_66_val = local_tiles_66.get_measurement_set().get_mean(lambda m: m.compute_runtime_per_cell_per_iter())
-
-print(f'base case (no work reduction) speedup over best naive: {naive_char_val / bitwise_tiles_64_val:.2f} x')
-print(f'base case (no work reduction) speedup over best sota: {sota_packed_32_val / bitwise_tiles_64_val:.2f} x')
-print(f'base case (no work reduction) speedup over AN5D: {and5_val / bitwise_tiles_64_val:.2f} x')
-
-print(f'work reduction (no work) speedup over best naive: {naive_char_val / local_tiles_66_val:.2f} x')
-print(f'work reduction (no work) speedup over best sota: {sota_packed_32_val / local_tiles_66_val:.2f} x')
-print(f'work reduction (no work) speedup over AN5D: {and5_val / local_tiles_66_val:.2f} x')
+# # ALG_LIST.cpu_naive_char,
+# # ALG_LIST.cpu_naive_int,
+# # ALG_LIST.cpu_bitwise_cols_naive_32,
+# # ALG_LIST.cpu_bitwise_cols_naive_64,
+# # ALG_LIST.cpu_bitwise_cols_macro_32,
+# # ALG_LIST.cpu_bitwise_cols_macro_64,
+# # ALG_LIST.cpu_bitwise_tiles_naive_32,
+# # ALG_LIST.cpu_bitwise_tiles_naive_64,
+# # ALG_LIST.cpu_bitwise_cols_macro_32,
+# # ALG_LIST.cpu_bitwise_cols_macro_64,
 
 
+# ALG_LIST.cuda_naive_char,
+# ALG_LIST.cuda_naive_int,
+
+# ALG_LIST.cuda_an5d,
+
+# # ALG_LIST.cuda_naive_bitwise_no_macro_32,
+# # ALG_LIST.cuda_naive_bitwise_no_macro_64,
+
+# ALG_LIST.cuda_naive_bitwise_cols_32,
+# ALG_LIST.cuda_naive_bitwise_cols_64,
+
+# ALG_LIST.cuda_naive_bitwise_tiles_32,
+# ALG_LIST.cuda_naive_bitwise_tiles_64,
+
+# # ALG_LIST.cuda_local_one_cell_cols_32,
+# # ALG_LIST.cuda_local_one_cell_cols_64,
+# # ALG_LIST.cuda_local_one_cell_bit_tiles_32,
+# # ALG_LIST.cuda_local_one_cell_bit_tiles_64,
+
+# # ALG_LIST.eff_baseline,
+# # ALG_LIST.eff_baseline_shm,
+# ALG_LIST.eff_sota_packed_32, # best SOTA
+# ALG_LIST.eff_sota_packed_64,
+
+# # combined(ALG_LIST.cuda_local_one_cell_bit_tiles_64, ALG_LIST.data__no_work),
+# # combined(ALG_LIST.cuda_local_one_cell_bit_tiles_64, ALG_LIST.data__full_work),
+# # combined(ALG_LIST.cuda_local_one_cell_bit_tiles_64, ALG_LIST.data__glider_gun),
+# # combined(ALG_LIST.cuda_local_one_cell_bit_tiles_64, ALG_LIST.data__spacefiller),
+
+# # *ALG_LIST.ALGS
