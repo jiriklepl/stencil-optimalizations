@@ -13,6 +13,8 @@ GRAPH_DIR = './generated-graphs'
 MODE='png'
 # MODE='pdf'
 
+USE_DEBUG_NAMES = False
+
 X_LABEL_FONT_SIZE = 16
 Y_LABEL_FONT_SIZE = 16
 LEGEND_FONT_SIZE = 11
@@ -27,6 +29,20 @@ class LegendNames:
     def get(alg):
         key = '_'.join([k[1] for k in alg])
 
+
+        if USE_DEBUG_NAMES:
+            names = LegendNames.get_debug_names()
+        else:
+            names = LegendNames.get_paper_names()
+
+        try:
+            return names[key]
+        except:
+            print('No name for:', key, ' --> using debug names')
+            return LegendNames.get_debug_names()[key]
+
+    @staticmethod
+    def get_debug_names():
         return {
             'gol-cpu-naive_char': 'CPU Naive (char)',
             'gol-cpu-naive_int': 'CPU Naive (int)',
@@ -64,7 +80,25 @@ class LegendNames:
 
             'an5d': 'AN5D',
 
-        }[key]
+        }
+
+
+    @staticmethod
+    def get_paper_names():
+        return {
+            'cuda_naive_bitwise_cols_32': 'Core Linear 32-bit',
+            'cuda_naive_bitwise_cols_64': 'Core Linear 64-bit',
+            'cuda_naive_bitwise_tiles_32': 'Core Tiled 32-bit',
+            'cuda_naive_bitwise_tiles_64': 'Core Tiled 64-bit',
+            'eff_sota_packed_32': 'Packed 32-bit (SOTA)',
+            
+            'cuda_naive_char': 'Baseline (char)',
+            'cuda_naive_int': 'Baseline (int)',
+            'cuda_an5d': 'AN5D',
+            'cuda_naive_bitwise_tiles_64': 'Core Tiled 64-bit',
+            'cuda_local_one_cell_bit_tiles_64': 'Optimized Tiled 64-bit (Optimal)',
+            'data__no_work': 'Optimized Tiled 64-bit (Optimal)'
+        }
 
 class ALG_LIST:
     cpu_naive_char =                     [(ra.Key.algorithm_name, 'gol-cpu-naive'), (ra.Key.base_grid_encoding, 'char')]
@@ -182,6 +216,10 @@ class TimePerCellPerIter__InputSize:
         self.colors = colors
         return self
 
+    def set_linestyles(self, linestyles):
+        self.linestyles = linestyles
+        return self
+
     def gen_graphs(self):
         plt.figure(figsize=(8, 6))
 
@@ -228,10 +266,10 @@ class TimePerCellPerIter__InputSize:
                 linestyle=self.linestyles[i % len(self.linestyles)]
             )
 
-        plt.xticks(x_positions, x_labels, rotation=0, fontsize=X_TICKS_FONT_SIZE)
+        plt.xticks(x_positions, x_labels, rotation=0, fontsize=X_TICKS_FONT_SIZE, y=X_TICKS_OFFSET)
 
-        plt.xlabel("Grid Size", fontsize=X_LABEL_FONT_SIZE)
-        plt.ylabel("Time / Million Cells / One Iteration (µs)", fontsize=Y_LABEL_FONT_SIZE)
+        # plt.xlabel("Grid Size", fontsize=X_LABEL_FONT_SIZE)
+        plt.ylabel("Time per cell (ps)", fontsize=Y_LABEL_FONT_SIZE)
         plt.ylim(bottom=0)
         plt.legend([LegendNames.get(alg) for alg in self.algs], fontsize=LEGEND_FONT_SIZE)
 
@@ -316,9 +354,9 @@ class CompareAlgsOnGrids:
             )
             
 
-        plt.xticks(x + bar_width * (len(self.algs) / 2), self.x_labels, rotation=0, fontsize=X_TICKS_FONT_SIZE)
-        plt.xlabel("Cases on grid " + self.tested_grid[0][1], fontsize=X_LABEL_FONT_SIZE)
-        plt.ylabel("Time / Million Cells / One Iteration (µs)", fontsize=Y_LABEL_FONT_SIZE)
+        plt.xticks(x + bar_width * (len(self.algs) / 2), self.x_labels, rotation=0, fontsize=X_TICKS_FONT_SIZE, y=X_TICKS_OFFSET)
+        # plt.xlabel("Cases on grid " + self.tested_grid[0][1], fontsize=X_LABEL_FONT_SIZE)
+        plt.ylabel("Time per cell (ps)", fontsize=Y_LABEL_FONT_SIZE)
         plt.legend(fontsize=LEGEND_FONT_SIZE)
         out_path = os.path.join(GRAPH_DIR, self.PLOT_NAME + '.' + MODE)
         plt.tight_layout(pad=1.0)
@@ -349,6 +387,9 @@ def print_line_graph(
         .set_algs(algs) \
         .set_position(position) \
         .set_bbox(bbox) \
+        .set_colors(colors) \
+        .set_markers(markers) \
+        .set_linestyles(linestyles) \
         .set_plot_name(f'{architecture}_{plot_name}') \
         .set_grids([
             # ALG_LIST.g_1024,
@@ -426,6 +467,35 @@ def print_stats(results):
 
 results = ra.Results.from_directory(BASE_DIR)
 
+print_line_graph(
+    results,
+    plot_name='__new_ours',
+    algs_with_colors_etcs=[
+
+        (ALG_LIST.cuda_naive_bitwise_cols_32, 'tab:blue', 'd', ':'),  
+        (ALG_LIST.cuda_naive_bitwise_cols_64, 'tab:blue', 's', '-'),  
+        (ALG_LIST.cuda_naive_bitwise_tiles_32, 'tab:green', 'o', ':'),
+        (ALG_LIST.cuda_naive_bitwise_tiles_64, 'tab:green', '^', '-'),
+        
+        (ALG_LIST.eff_sota_packed_32, 'tab:red', '<', '--'), 
+    ])
+
+print_line_graph(
+    results,
+    plot_name='__new_final',
+    algs_with_colors_etcs=[
+
+        (ALG_LIST.cuda_naive_char, 'tab:blue', 'o', '-'),  # Blue, circle marker, solid line
+        (ALG_LIST.cuda_naive_int, 'tab:pink', 's', '--'),  # Pink, square marker, dashed line
+
+        (ALG_LIST.cuda_an5d, 'tab:orange', 'd', '-.'),  # Orange, diamond marker, dash-dot line
+        
+        (ALG_LIST.cuda_naive_bitwise_tiles_64, 'tab:green', '^', '-'),  # Green, triangle marker, solid line
+        
+        (ALG_LIST.eff_sota_packed_32, 'tab:red', '<', '-.'),  # Red, left triangle marker, dash-dot line
+        (combined(ALG_LIST.cuda_local_one_cell_bit_tiles_64, ALG_LIST.data__no_work), 'tab:blue', '*', '-'),  # Blue, star marker, solid line
+    ])
+
 # debug graph
 print_line_graph(
     results,
@@ -434,17 +504,15 @@ print_line_graph(
         (ALG_LIST.cuda_naive_char, 'blue', 'o', '-'),
         (ALG_LIST.cuda_naive_int,  'red', 's', '-.'),
 
-        (ALG_LIST.cuda_an5d, 'green', 'v', '.'),
+        (ALG_LIST.cuda_an5d, 'green', 'v', '--'),
         
         (ALG_LIST.cuda_naive_bitwise_cols_32, 'purple', 'x', '--'),
         (ALG_LIST.cuda_naive_bitwise_cols_64, 'orange', 'd', ':'),
         (ALG_LIST.cuda_naive_bitwise_tiles_32, 'black', 'p', '-'),
         (ALG_LIST.cuda_naive_bitwise_tiles_64, 'brown', 'h', '-.'),
         
-        (ALG_LIST.eff_baseline, 'blue', 'o', '-'),
         (ALG_LIST.eff_baseline_shm, 'red', 's', '-.'),
-        (ALG_LIST.eff_sota_packed_32, 'green', 'v', '.'), 
-        (ALG_LIST.eff_sota_packed_64, 'purple', 'x', '--'),
+        (ALG_LIST.eff_sota_packed_32, 'green', 'v', 'dotted'), 
     ])
 
 
