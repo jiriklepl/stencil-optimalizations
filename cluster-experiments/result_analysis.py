@@ -4,6 +4,7 @@ import results_abstraction as ra
 import matplotlib.pyplot as plt
 import numpy as np
 
+# USE_DEBUG_NAMES = False
 USE_DEBUG_NAMES = False
 
 ARCHITECTURES = ['hopper', 'ampere', 'volta']
@@ -11,8 +12,8 @@ BASE_DIR = './final-measurements/{architecture}'
 
 GRAPH_DIR = './generated-graphs'
 
-# MODE='png'
-MODE='pdf'
+MODE='png'
+# MODE='pdf'
 
 X_LABEL_FONT_SIZE = 16
 Y_LABEL_FONT_SIZE = 16
@@ -389,8 +390,6 @@ class CompareAlgsOnGrids:
             
             base_alg_value = from_ms_to_pico_seconds(base_alg_value)
             
-            print('Base alg value:', base_alg_value)
-
             plt.axhline(
                 y=base_alg_value, color=base_line_colors[i],
                 linestyle=ax_pattern[i % len(ax_pattern)],
@@ -438,8 +437,6 @@ class CompareAlgsOnGrids:
 
     def _interleave(self, a, b):
         return [val for pair in zip(a, b) for val in pair]            
-
-
 
 def combined(alg, data):
     return [*alg, *data]
@@ -573,22 +570,30 @@ for architecture in ARCHITECTURES:
 
     print()
 
-exit()
 # debug graph
-print_line_graph(
-    results,
-    plot_name='__tmp_working_line_graph.png',
-    algs_with_colors_etcs=[
-        (ALG_LIST.cuda_naive_char, 'blue', 'o', '-'),
-        (ALG_LIST.cuda_naive_int,  'red', 's', '-.'),
+# exit()
 
-        (ALG_LIST.cuda_an5d, 'green', 'v', '--'),
-        
-        (ALG_LIST.cuda_naive_bitwise_cols_32, 'purple', 'x', '--'),
-        (ALG_LIST.cuda_naive_bitwise_cols_64, 'orange', 'd', ':'),
-        (ALG_LIST.cuda_naive_bitwise_tiles_32, 'black', 'p', '-'),
-        (ALG_LIST.cuda_naive_bitwise_tiles_64, 'brown', 'h', '-.'),
-        
-        (ALG_LIST.eff_baseline_shm, 'red', 's', '-.'),
-        (ALG_LIST.eff_sota_packed_32, 'green', 'v', 'dotted'), 
-    ])
+USE_DEBUG_NAMES = True
+
+for architecture in ARCHITECTURES:
+    DATA_DIR = BASE_DIR.format(architecture=architecture)
+    results = ra.Results.from_directory(DATA_DIR)
+
+    print_line_graph(
+        results,
+        plot_name=f'__tmp_working_line_graph_{architecture}',
+        algs_with_colors_etcs=[
+            (ALG_LIST.cuda_naive_char, 'blue', 'o', '-'),
+            (ALG_LIST.cuda_naive_int,  'red', 's', '-.'),
+
+            (ALG_LIST.cuda_an5d, 'green', 'v', '--'),
+            
+            (ALG_LIST.cuda_naive_bitwise_cols_32, 'purple', 'x', '--'),
+            (ALG_LIST.cuda_naive_bitwise_cols_64, 'orange', 'd', ':'),
+            (ALG_LIST.cuda_naive_bitwise_tiles_32, 'black', 'p', '-'),
+            (ALG_LIST.cuda_naive_bitwise_tiles_64, 'brown', 'h', '-.'),
+            
+            (ALG_LIST.eff_baseline_shm, 'red', 's', '-.'),
+            (ALG_LIST.eff_sota_packed_32, 'green', 'v', 'dotted'), 
+            (ALG_LIST.eff_sota_packed_64, 'blue', 'o', 'dotted'), 
+        ])

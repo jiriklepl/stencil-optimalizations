@@ -14,4 +14,4 @@ _test/
 */__pycache__/
 rel_work/
 out
-__tmp_working_line_graph.*
+__tmp_working_line_graph*
