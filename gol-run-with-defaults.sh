@@ -70,8 +70,8 @@ ALGORITHM="gol-cuda-naive-bitwise-tiles-64"
 # ALGORITHM="gol-cuda-naive-just-tiling-64--bit-tiles"
 # ALGORITHM="gol-cuda-naive-just-tiling-32--bit-tiles"
 # ALGORITHM="gol-cuda-naive-just-tiling-cols-64"
-ALGORITHM="gol-cuda-local-one-cell-64--bit-tiles"
 ALGORITHM="gol-cuda-local-one-cell-32--bit-tiles"
+ALGORITHM="gol-cuda-local-one-cell-64--bit-tiles"
 GRID_DIMENSIONS_X=$__14
 GRID_DIMENSIONS_Y=$__14
 # GRID_DIMENSIONS_X=$((8 * 6))
@@ -81,8 +81,8 @@ ITERATIONS="10000"
 BASE_GRID_ENCODING="char"
 # BASE_GRID_ENCODING="int"
 
-WARMUP_ROUNDS="0"
-MEASUREMENT_ROUNDS="1"
+WARMUP_ROUNDS="1"
+MEASUREMENT_ROUNDS="3"
 
 # DATA_LOADER_NAME="random-ones-zeros"
 # DATA_LOADER_NAME="always-changing"
@@ -90,7 +90,7 @@ MEASUREMENT_ROUNDS="1"
 DATA_LOADER_NAME="lexicon"
 # PATTERN_EXPRESSION="blinker[10,10]"
 # PATTERN_EXPRESSION="glider[3,3] glider[10,10] glider[20,20]"
-# PATTERN_EXPRESSION="spacefiller[$((GRID_DIMENSIONS_X/2)),$((GRID_DIMENSIONS_Y/2))]"
+PATTERN_EXPRESSION="spacefiller[$((GRID_DIMENSIONS_X/2)),$((GRID_DIMENSIONS_Y/2))]"
 # PATTERN_EXPRESSION="gosper-glider-gun[0,0]"
 
 # 6x5 sp & 16k & 10000 iters --> total cca 63w/37off workload (on 64 bit)
@@ -156,8 +156,8 @@ TAG="test-run"
 # COLLECT_TOUCHED_TILES_STATS="true"
 COLLECT_TOUCHED_TILES_STATS="false"
 
-# srun -p gpu-short -A kdss --cpus-per-task=64 --mem=256GB --gres=gpu:H100 --time=2:00:00 $GOL_EXE_NAME \
-srun -p gpu-short -A kdss --cpus-per-task=64 --mem=256GB --gres=gpu:L40 --time=2:00:00 $GOL_EXE_NAME \
+# srun -p gpu-short -A kdss --cpus-per-task=64 --mem=256GB --gres=gpu:L40 --time=2:00:00 $GOL_EXE_NAME \
+srun -p gpu-short -A kdss --cpus-per-task=64 --mem=256GB --gres=gpu:H100 --time=2:00:00 $GOL_EXE_NAME \
     --algorithm="$ALGORITHM" \
     --grid-dimensions-x="$GRID_DIMENSIONS_X" \
     --grid-dimensions-y="$GRID_DIMENSIONS_Y" \

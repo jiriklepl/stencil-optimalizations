@@ -24,8 +24,8 @@ class BenchSetUp:
     VARIOUS_DATA_LOADERS = [
         # f' DATA_LOADER_NAME="lexicon" PATTERN_EXPRESSION="spacefiller[{MID_COORDS_MACRO}]" TAG="spacefiller"  ',
         # ' DATA_LOADER_NAME="lexicon" PATTERN_EXPRESSION="gosper-glider-gun[0,0]" TAG="glider-gun"  ',
-        # ' DATA_LOADER_NAME="zeros" TAG="no-work" ',
-        # ' DATA_LOADER_NAME="always-changing" TAG="full-work" ',
+        ' DATA_LOADER_NAME="zeros" TAG="no-work" ',
+        ' DATA_LOADER_NAME="always-changing" TAG="full-work" ',
         ' TAG="66-work" DATA_LOADER_NAME="lexicon" PATTERN_EXPRESSION="spacefiller[2340, 2730]; spacefiller[2340, 5460]; spacefiller[2340, 8190]; spacefiller[2340, 10920]; spacefiller[2340, 13650]; spacefiller[4680, 2730]; spacefiller[4680, 5460]; spacefiller[4680, 8190]; spacefiller[4680, 10920]; spacefiller[4680, 13650]; spacefiller[7020, 2730]; spacefiller[7020, 5460]; spacefiller[7020, 8190]; spacefiller[7020, 10920]; spacefiller[7020, 13650]; spacefiller[9360, 2730]; spacefiller[9360, 5460]; spacefiller[9360, 8190]; spacefiller[9360, 10920]; spacefiller[9360, 13650]; spacefiller[11700, 2730]; spacefiller[11700, 5460]; spacefiller[11700, 8190]; spacefiller[11700, 10920]; spacefiller[11700, 13650]; spacefiller[14040, 2730]; spacefiller[14040, 5460]; spacefiller[14040, 8190]; spacefiller[14040, 10920]; spacefiller[14040, 13650];" ',
         ' TAG="33-work" DATA_LOADER_NAME="lexicon" PATTERN_EXPRESSION="spacefiller[4096, 4096]; spacefiller[4096, 8192]; spacefiller[4096, 12288]; spacefiller[8192, 4096]; spacefiller[8192, 8192]; spacefiller[8192, 12288]; spacefiller[12288, 4096]; spacefiller[12288, 8192]; spacefiller[12288, 12288];" ',
     ]
