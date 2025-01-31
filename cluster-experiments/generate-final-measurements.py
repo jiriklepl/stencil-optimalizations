@@ -8,7 +8,7 @@ class BenchSetUp:
     GENERAL_SETTINGS = ' ITERATIONS="100000" MAX_RUNTIME_SECONDS="5" RANDOM_SEED="42" WARMUP_ROUNDS="5" MEASUREMENT_ROUNDS="10" COLORFUL="false" ANIMATE_OUTPUT="false" BASE_GRID_ENCODING="char" '
 
     TEST_CASES = [
-        f' GRID_DIMENSIONS_X="1024"  GRID_DIMENSIONS_Y="1024"  {GENERAL_SETTINGS} {SPEED_UP_AND_VALIDATION_OFF} ',
+        # f' GRID_DIMENSIONS_X="1024"  GRID_DIMENSIONS_Y="1024"  {GENERAL_SETTINGS} {SPEED_UP_AND_VALIDATION_OFF} ',
         f' GRID_DIMENSIONS_X="2048"  GRID_DIMENSIONS_Y="2048"  {GENERAL_SETTINGS} {SPEED_UP_AND_VALIDATION_OFF} ',
         f' GRID_DIMENSIONS_X="4096"  GRID_DIMENSIONS_Y="4096"  {GENERAL_SETTINGS} {SPEED_UP_AND_VALIDATION_OFF} ',
         f' GRID_DIMENSIONS_X="8192"  GRID_DIMENSIONS_Y="8192"  {GENERAL_SETTINGS} {SPEED_UP_AND_VALIDATION_OFF} ',
@@ -33,6 +33,10 @@ class BenchSetUp:
         f' DATA_LOADER_NAME="lexicon" PATTERN_EXPRESSION="spacefiller[{MID_COORDS_MACRO}]"  ',
     ]
 
+    BEST_CASE_WORK_REDUCTION_LOADER = [
+        ' DATA_LOADER_NAME="zeros" TAG="no-work" ',
+    ]
+
 
 simple_cases_base = [
     BenchSetUp.TEST_CASES,
@@ -42,6 +46,11 @@ simple_cases_base = [
 local_cases_base = [
     BenchSetUp.DATA_DEPENDANT_CASES,
     BenchSetUp.VARIOUS_DATA_LOADERS,
+]
+
+local_best_case = [
+    BenchSetUp.TEST_CASES,
+    BenchSetUp.BEST_CASE_WORK_REDUCTION_LOADER,
 ]
 
 class HP:
@@ -89,17 +98,21 @@ per_alg_hps = [
     # [['gol-cuda-naive-bitwise-no-macro-64', None],                                           
     #  [*simple_cases_base, [HP().block_size(256).str()]]],
 
-    [['gol-cuda-local-one-cell-cols-32', None],                                              
-     [*local_cases_base, [HP().block_size(256).state_bits(32).str()]],],
+    # [['gol-cuda-local-one-cell-cols-32', None],                                              
+    #  [*local_cases_base, [HP().block_size(256).state_bits(32).str()]],],
     
-    [['gol-cuda-local-one-cell-cols-64', None],                                              
-     [*local_cases_base, [HP().block_size(128).state_bits(32).str()]]],
+    # [['gol-cuda-local-one-cell-cols-64', None],                                              
+    #  [*local_cases_base, [HP().block_size(128).state_bits(32).str()]]],
 
-    [['gol-cuda-local-one-cell-32--bit-tiles', None],                                        
-     [*local_cases_base, [HP().block_size(256).state_bits(32).str()]]],
+    # [['gol-cuda-local-one-cell-32--bit-tiles', None],                                        
+    #  [*local_cases_base, [HP().block_size(256).state_bits(32).str()]]],
     
+    # [['gol-cuda-local-one-cell-64--bit-tiles', None],                                        
+    #  [*local_cases_base, [HP().block_size(128).state_bits(32).str()]]],
+
+    # best of best cases for work reduction
     [['gol-cuda-local-one-cell-64--bit-tiles', None],                                        
-     [*local_cases_base, [HP().block_size(128).state_bits(32).str()]]],
+     [*local_best_case, [HP().block_size(128).state_bits(32).str()]]],
 
     # # CPUs
 
