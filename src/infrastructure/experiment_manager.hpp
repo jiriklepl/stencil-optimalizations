@@ -110,6 +110,7 @@ class ExperimentManager {
         _2d_repo-> template register_algorithm<alg::GoLCudaNaiveBitwise<grid_cell_t, 16, alg::BitColumnsMode>>("gol-cuda-naive-bitwise-cols-16");
         _2d_repo-> template register_algorithm<alg::GoLCudaNaiveBitwise<grid_cell_t, 32, alg::BitColumnsMode>>("gol-cuda-naive-bitwise-cols-32");
         _2d_repo-> template register_algorithm<alg::GoLCudaNaiveBitwise<grid_cell_t, 64, alg::BitColumnsMode>>("gol-cuda-naive-bitwise-cols-64");
+        _2d_repo-> template register_algorithm<alg::GoLCudaNaiveBitwise<grid_cell_t, 64, alg::BitColumnsFujitaMode>>("gol-cuda-naive-bitwise-cols-fujita-64");
 
         _2d_repo-> template register_algorithm<alg::GoLCudaNaiveBitwise<grid_cell_t, 16, alg::BitTileMode>>("gol-cuda-naive-bitwise-tiles-16");
         _2d_repo-> template register_algorithm<alg::GoLCudaNaiveBitwise<grid_cell_t, 32, alg::BitTileMode>>("gol-cuda-naive-bitwise-tiles-32");

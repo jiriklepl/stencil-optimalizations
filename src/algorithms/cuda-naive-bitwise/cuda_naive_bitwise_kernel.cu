@@ -83,10 +83,12 @@ void GoLCudaNaiveBitwise<grid_cell_t, Bits, bit_grid_mode>::run_kernel(size_type
 template class algorithms::GoLCudaNaiveBitwise<common::CHAR, 16, algorithms::BitColumnsMode>;
 template class algorithms::GoLCudaNaiveBitwise<common::CHAR, 32, algorithms::BitColumnsMode>;
 template class algorithms::GoLCudaNaiveBitwise<common::CHAR, 64, algorithms::BitColumnsMode>;
+template class algorithms::GoLCudaNaiveBitwise<common::CHAR, 64, algorithms::BitColumnsFujitaMode>;
 
 template class algorithms::GoLCudaNaiveBitwise<common::INT, 16, algorithms::BitColumnsMode>;
 template class algorithms::GoLCudaNaiveBitwise<common::INT, 32, algorithms::BitColumnsMode>;
 template class algorithms::GoLCudaNaiveBitwise<common::INT, 64, algorithms::BitColumnsMode>;
+template class algorithms::GoLCudaNaiveBitwise<common::INT, 64, algorithms::BitColumnsFujitaMode>;
 
 template class algorithms::GoLCudaNaiveBitwise<common::CHAR, 16, algorithms::BitTileMode>;
 template class algorithms::GoLCudaNaiveBitwise<common::CHAR, 32, algorithms::BitTileMode>;

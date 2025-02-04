@@ -161,6 +161,15 @@ struct BitColumnsMode {
     }
 };
 
+struct BitColumnsFujitaMode {
+    template <typename bit_type>
+    using policy = BitColumns<bit_type>;
+
+    static std::string name() {
+        return "ModeColumnsFujita";
+    }
+};
+
 struct BitTileMode {
     template <typename bit_type>
     using policy = BitTile<bit_type>;
