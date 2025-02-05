@@ -122,21 +122,21 @@ public:
         word_type lc, word_type cc, word_type rc,
         word_type lb, word_type cb, word_type rb) {
         // the top-left neighbors of the center cell:
-        const word_type A = (lt << 63) | (ct >> 1);
+        const word_type A = (lc << 1) | (lt >> 63);
         // the top neighbors of the center cell:
-        const word_type B = ct;
+        const word_type B = (cc << 1) | (ct >> 63);
         // the top-right neighbors of the center cell:
-        const word_type C = (ct << 1) | (rt >> 63);
+        const word_type C = (rc << 1) | (rt >> 63);
         // the right neighbors of the center cell:
-        const word_type D = (cc << 1) | (rc >> 63);
+        const word_type D = rc;
         // the bottom-right neighbors of the center cell:
-        const word_type E = (cb << 1) | (rb >> 63);
+        const word_type E = (rc >> 1) | (rb << 63);
         // the bottom neighbors of the center cell:
-        const word_type F = cb;
+        const word_type F = (cc >> 1) | (cb << 63);
         // the bottom-left neighbors of the center cell:
-        const word_type G = (cb >> 1) | (lb << 63);
+        const word_type G = (lc >> 1) | (lb << 63);
         // the left neighbors of the center cell:
-        const word_type H = (cc >> 1) | (lc << 63);
+        const word_type H = lc;
         const word_type I = cc;
 
         return compute_center_word_fujita(A, B, C, H, I, D, G, F, E);
